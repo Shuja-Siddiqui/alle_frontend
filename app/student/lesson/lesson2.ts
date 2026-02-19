@@ -1,0 +1,618 @@
+export const lessonData = {
+    "lesson2": {
+      "missions": [
+        {
+          "missionSequence": 1,
+          "missionName": "Mission Mode - Core Sounds & Blending",
+          "tasks": {
+            "1": {
+              "tts_missionControlVoice": "Welcome, operative! First mission: crack the core code. Six sounds unlock English. Master these, you're operational. Ready? Let's activate the grid!",
+              "tts_missionControlVoice_ssml": "<speak><prosody rate=\"medium\" pitch=\"+5%\">Welcome, operative!<break time=\"300ms\"/> First mission: crack the core code.<break time=\"200ms\"/> Six sounds unlock English.<break time=\"200ms\"/> Master these, you're operational.<break time=\"300ms\"/> Ready?<break time=\"400ms\"/> Let's activate the grid!</prosody></speak>",
+              "visual": [
+                {
+                  "scene": "Command center activates. Six letter stations power up: S-A-T-P-I-N.",
+                  "sfx": "activation sequence → each letter hums with distinct tone"
+                }
+              ]
+            },
+            "2": {
+              "tts_ss1": "First up: S. Listen: /sss/. Like a silent signal. Say it: /sss/. Hold it steady.",
+              "tts_ss1_ssml": "<speak>First up: <say-as interpret-as=\"characters\">S</say-as>.<break time=\"200ms\"/> Listen: <phoneme alphabet=\"ipa\" ph=\"s\">/sss/</phoneme>.<break time=\"200ms\"/> Like a silent signal.<break time=\"200ms\"/> Say it: <phoneme alphabet=\"ipa\" ph=\"s\">/sss/</phoneme>.<break time=\"200ms\"/> Hold it steady.</speak>",
+              "word": "S",
+              "visual": [
+                {
+                  "prompt": "Sound Station 1 - S",
+                  "mouthCue": "Side profile of mouth: teeth together, tongue behind teeth, air flowing out.",
+                  "association": "Snake moving through grass (think snake sound /sss/).",
+                  "image": "Snake moving through grass"
+                }
+              ],
+              "feedback": {
+                "tts_exactMatch": "Signal clear! S activated!",
+                "tts_exactMatch_ssml": "<speak>Signal clear!<break time=\"200ms\"/> S activated!</speak>",
+                "tts_closeMatch": "Almost—keep it smooth: /sss/, not /suh/.",
+                "tts_closeMatch_ssml": "<speak>Almost—keep it smooth:<break time=\"200ms\"/> /sss/, not /suh/.</speak>",
+                "tts_wrongSound": "That's not /sss/. Check the screen—teeth together, air only. Try again.",
+                "tts_wrongSound_ssml": "<speak>That's not /sss/.<break time=\"200ms\"/> Check the screen—teeth together, air only.<break time=\"200ms\"/> Try again.</speak>"
+              }
+            },
+            "3": {
+              "tts_ss2": "Next: A. Short and sharp: /a/ like 'ant'. Your turn: /a/.",
+              "tts_ss2_ssml": "<speak>Next: <say-as interpret-as=\"characters\">A</say-as>.<break time=\"200ms\"/> Short and sharp: <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme> like \"ant\".<break time=\"200ms\"/> Your turn: <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme>.</speak>",
+              "word": "A",
+              "visual": [
+                {
+                  "prompt": "Sound Station 2 - A",
+                  "mouthCue": "Mouth open medium-wide, jaw drops slightly, tongue flat and low.",
+                  "association": "Apple, ant.",
+                  "image": "Apple"
+                }
+              ],
+                  "feedback": {
+                    "tts_exactMatch": "Locked in! A operational!",
+                    "tts_exactMatch_ssml": "<speak>Locked in!<break time=\"200ms\"/> A operational!</speak>",
+                    "tts_closeMatch": "Keep it short: /a/, not 'ay'.",
+                    "tts_closeMatch_ssml": "<speak>Keep it short:<break time=\"200ms\"/> /a/, not \"ay\".</speak>",
+                    "tts_wrongSound": "That's 'ay' like the letter name. We need the short sound: /a/ like 'ant'.",
+                    "tts_wrongSound_ssml": "<speak>That's \"ay\" like the letter name.<break time=\"200ms\"/> We need the short sound: /a/ like \"ant\".</speak>"
+                  }
+                },
+            "4": {
+              "tts_ss3": "Letter T makes /t/. It's a quick tap—tongue up, then release. No 'tuh' at the end. Just /t/.",
+              "tts_ss3_ssml": "<speak>Letter <say-as interpret-as=\"characters\">T</say-as> makes <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme>.<break time=\"200ms\"/> It's a quick tap—tongue up, then release.<break time=\"200ms\"/> No \"tuh\" at the end.<break time=\"200ms\"/> Just <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme>.</speak>",
+              "word": "T",
+              "visual": [
+                {
+                  "prompt": "Sound Station 3 - T",
+                    "mouthCue": "Tongue tip taps roof of mouth just behind teeth, then releases with a small burst of air.",
+                  "association": "Timer, tick.",
+                  "image": "Timer/clock"
+                }
+              ],
+                  "feedback": {
+                    "tts_exactMatch": "Clean. That's /t/.",
+                    "tts_exactMatch_ssml": "<speak>Clean.<break time=\"200ms\"/> That's /t/.</speak>",
+                    "tts_closeMatch": "You're saying 'tuh'. Stop before the vowel—just /t/.",
+                    "tts_closeMatch_ssml": "<speak>You're saying \"tuh\".<break time=\"200ms\"/> Stop before the vowel—just /t/.</speak>",
+                    "tts_wrongSound": "Tongue needs to be up. Watch where it touches.",
+                    "tts_wrongSound_ssml": "<speak>Tongue needs to be up.<break time=\"200ms\"/> Watch where it touches.</speak>"
+                  }
+                },
+            "5": {
+              "tts_ss4": "Letter P makes /p/. Lips together, then pop. No voice, just air pressure release.",
+              "tts_ss4_ssml": "<speak>Letter <say-as interpret-as=\"characters\">P</say-as> makes <phoneme alphabet=\"ipa\" ph=\"p\">/p/</phoneme>.<break time=\"200ms\"/> Lips together, then pop.<break time=\"200ms\"/> No voice, just air pressure release.</speak>",
+              "word": "P",
+              "visual": [
+                {
+                  "prompt": "Sound Station 4 - P",
+                    "mouthCue": "Lips pressed together, then pop open with air burst; no vocal cord vibration.",
+                  "association": "Popcorn popping.",
+                  "image": "Popcorn"
+                }
+              ],
+                  "feedback": {
+                    "tts_exactMatch": "Exact. /p/ locked.",
+                    "tts_exactMatch_ssml": "<speak>Exact.<break time=\"200ms\"/> /p/ locked.</speak>",
+                    "tts_closeMatch": "Just /p/—don't add 'puh'. Lips pop and stop.",
+                    "tts_closeMatch_ssml": "<speak>Just /p/—don't add \"puh\".<break time=\"200ms\"/> Lips pop and stop.</speak>",
+                    "tts_wrongSound": "That's /b/. P has no voice—just air.",
+                    "tts_wrongSound_ssml": "<speak>That's /b/.<break time=\"200ms\"/> P has no voice—just air.</speak>"
+                  }
+                },
+            "6": {
+              "tts_ss5": "Letter I makes /i/. Quick, tight sound. Not 'eye'—just /i/ like 'it'.",
+              "tts_ss5_ssml": "<speak>Letter <say-as interpret-as=\"characters\">I</say-as> makes <phoneme alphabet=\"ipa\" ph=\"ɪ\">/i/</phoneme>.<break time=\"200ms\"/> Quick, tight sound.<break time=\"200ms\"/> Not \"eye\"—just <phoneme alphabet=\"ipa\" ph=\"ɪ\">/i/</phoneme> like \"it\".</speak>",
+              "word": "I",
+              "visual": [
+                {
+                  "prompt": "Sound Station 5 - I",
+                    "mouthCue": "Mouth slightly open, tongue high in the middle, short duration.",
+                  "association": "Insect.",
+                  "image": "Insect"
+                }
+              ],
+                  "feedback": {
+                    "tts_exactMatch": "Perfect /i/.",
+                    "tts_exactMatch_ssml": "<speak>Perfect /i/.</speak>",
+                    "tts_closeMatch": "Tighter. Make it quick: /i/.",
+                    "tts_closeMatch_ssml": "<speak>Tighter.<break time=\"200ms\"/> Make it quick: /i/.</speak>",
+                    "tts_wrongSound": "That's 'ee' or 'eye'. We need short /i/ like 'sit'.",
+                    "tts_wrongSound_ssml": "<speak>That's \"ee\" or \"eye\".<break time=\"200ms\"/> We need short /i/ like \"sit\".</speak>"
+                  }
+                },
+            "7": {
+              "tts_ss6": "Letter N makes /nnn/. Tongue up, sound comes through your nose. Feel the buzz in your nose? That's it.",
+              "tts_ss6_ssml": "<speak>Letter <say-as interpret-as=\"characters\">N</say-as> makes <phoneme alphabet=\"ipa\" ph=\"n\">/nnn/</phoneme>.<break time=\"200ms\"/> Tongue up, sound comes through your nose.<break time=\"200ms\"/> Feel the buzz in your nose? That's it.</speak>",
+              "word": "N",
+              "visual": [
+                {
+                  "prompt": "Sound Station 6 - N",
+                    "mouthCue": "Tongue tip touches roof of mouth, air goes through nose (nasal airflow).",
+                  "association": "Nose; feel it buzz.",
+                  "image": "Nose"
+                }
+              ],
+                  "feedback": {
+                    "tts_exactMatch": "Solid. That's /nnn/.",
+                    "tts_exactMatch_ssml": "<speak>Solid.<break time=\"200ms\"/> That's /nnn/.</speak>",
+                    "tts_closeMatch": "Not enough nose sound. Tongue up, push air through your nose.",
+                    "tts_closeMatch_ssml": "<speak>Not enough nose sound.<break time=\"200ms\"/> Tongue up, push air through your nose.</speak>",
+                    "tts_wrongSound": "That's /m/. N has your tongue up, M has lips closed.",
+                    "tts_wrongSound_ssml": "<speak>That's /m/.<break time=\"200ms\"/> N has your tongue up, M has lips closed.</speak>"
+                  }
+            },
+            "8": {
+              "tts_blendingDrill": "Now we combine! Watch: /s/ /a/ /t/ → sat. Each sound connects smoothly. Your turn—blend it! Then read: sat, tap, pin, nap, pit, tip, pan, sit, tan, sap.",
+              "tts_blendingDrill_ssml": "<speak>Now we combine!<break time=\"300ms\"/> Watch:<break time=\"200ms\"/> <phoneme alphabet=\"ipa\" ph=\"s\">/s/</phoneme> <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme> <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme><break time=\"200ms\"/> <say-as interpret-as=\"characters\">s</say-as><break time=\"50ms\"/><say-as interpret-as=\"characters\">a</say-as><break time=\"50ms\"/><say-as interpret-as=\"characters\">t</say-as> → <emphasis>sat</emphasis>.<break time=\"300ms\"/> Each sound connects smoothly.<break time=\"200ms\"/> Your turn—blend it!<break time=\"400ms\"/> Then read: sat, tap, pin, nap, pit, tip, pan, sit, tan, sap.</speak>",
+              "visual": [
+                {
+                  "word": "sat",
+                  "image": "Person sitting on a chair",
+                  "tts_correctFeedback": "Correct.",
+                  "tts_correctFeedback_ssml": "<speak>Correct.</speak>",
+                  "tts_incorrectFeedback": "Not quite. Sound it out: /s/... /a/... /t/. Blend them.",
+                  "tts_incorrectFeedback_ssml": "<speak>Not quite.<break time=\"200ms\"/> Sound it out: /s/... /a/... /t/. Blend them.</speak>",
+                  "xp": 5
+                },
+                {
+                  "word": "tap",
+                  "image": "Finger tapping on surface",
+                  "tts_correctFeedback": "Got it.",
+                  "tts_correctFeedback_ssml": "<speak>Got it.</speak>",
+                  "tts_incorrectFeedback": "Try again. /t/... /a/... /p/.",
+                  "tts_incorrectFeedback_ssml": "<speak>Try again.<break time=\"200ms\"/> /t/... /a/... /p/.</speak>",
+                  "xp": 5
+                },
+                {
+                  "word": "pin",
+                  "image": "Safety pin",
+                  "tts_correctFeedback": "Right.",
+                  "tts_correctFeedback_ssml": "<speak>Right.</speak>",
+                  "tts_incorrectFeedback": "Break it down: /p/... /i/... /n/.",
+                  "tts_incorrectFeedback_ssml": "<speak>Break it down:<break time=\"200ms\"/> /p/... /i/... /n/.</speak>",
+                  "xp": 5
+                },
+                {
+                  "word": "nap",
+                  "image": "Person sleeping with 'ZZZ'",
+                  "tts_correctFeedback": "Correct.",
+                  "tts_correctFeedback_ssml": "<speak>Correct.</speak>",
+                  "tts_incorrectFeedback": "/n/... /a/... /p/. Blend it smooth.",
+                  "tts_incorrectFeedback_ssml": "<speak>/n/... /a/... /p/.<break time=\"200ms\"/> Blend it smooth.</speak>",
+                  "xp": 5
+                },
+                {
+                  "word": "pit",
+                  "image": "Hole/pit in the ground",
+                  "tts_correctFeedback": "Yes.",
+                  "tts_correctFeedback_ssml": "<speak>Yes.</speak>",
+                  "tts_incorrectFeedback": "Sound it: /p/... /i/... /t/.",
+                  "tts_incorrectFeedback_ssml": "<speak>Sound it:<break time=\"200ms\"/> /p/... /i/... /t/.</speak>",
+                  "xp": 5
+                },
+                {
+                  "word": "tip",
+                  "image": "Arrow pointing to tip of pencil",
+                  "tts_correctFeedback": "Good.",
+                  "tts_correctFeedback_ssml": "<speak>Good.</speak>",
+                  "tts_incorrectFeedback": "/t/... /i/... /p/. Keep going.",
+                  "tts_incorrectFeedback_ssml": "<speak>/t/... /i/... /p/.<break time=\"200ms\"/> Keep going.</speak>",
+                  "xp": 5
+                },
+                {
+                  "word": "pan",
+                  "image": "Frying pan",
+                  "tts_correctFeedback": "Nice.",
+                  "tts_correctFeedback_ssml": "<speak>Nice.</speak>",
+                  "tts_incorrectFeedback": "Try: /p/... /a/... /n/.",
+                  "tts_incorrectFeedback_ssml": "<speak>Try:<break time=\"200ms\"/> /p/... /a/... /n/.</speak>",
+                  "xp": 5
+                },
+                {
+                  "word": "sit",
+                  "image": "Chair with 'sit' sign",
+                  "tts_correctFeedback": "Correct.",
+                  "tts_correctFeedback_ssml": "<speak>Correct.</speak>",
+                  "tts_incorrectFeedback": "Break it down. /s/... /i/... /t/.",
+                  "tts_incorrectFeedback_ssml": "<speak>Break it down.<break time=\"200ms\"/> /s/... /i/... /t/.</speak>",
+                  "xp": 5
+                },
+                {
+                  "word": "tan",
+                  "image": "Tan/brown color swatch",
+                  "tts_correctFeedback": "Right.",
+                  "tts_correctFeedback_ssml": "<speak>Right.</speak>",
+                  "tts_incorrectFeedback": "/t/... /a/... /n/. Connect them.",
+                  "tts_incorrectFeedback_ssml": "<speak>/t/... /a/... /n/.<break time=\"200ms\"/> Connect them.</speak>",
+                  "xp": 5
+                },
+                {
+                  "word": "sap",
+                  "image": "Tree sap dripping",
+                  "tts_correctFeedback": "Got it.",
+                  "tts_correctFeedback_ssml": "<speak>Got it.</speak>",
+                  "tts_incorrectFeedback": "One more time: /s/... /a/... /p/.",
+                  "tts_incorrectFeedback_ssml": "<speak>One more time:<break time=\"200ms\"/> /s/... /a/... /p/.</speak>",
+                  "xp": 5
+                }
+              ]
+            }
+          }
+        },
+        {
+          "missionSequence": 2,
+          "missionName": "Direct Instruction - SATPIN Sounds",
+          "tasks": {
+            "1": {
+              "tts_coach": "Alright, let's get straight to it. Six sounds today. These unlock actual English words you'll see everywhere—texts, signs, homework, all of it. No fluff. Let's go.",
+              "tts_coach_ssml": "<speak>Alright, let's get straight to it.<break time=\"200ms\"/> Six sounds today.<break time=\"300ms\"/> These unlock actual English words you'll see everywhere—texts, signs, homework, all of it.<break time=\"200ms\"/> No fluff.<break time=\"300ms\"/> Let's go.</speak>",
+              "visual": []
+            },
+            "2": {
+              "tts_coach": "Letter S makes /sss/. It's all air, no voice. Watch the screen—teeth almost together, tongue stays behind. Listen: /sss/. Say it: /sss/.",
+              "tts_coach_ssml": "<speak>Letter <say-as interpret-as=\"characters\">S</say-as> makes <phoneme alphabet=\"ipa\" ph=\"s\">/sss/</phoneme>.<break time=\"200ms\"/> It's all air, no voice.<break time=\"200ms\"/> Watch the screen—teeth almost together, tongue stays behind.<break time=\"300ms\"/> Listen: <phoneme alphabet=\"ipa\" ph=\"s\">/sss/</phoneme>.<break time=\"200ms\"/> Say it: <phoneme alphabet=\"ipa\" ph=\"s\">/sss/</phoneme>.</speak>",
+              "word": "S",
+              "visual": [
+                {
+                  "word": "S",
+                  "mouthCue": "Teeth almost together, tongue stays behind; air flows out.",
+                  "association": "Snake sound /sss/."
+                }
+              ],
+              "feedback": {
+                "tts_exactMatch": "Perfect. That's exactly /sss/. Locked in.",
+                "tts_exactMatch_ssml": "<speak>Perfect.<break time=\"200ms\"/> That's exactly /sss/. Locked in.</speak>",
+                "tts_closeMatch": "Almost—you're adding voice. It's just air: /sss/, not /zzz/. Watch the animation again.",
+                "tts_closeMatch_ssml": "<speak>Almost—you're adding voice.<break time=\"200ms\"/> It's just air: /sss/, not /zzz/. Watch the animation again.</speak>",
+                "tts_wrongSound": "That's not /sss/. Check the screen—teeth together, air only. Try again.",
+                "tts_wrongSound_ssml": "<speak>That's not /sss/.<break time=\"200ms\"/> Check the screen—teeth together, air only.<break time=\"200ms\"/> Try again.</speak>"
+              }
+            },
+            "3": {
+              "tts_coach": "Letter A makes /a/. Short and sharp, like when you're surprised. Not 'ay'—just /a/ like 'ant'. Listen: /a/. Say it: /a/.",
+              "tts_coach_ssml": "<speak>Letter <say-as interpret-as=\"characters\">A</say-as> makes <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme>.<break time=\"200ms\"/> Short and sharp, like when you're surprised.<break time=\"200ms\"/> Not \"ay\"—just <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme> like \"ant\".<break time=\"300ms\"/> Listen: <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme>.<break time=\"200ms\"/> Say it: <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme>.</speak>",
+              "word": "A",
+              "visual": [
+                {
+                  "word": "A",
+                  "mouthCue": "Mouth open medium-wide, jaw drops slightly, tongue flat and low.",
+                  "association": "Apple, ant."
+                }
+              ],
+              "feedback": {
+                "tts_exactMatch": "That's it. Perfect /a/.",
+                "tts_exactMatch_ssml": "<speak>That's it.<break time=\"200ms\"/> Perfect /a/.</speak>",
+                "tts_closeMatch": "You're holding it too long. Make it quick: /a/.",
+                "tts_closeMatch_ssml": "<speak>You're holding it too long.<break time=\"200ms\"/> Make it quick: /a/.</speak>",
+                "tts_wrongSound": "That's 'ay' like the letter name. We need the short sound: /a/ like 'ant'.",
+                "tts_wrongSound_ssml": "<speak>That's \"ay\" like the letter name.<break time=\"200ms\"/> We need the short sound: /a/ like \"ant\".</speak>"
+              }
+            },
+            "4": {
+              "tts_coach": "Letter T makes /t/. It's a quick tap—tongue up, then release. No 'tuh' at the end. Just /t/. Listen: /t/. Say it: /t/.",
+              "tts_coach_ssml": "<speak>Letter <say-as interpret-as=\"characters\">T</say-as> makes <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme>.<break time=\"200ms\"/> It's a quick tap—tongue up, then release.<break time=\"200ms\"/> No \"tuh\" at the end.<break time=\"200ms\"/> Just <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme>.<break time=\"300ms\"/> Listen: <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme>.<break time=\"200ms\"/> Say it: <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme>.</speak>",
+              "word": "T",
+              "visual": [
+                {
+                  "word": "T",
+                  "mouthCue": "Tongue tip taps roof of mouth just behind teeth, then releases with a small burst of air.",
+                  "association": "Timer, tick."
+                }
+              ],
+              "feedback": {
+                "tts_exactMatch": "Clean. That's /t/.",
+                "tts_exactMatch_ssml": "<speak>Clean.<break time=\"200ms\"/> That's /t/.</speak>",
+                "tts_closeMatch": "You're saying 'tuh'. Stop before the vowel—just /t/.",
+                "tts_closeMatch_ssml": "<speak>You're saying \"tuh\".<break time=\"200ms\"/> Stop before the vowel—just /t/.</speak>",
+                "tts_wrongSound": "Tongue needs to be up. Watch where it touches.",
+                "tts_wrongSound_ssml": "<speak>Tongue needs to be up.<break time=\"200ms\"/> Watch where it touches.</speak>"
+              }
+            },
+            "5": {
+              "tts_coach": "Letter P makes /p/. Lips together, then pop. No voice, just air pressure release. Listen: /p/. Say it: /p/.",
+              "tts_coach_ssml": "<speak>Letter <say-as interpret-as=\"characters\">P</say-as> makes <phoneme alphabet=\"ipa\" ph=\"p\">/p/</phoneme>.<break time=\"200ms\"/> Lips together, then pop.<break time=\"200ms\"/> No voice, just air pressure release.<break time=\"300ms\"/> Listen: <phoneme alphabet=\"ipa\" ph=\"p\">/p/</phoneme>.<break time=\"200ms\"/> Say it: <phoneme alphabet=\"ipa\" ph=\"p\">/p/</phoneme>.</speak>",
+              "word": "P",
+              "visual": [
+                {
+                  "word": "P",
+                  "mouthCue": "Lips pressed together, then pop open with air burst; no vocal cord vibration.",
+                  "association": "Popcorn popping."
+                }
+              ],
+              "feedback": {
+                "tts_exactMatch": "Exact. /p/ locked.",
+                "tts_exactMatch_ssml": "<speak>Exact.<break time=\"200ms\"/> /p/ locked.</speak>",
+                "tts_closeMatch": "Just /p/—don't add 'puh'. Lips pop and stop.",
+                "tts_closeMatch_ssml": "<speak>Just /p/—don't add \"puh\".<break time=\"200ms\"/> Lips pop and then stop.</speak>",
+                "tts_wrongSound": "That's /b/. P has no voice—just air.",
+                "tts_wrongSound_ssml": "<speak>That's /b/.<break time=\"200ms\"/> P has no voice—just air.</speak>"
+              }
+            },
+            "6": {
+              "tts_coach": "Letter I makes /i/. Quick, tight sound. Not 'eye'—just /i/ like 'it'. Listen: /i/. Say it: /i/.",
+              "tts_coach_ssml": "<speak>Letter <say-as interpret-as=\"characters\">I</say-as> makes <phoneme alphabet=\"ipa\" ph=\"ɪ\">/i/</phoneme>.<break time=\"200ms\"/> Quick, tight sound.<break time=\"200ms\"/> Not \"eye\"—just <phoneme alphabet=\"ipa\" ph=\"ɪ\">/i/</phoneme> like \"it\".<break time=\"300ms\"/> Listen: <phoneme alphabet=\"ipa\" ph=\"ɪ\">/i/</phoneme>.<break time=\"200ms\"/> Say it: <phoneme alphabet=\"ipa\" ph=\"ɪ\">/i/</phoneme>.</speak>",
+              "word": "I",
+              "visual": [
+                {
+                  "word": "I",
+                  "mouthCue": "Mouth slightly open, tongue high in the middle, short duration.",
+                  "association": "Insect."
+                }
+              ],
+              "feedback": {
+                "tts_exactMatch": "Perfect /i/.",
+                "tts_exactMatch_ssml": "<speak>Perfect /i/.</speak>",
+                "tts_closeMatch": "Tighter. Make it quick: /i/.",
+                "tts_closeMatch_ssml": "<speak>Tighter.<break time=\"200ms\"/> Make it quick: /i/.</speak>",
+                "tts_wrongSound": "That's 'ee' or 'eye'. We need short /i/ like 'sit'.",
+                "tts_wrongSound_ssml": "<speak>That's \"ee\" or \"eye\".<break time=\"200ms\"/> We need short /i/ like \"sit\".</speak>"
+              }
+            },
+            "7": {
+              "tts_coach": "Letter N makes /nnn/. Tongue up, sound comes through your nose. Feel the buzz in your nose? That's it. Listen: /nnn/. Say it: /nnn/.",
+              "tts_coach_ssml": "<speak>Letter <say-as interpret-as=\"characters\">N</say-as> makes <phoneme alphabet=\"ipa\" ph=\"n\">/nnn/</phoneme>.<break time=\"200ms\"/> Tongue up, sound comes through your nose.<break time=\"200ms\"/> Feel the buzz in your nose? That's it.<break time=\"300ms\"/> Listen: <phoneme alphabet=\"ipa\" ph=\"n\">/nnn/</phoneme>.<break time=\"200ms\"/> Say it: <phoneme alphabet=\"ipa\" ph=\"n\">/nnn/</phoneme>.</speak>",
+              "word": "N",
+              "visual": [
+                {
+                  "word": "N",
+                  "mouthCue": "Tongue tip touches roof of mouth, air goes through nose (nasal airflow).",
+                  "association": "Nose; feel the nasal buzz."
+                }
+              ],
+              "feedback": {
+                "tts_exactMatch": "Solid. That's /nnn/.",
+                "tts_exactMatch_ssml": "<speak>Solid.<break time=\"200ms\"/> That's /nnn/.</speak>",
+                "tts_closeMatch": "Not enough nose sound. Tongue up, push air through your nose.",
+                "tts_closeMatch_ssml": "<speak>Not enough nose sound.<break time=\"200ms\"/> Tongue up, push air through your nose.</speak>",
+                "tts_wrongSound": "That's /m/. N has your tongue up, M has lips closed.",
+                "tts_wrongSound_ssml": "<speak>That's /m/.<break time=\"200ms\"/> N has your tongue up, M has lips closed.</speak>"
+              }
+            },
+            "8": {
+              "tts_blendingDrill": "Now we put sounds together. Watch: /s/ /a/ /t/ → sat. Each sound connects smoothly. Your turn—blend it! Then read: sat, tap, pin, nap, pit, tip, pan, sit, tan, sap.",
+              "tts_blendingDrill_ssml": "<speak>Now we put sounds together.<break time=\"300ms\"/> Watch:<break time=\"200ms\"/> <phoneme alphabet=\"ipa\" ph=\"s\">/s/</phoneme> <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme> <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme><break time=\"200ms\"/> <say-as interpret-as=\"characters\">s</say-as><break time=\"50ms\"/><say-as interpret-as=\"characters\">a</say-as><break time=\"50ms\"/><say-as interpret-as=\"characters\">t</say-as> → <emphasis>sat</emphasis>.<break time=\"300ms\"/> Each sound connects smoothly.<break time=\"200ms\"/> Your turn—blend it!<break time=\"400ms\"/> Then read: sat, tap, pin, nap, pit, tip, pan, sit, tan, sap.</speak>",
+              "visual": [
+                {
+                  "word": "sat",
+                  "image": "Person sitting on a chair",
+                  "tts_correctFeedback": "Correct.",
+                  "tts_correctFeedback_ssml": "<speak>Correct.</speak>",
+                  "tts_incorrectFeedback": "Not quite. Sound it out: /s/... /a/... /t/. Blend them.",
+                  "tts_incorrectFeedback_ssml": "<speak>Not quite.<break time=\"200ms\"/> Sound it out: /s/... /a/... /t/. Blend them.</speak>",
+                  "xp": 5
+                },
+                {
+                  "word": "tap",
+                  "image": "Finger tapping on surface",
+                  "tts_correctFeedback": "Got it.",
+                  "tts_correctFeedback_ssml": "<speak>Got it.</speak>",
+                  "tts_incorrectFeedback": "Try again. /t/... /a/... /p/.",
+                  "tts_incorrectFeedback_ssml": "<speak>Try again.<break time=\"200ms\"/> /t/... /a/... /p/.</speak>",
+                  "xp": 5
+                },
+                {
+                  "word": "pin",
+                  "image": "Safety pin",
+                  "tts_correctFeedback": "Right.",
+                  "tts_correctFeedback_ssml": "<speak>Right.</speak>",
+                  "tts_incorrectFeedback": "Break it down: /p/... /i/... /n/.",
+                  "tts_incorrectFeedback_ssml": "<speak>Break it down:<break time=\"200ms\"/> /p/... /i/... /n/.</speak>",
+                  "xp": 5
+                },
+                {
+                  "word": "nap",
+                  "image": "Person sleeping with 'ZZZ'",
+                  "tts_correctFeedback": "Correct.",
+                  "tts_correctFeedback_ssml": "<speak>Correct.</speak>",
+                  "tts_incorrectFeedback": "/n/... /a/... /p/. Blend it smooth.",
+                  "tts_incorrectFeedback_ssml": "<speak>/n/... /a/... /p/.<break time=\"200ms\"/> Blend it smooth.</speak>",
+                  "xp": 5
+                },
+                {
+                  "word": "pit",
+                  "image": "Hole/pit in the ground",
+                  "tts_correctFeedback": "Yes.",
+                  "tts_correctFeedback_ssml": "<speak>Yes.</speak>",
+                  "tts_incorrectFeedback": "Sound it: /p/... /i/... /t/.",
+                  "tts_incorrectFeedback_ssml": "<speak>Sound it:<break time=\"200ms\"/> /p/... /i/... /t/.</speak>",
+                  "xp": 5
+                },
+                {
+                  "word": "tip",
+                  "image": "Arrow pointing to tip of pencil",
+                  "tts_correctFeedback": "Good.",
+                  "tts_correctFeedback_ssml": "<speak>Good.</speak>",
+                  "tts_incorrectFeedback": "/t/... /i/... /p/. Keep going.",
+                  "tts_incorrectFeedback_ssml": "<speak>/t/... /i/... /p/.<break time=\"200ms\"/> Keep going.</speak>",
+                  "xp": 5
+                },
+                {
+                  "word": "pan",
+                  "image": "Frying pan",
+                  "tts_correctFeedback": "Nice.",
+                  "tts_correctFeedback_ssml": "<speak>Nice.</speak>",
+                  "tts_incorrectFeedback": "Try: /p/... /a/... /n/.",
+                  "tts_incorrectFeedback_ssml": "<speak>Try:<break time=\"200ms\"/> /p/... /a/... /n/.</speak>",
+                  "xp": 5
+                },
+                {
+                  "word": "sit",
+                  "image": "Chair with 'sit' sign",
+                  "tts_correctFeedback": "Correct.",
+                  "tts_correctFeedback_ssml": "<speak>Correct.</speak>",
+                  "tts_incorrectFeedback": "Break it down. /s/... /i/... /t/.",
+                  "tts_incorrectFeedback_ssml": "<speak>Break it down.<break time=\"200ms\"/> /s/... /i/... /t/.</speak>",
+                  "xp": 5
+                },
+                {
+                  "word": "tan",
+                  "image": "Tan/brown color swatch",
+                  "tts_correctFeedback": "Right.",
+                  "tts_correctFeedback_ssml": "<speak>Right.</speak>",
+                  "tts_incorrectFeedback": "/t/... /a/... /n/. Connect them.",
+                  "tts_incorrectFeedback_ssml": "<speak>/t/... /a/... /n/.<break time=\"200ms\"/> Connect them.</speak>",
+                  "xp": 5
+                },
+                {
+                  "word": "sap",
+                  "image": "Tree sap dripping",
+                  "tts_correctFeedback": "Got it.",
+                  "tts_correctFeedback_ssml": "<speak>Got it.</speak>",
+                  "tts_incorrectFeedback": "One more time: /s/... /a/... /p/.",
+                  "tts_incorrectFeedback_ssml": "<speak>One more time:<break time=\"200ms\"/> /s/... /a/... /p/.</speak>",
+                  "xp": 5
+                }
+              ]
+            }
+          }
+        },
+        {
+          "missionSequence": 3,
+          "missionName": "Assessment - Mastery Check",
+          "tasks": {
+            "1": {
+              "tts_coach": "Now let's check what stuck. You'll read words built from S, A, T, P, I, N. Aim for at least eight out of ten to hit mastery.",
+              "tts_coach_ssml": "<speak>Now let's check what stuck.<break time=\"200ms\"/> You'll read words built from <say-as interpret-as=\"characters\">S A T P I N</say-as>.<break time=\"300ms\"/> Aim for at least eight out of ten to hit mastery.</speak>",
+              "visual": []
+            },
+            "2": {
+              "visual": [
+                {
+                  "word": "sat",
+                  "image": "Person sitting on a chair",
+                  "tts_positiveFeedback": "You've got it. That's mastery starting to show.",
+                  "tts_positiveFeedback_ssml": "<speak>You've got it.<break time=\"200ms\"/> That's mastery starting to show.</speak>",
+                  "tts_negativeFeedback": "Sound it out: /s/... /a/... /t/.",
+                  "tts_negativeFeedback_ssml": "<speak>Sound it out:<break time=\"200ms\"/> /s/... /a/... /t/.</speak>",
+                  "retryLimit": 3,
+                  "xp": 5
+                },
+                {
+                  "word": "tap",
+                  "image": "Finger tapping",
+                  "tts_positiveFeedback": "Nice blend.",
+                  "tts_positiveFeedback_ssml": "<speak>Nice blend.</speak>",
+                  "tts_negativeFeedback": "Try again: /t/... /a/... /p/.",
+                  "tts_negativeFeedback_ssml": "<speak>Try again:<break time=\"200ms\"/> /t/... /a/... /p/.</speak>",
+                  "retryLimit": 3,
+                  "xp": 5
+                },
+                {
+                  "word": "pin",
+                  "image": "Safety pin",
+                  "tts_positiveFeedback": "Right on.",
+                  "tts_positiveFeedback_ssml": "<speak>Right on.</speak>",
+                  "tts_negativeFeedback": "Break it down: /p/... /i/... /n/.",
+                  "tts_negativeFeedback_ssml": "<speak>Break it down:<break time=\"200ms\"/> /p/... /i/... /n/.</speak>",
+                  "retryLimit": 3,
+                  "xp": 5
+                },
+                {
+                  "word": "nap",
+                  "image": "Person sleeping",
+                  "tts_positiveFeedback": "Correct.",
+                  "tts_positiveFeedback_ssml": "<speak>Correct.</speak>",
+                  "tts_negativeFeedback": "/n/... /a/... /p/.",
+                  "tts_negativeFeedback_ssml": "<speak>/n/... /a/... /p/.</speak>",
+                  "retryLimit": 3,
+                  "xp": 5
+                },
+                {
+                  "word": "pit",
+                  "image": "Hole in the ground",
+                  "tts_positiveFeedback": "Yes.",
+                  "tts_positiveFeedback_ssml": "<speak>Yes.</speak>",
+                  "tts_negativeFeedback": "/p/... /i/... /t/.",
+                  "tts_negativeFeedback_ssml": "<speak>/p/... /i/... /t/.</speak>",
+                  "retryLimit": 3,
+                  "xp": 5
+                },
+                {
+                  "word": "tip",
+                  "image": "Tip of a pencil",
+                  "tts_positiveFeedback": "Good.",
+                  "tts_positiveFeedback_ssml": "<speak>Good.</speak>",
+                  "tts_negativeFeedback": "/t/... /i/... /p/.",
+                  "tts_negativeFeedback_ssml": "<speak>/t/... /i/... /p/.</speak>",
+                  "retryLimit": 3,
+                  "xp": 5
+                },
+                {
+                  "word": "pan",
+                  "image": "Frying pan",
+                  "tts_positiveFeedback": "Nice.",
+                  "tts_positiveFeedback_ssml": "<speak>Nice.</speak>",
+                  "tts_negativeFeedback": "/p/... /a/... /n/.",
+                  "tts_negativeFeedback_ssml": "<speak>/p/... /a/... /n/.</speak>",
+                  "retryLimit": 3,
+                  "xp": 5
+                },
+                {
+                  "word": "sit",
+                  "image": "Chair with 'sit' sign",
+                  "tts_positiveFeedback": "Correct.",
+                  "tts_positiveFeedback_ssml": "<speak>Correct.</speak>",
+                  "tts_negativeFeedback": "/s/... /i/... /t/.",
+                  "tts_negativeFeedback_ssml": "<speak>/s/... /i/... /t/.</speak>",
+                  "retryLimit": 3,
+                  "xp": 5
+                },
+                {
+                  "word": "tan",
+                  "image": "Tan color swatch",
+                  "tts_positiveFeedback": "Right.",
+                  "tts_positiveFeedback_ssml": "<speak>Right.</speak>",
+                  "tts_negativeFeedback": "/t/... /a/... /n/.",
+                  "tts_negativeFeedback_ssml": "<speak>/t/... /a/... /n/.</speak>",
+                  "retryLimit": 3,
+                  "xp": 5
+                },
+                {
+                  "word": "sap",
+                  "image": "Tree sap",
+                  "tts_positiveFeedback": "Got it.",
+                  "tts_positiveFeedback_ssml": "<speak>Got it.</speak>",
+                  "tts_negativeFeedback": "/s/... /a/... /p/.",
+                  "tts_negativeFeedback_ssml": "<speak>/s/... /a/... /p/.</speak>",
+                  "retryLimit": 3,
+                  "xp": 5
+                }
+              ]
+            },
+            "3": {
+              "tts_8_10_correct": "You've got it. That's mastery—8 out of 10 or better. Moving forward.",
+              "tts_8_10_correct_ssml": "<speak>You've got it.<break time=\"200ms\"/> That's mastery—eight out of ten or better.<break time=\"200ms\"/> Moving forward.</speak>",
+              "tts_5_7_correct": "You're close—got {obtained_correct}/10. Let's drill the ones you missed, then retry.",
+              "tts_5_7_correct_ssml": "<speak>You're close—got {obtained_correct} out of ten.<break time=\"200ms\"/> Let's drill the ones you missed, then retry.</speak>",
+              "tts_1_5_correct": "Not quite there yet. We're going to break this down more. Sound-by-sound practice coming up.",
+              "tts_1_5_correct_ssml": "<speak>Not quite there yet.<break time=\"200ms\"/> We're going to break this down more.<break time=\"200ms\"/> Sound-by-sound practice coming up.</speak>"
+            }
+          }
+        },
+        {
+          "missionSequence": 4,
+          "missionName": "Lesson Wrap",
+          "tasks": {
+            "1": {
+              "tts_coach": "Done. You learned six sounds: S, A, T, P, I, N. With just these six, you can read actual English words. That's not kids' stuff—that's functional literacy building. Next session, we add four more sounds, and your word count explodes. English has about 44 sounds total. You just learned 6. By the end of next lesson, you'll have 10. That's almost 25% of English phonics in two sessions. Stay sharp.",
+              "tts_coach_ssml": "<speak>Done.<break time=\"200ms\"/> You learned six sounds: <say-as interpret-as=\"characters\">S, A, T, P, I, N</say-as>.<break time=\"300ms\"/> With just these six, you can read actual English words.<break time=\"200ms\"/> That's not kids' stuff—that's functional literacy building.<break time=\"400ms\"/> Next session, we add four more sounds, and your word count explodes.<break time=\"300ms\"/> English has about forty-four sounds total.<break time=\"200ms\"/> You just learned six.<break time=\"300ms\"/> By the end of next lesson, you'll have ten.<break time=\"200ms\"/> That's almost twenty-five percent of English phonics in two sessions.<break time=\"300ms\"/> Stay sharp.</speak>",
+              "visual": [
+                {
+                  "progressBar": "6/44 sounds learned",
+                  "sessionStats": {
+                    "soundsMastered": 6,
+                    "totalSounds": 6,
+                    "wordsRead": 10,
+                    "masteryThreshold": 80,
+                    "xpEarned": 110
+                  },
+                  "nextUnlock": "MDGO sounds"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  } as const;
+  
