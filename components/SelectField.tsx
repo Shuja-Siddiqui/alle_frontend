@@ -135,7 +135,10 @@ export function SelectField({
 
         {/* Dropdown */}
         {open && (
-          <div className="absolute left-0 right-0 z-20 mt-2 flex w-[418px] flex-col items-start gap-[22px] overflow-hidden rounded-[24px] border border-[#434B93] bg-[#050821]/95 p-6 shadow-xl backdrop-blur-md">
+          <div
+            className="absolute left-0 right-0 z-20 mt-2 flex w-[418px] max-h-[280px] flex-col items-start gap-[22px] overflow-y-auto overflow-x-hidden rounded-[24px] border border-[#434B93] bg-[#050821]/95 p-6 shadow-xl backdrop-blur-md"
+            style={{ overscrollBehavior: "contain" }}
+          >
             {options.map((opt) => (
               <button
                 key={opt.value}
@@ -172,19 +175,6 @@ export function SelectField({
                 )}
               </button>
             ))}
-            {/* Decorative scroll bar */}
-            <div
-              className="pointer-events-none"
-              style={{
-                position: "absolute",
-                right: "12px",
-                top: "60px",
-                width: "4px",
-                height: "80px",
-                borderRadius: "40px",
-                background: "#434B93",
-              }}
-            />
           </div>
         )}
       </div>

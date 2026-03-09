@@ -2,7 +2,7 @@
 
 import { EduPortal } from "./EduPortal";
 import { Profile } from "./Profile";
-import { XpSlider } from "./XpSlider";
+import { XpProgressBar } from "./XpProgressBar";
 
 type StudentNavbarProps = {
   /** Current XP value */
@@ -49,28 +49,14 @@ export function StudentNavbar({
       <div className="flex  gap-[33px] shrink-0 justify-center items-center" data-node-id="2133:245">
         {/* XP Slider with battery icon - container includes both battery and slider */}
         {!hideXpSlider && (
-          <div
-            style={{
-              position: "relative",
-              height: "100%",
-              display: "flex",
-              alignItems: "flex-end",
-              overflow: "visible",
-            }}
-          >
-            <XpSlider
-              value={xp}
-              max={xpMax}
-              label=""
-              hideNumbers={true}
-              barWidth={187.16}
-              barHeight={22.88}
-              batteryWidth={45.423}
-              batteryHeight={59.794}
-              containerWidth={217.373}
-              containerHeight={42.864}
-            />
-          </div>
+          <XpProgressBar
+            value={xp}
+            max={xpMax}
+            label=""
+            hideNumbers={true}
+            width={217}
+            height={43}
+          />
         )}
         
         {/* Profile */}

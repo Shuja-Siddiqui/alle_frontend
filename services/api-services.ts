@@ -35,7 +35,7 @@ export const authApi = {
     api.post('/auth/logout'),
 
   getCurrentUser: (token: string) =>
-    api.get('/auth/me', token),
+    api.get('/users/me', token),
 };
 
 // ============================================

@@ -82,7 +82,8 @@ export function RetentionMetrics({
   // Calculate thumb position on the chart using animated percentage
   // Chart starts at 90 degrees (top) and goes clockwise
   // For percentage, calculate the angle: 90 - (percentage * 360 / 100)
-  const chartRadius = 70; // outerRadius
+  const chartRadius = 70; // Pie outerRadius
+  const thumbRadius = 66; // Slightly inside the ring so it doesn't pop outside
   const chartCenterX = 70; // half of 140px width
   const chartCenterY = 70; // half of 140px height
   
@@ -92,8 +93,8 @@ export function RetentionMetrics({
   const angleRadians = (angleDegrees * Math.PI) / 180;
   
   // Calculate thumb position on the outer edge of the chart
-  const thumbX = chartCenterX + chartRadius * Math.cos(angleRadians);
-  const thumbY = chartCenterY - chartRadius * Math.sin(angleRadians); // Negative because SVG Y increases downward
+  const thumbX = chartCenterX + thumbRadius * Math.cos(angleRadians);
+  const thumbY = chartCenterY - thumbRadius * Math.sin(angleRadians); // Negative because SVG Y increases downward
 
   return (
     <div
@@ -177,8 +178,8 @@ export function RetentionMetrics({
           <div
             className="absolute"
             style={{
-              left: `${thumbX + 14}px`,
-              top: `${thumbY}px`,
+              left: `${thumbX}px`,
+              top: `${thumbY + 10}px`,
               transform: "translate(-50%, -50%)",
               width: "24px",
               height: "24px",

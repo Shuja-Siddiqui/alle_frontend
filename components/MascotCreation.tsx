@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MASCOT_COLORS } from "../app/mascotColors";
 import { BackButton } from "./BackButton";
 import { PrimaryButton } from "./PrimaryButton";
@@ -9,25 +9,36 @@ import { ConfirmCancelDialog } from "./ConfirmCancelDialog";
 import { MascotDisplay } from "./MascotDisplay";
 
 type MascotParts = {
-  face: string;
+  head: string;
   hair: string;
   body: string;
+  collar: string;
   hairColor?: string;
 };
 
+/** Partial mascot for per-part save (only fields being updated) */
+export type MascotPartUpdate = Partial<{
+  face: string;
+  hair: string;
+  body: string;
+  hairColor: string;
+}>;
+
 type MascotCreationProps = {
   /** Initial selected parts */
-  initialParts?: Partial<MascotParts>;
+  initialParts?: Partial<MascotParts & { face?: string }>;
   /** Called when any part is selected */
   onPartSelect?: (parts: MascotParts) => void;
-  /** Called when the Save button is clicked */
+  /** Called when the Save button is clicked (saves all parts) */
   onSave?: (parts: MascotParts) => void;
+  /** Called when Save is clicked for a specific part (head, hair, body, or color). When provided, Save does per-part save instead of full save. */
+  onSavePart?: (partial: MascotPartUpdate) => void;
   /** Called when the back button is clicked */
   onBack?: () => void;
 };
 
-// Step-based flow: face → hair → body
-type Step = "face" | "hair" | "body";
+// Step-based flow: head → hair → body (collar auto-applied from body: body1→collar1, body2→collar2, etc.)
+type Step = "head" | "hair" | "body";
 
 // Hair color palette - specific colors for hair selection
 const HAIR_COLORS = [
@@ -45,28 +56,32 @@ const HAIR_COLORS = [
 ];
 
 // Category definitions
-type Category = "face" | "hair" | "body";
+type Category = "head" | "hair" | "body";
 
-const CATEGORIES: Category[] = ["face", "hair", "body"];
+const CATEGORIES: Category[] = ["head", "hair", "body"];
 
-// Face options - 10 faces in order
-const FACE_OPTIONS = Array.from({ length: 10 }, (_, i) => `head${String(i + 1)}`);
-
-// Hair options - 13 hairs from hair folder (hair1, hair2, ..., hair13) - no zero-padding
-const HAIR_OPTIONS = Array.from({ length: 13 }, (_, i) => `hair${i + 1}`);
-
-// Body options - 15 bodies from suit folder
-const BODY_OPTIONS = Array.from({ length: 15 }, (_, i) => `body${String(i + 1)}`);
+// Mascot options from /assets/icons/mascots (heads, hairs, body, collars)
+const HEAD_OPTIONS = ["head1", "head2", "head3", "head4", "head5", "head6", "head7", "head8", "head9", "head10"];
+const HAIR_OPTIONS = ["hair1", "hair2", "hair3", "hair4", "hair5", "hair6", "hair7", "hair8", "hair9", "hair10", "hair11", "hair12", "hair13", "hair14", "hair15"];
+const BODY_OPTIONS = ["body1", "body2", "body3", "body4", "body5", "body6", "body7", "body8", "body9", "body10", "body11", "body12", "body13", "body14", "body15"];
 
 const CATEGORY_OPTIONS: Record<Category, string[]> = {
-  face: FACE_OPTIONS,
+  head: HEAD_OPTIONS,
   hair: HAIR_OPTIONS,
   body: BODY_OPTIONS,
 };
 
+// Collar is derived from body: body1→collar1, body2→collar2, etc.
+function getCollarFromBody(bodyId: string): string {
+  const match = bodyId.match(/body(\d+)/i);
+  const num = match ? match[1] : "1";
+  return `collar${num}`;
+}
+
+// Use mascots folder with subfolders: heads/, hairs/, body/
 const CATEGORY_PATHS: Record<Category, string> = {
-  face: "/assets/icons/mascots/heads",
-  hair: "/assets/icons/mascots/hair",
+  head: "/assets/icons/mascots/heads",
+  hair: "/assets/icons/mascots/hairs",
   body: "/assets/icons/mascots/body",
 };
 
@@ -74,26 +89,54 @@ export function MascotCreation({
   initialParts,
   onPartSelect,
   onSave,
+  onSavePart,
   onBack,
 }: MascotCreationProps) {
-  const [currentStep, setCurrentStep] = useState<Step>("face");
+  const [currentStep, setCurrentStep] = useState<Step>("head");
   const [selectedParts, setSelectedParts] = useState<MascotParts>({
-    face: initialParts?.face || "head1",
+    head: initialParts?.head ?? initialParts?.face ?? "head1",
     hair: initialParts?.hair || "hair1",
     body: initialParts?.body || "body1",
+    collar: initialParts?.collar || getCollarFromBody(initialParts?.body || "body1"),
     hairColor: initialParts?.hairColor || "#E451FE",
   });
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+
+   // When initialParts change (e.g. loaded from backend or updated after save),
+   // sync them into local state so reloads and profile edits reflect the saved mascot.
+   useEffect(() => {
+     if (!initialParts) return;
+     setSelectedParts((prev) => {
+       const prevBody = prev.body || "body1";
+       const nextBody = initialParts.body ?? prevBody;
+       return {
+         head: initialParts.head ?? initialParts.face ?? prev.head ?? "head1",
+         hair: initialParts.hair ?? prev.hair ?? "hair1",
+         body: nextBody,
+         collar: initialParts.collar ?? getCollarFromBody(nextBody),
+         hairColor: initialParts.hairColor ?? prev.hairColor ?? "#E451FE",
+       };
+     });
+   }, [
+     initialParts?.head,
+     initialParts?.face,
+     initialParts?.hair,
+     initialParts?.body,
+     initialParts?.collar,
+     initialParts?.hairColor,
+   ]);
 
   const currentOptions = CATEGORY_OPTIONS[currentStep];
   const currentSelected = selectedParts[currentStep];
 
   const handlePartClick = (partId: string) => {
-    // Only update the current step's part, keep all other parts unchanged
+    const newBody = currentStep === "body" ? partId : selectedParts.body;
+    const newCollar = currentStep === "body" ? getCollarFromBody(partId) : selectedParts.collar;
     const newParts: MascotParts = {
-      face: currentStep === "face" ? partId : selectedParts.face,
+      head: currentStep === "head" ? partId : selectedParts.head,
       hair: currentStep === "hair" ? partId : selectedParts.hair,
-      body: currentStep === "body" ? partId : selectedParts.body,
+      body: newBody,
+      collar: newCollar,
       hairColor: selectedParts.hairColor,
     };
     setSelectedParts(newParts);
@@ -107,8 +150,8 @@ export function MascotCreation({
   };
 
   const handleStepChange = () => {
-    // Cycle through steps: face → hair → body → face
-    const stepOrder: Step[] = ["face", "hair", "body"];
+    // Cycle through steps: head → hair → body → head
+    const stepOrder: Step[] = ["head", "hair", "body"];
     const currentIndex = stepOrder.indexOf(currentStep);
     const nextIndex = (currentIndex + 1) % stepOrder.length;
     setCurrentStep(stepOrder[nextIndex]);
@@ -129,17 +172,29 @@ export function MascotCreation({
   };
 
   const handleSave = () => {
-    // If on face step, move to hair step
-    if (currentStep === "face") {
+    if (onSavePart) {
+      // Per-part save: save current step + hair color, then advance head → hair → body
+      const hairColor = selectedParts.hairColor ?? "#E451FE";
+      if (currentStep === "head") {
+        onSavePart({ face: selectedParts.head, hairColor });
+        setCurrentStep("hair");
+      } else if (currentStep === "hair") {
+        onSavePart({ hair: selectedParts.hair, hairColor });
+        setCurrentStep("body");
+      } else if (currentStep === "body") {
+        onSavePart({ body: selectedParts.body, hairColor });
+      }
+      return;
+    }
+    // Legacy full-save flow (signup etc.): advance steps, confirm at body
+    if (currentStep === "head") {
       setCurrentStep("hair");
       return;
     }
-    // If on hair step, move to body step
     if (currentStep === "hair") {
       setCurrentStep("body");
       return;
     }
-    // If on body step, show confirmation dialog
     if (currentStep === "body") {
       setShowConfirmDialog(true);
       return;
@@ -157,6 +212,7 @@ export function MascotCreation({
 
   const getCategoryLabel = (step: Step): string => {
     if (step === "body") return "Clothes";
+    if (step === "head") return "Head";
     return step.charAt(0).toUpperCase() + step.slice(1);
   };
 
@@ -169,11 +225,11 @@ export function MascotCreation({
           <BackButton text="Mascot creation" onClick={onBack} />
         </div>
 
-        {/* Save button */}
+        {/* Save button - saves current part when onSavePart, otherwise advances steps */}
         <div className="flex items-center">
           <PrimaryButton
             type="button"
-            text="Save"
+            text={onSavePart ? `Save ${getCategoryLabel(currentStep)}` : "Save"}
             size="medium"
             iconSrc="/assets/icons/others/tick_white.svg"
             iconAlt="Save"
@@ -197,16 +253,17 @@ export function MascotCreation({
               "linear-gradient(155deg, #0B0F37 12.01%, #1B1F4E 94.63%)",
           }}
         >
-          {/* Composed mascot preview using master SVG */}
+          {/* Composed mascot preview using master SVG (collar auto-derived from body) */}
           <MascotDisplay
-            headId={selectedParts.face}
+            headId={selectedParts.head}
             hairId={selectedParts.hair}
             bodyId={selectedParts.body}
+            collarId={getCollarFromBody(selectedParts.body)}
             hairColor={selectedParts.hairColor}
             className="absolute bottom-0 left-1/2 -translate-x-1/2"
             style={{
-              width: "120%",
-              height: "120%",
+              width: "100%",
+              height: "100%",
             }}
           />
         </div>
@@ -328,9 +385,9 @@ export function MascotCreation({
               }}
             />
 
-            {/* Color options - positioned absolutely */}
+            {/* Color options + Save color button */}
             <div
-              className="absolute left-0 flex flex-row flex-wrap gap-[16px] w-full"
+              className="absolute left-0 flex flex-row flex-wrap items-center gap-[16px] w-full"
               style={{
                 top: "514px",
                 height: "45px",

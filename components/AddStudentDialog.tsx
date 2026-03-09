@@ -5,11 +5,13 @@ import { BackButton } from "./BackButton";
 import { InputField } from "./InputField";
 import { SelectField } from "./SelectField";
 import { PrimaryButton } from "./PrimaryButton";
+import { api } from "../lib/api-client";
 
 export type AddStudentFormData = {
   firstName: string;
   lastName: string;
   email: string;
+  password?: string;
   grade: string | null;
   startingModule: string | null;
   lesson: string | null;
@@ -20,14 +22,12 @@ type AddStudentDialogProps = {
   open: boolean;
   /** Called when back button is clicked or backdrop is clicked */
   onClose: () => void;
-  /** Called when Add student button is clicked */
-  onAddStudent: (data: AddStudentFormData) => void;
+  /** Called when student is added successfully */
+  onAddStudent: (data: AddStudentFormData) => void | Promise<void>;
   /** Available grades for dropdown */
   grades?: Array<{ value: string; label: string }>;
-  /** Available modules for dropdown */
+  /** Available modules for dropdown. If not provided, modules are fetched from API. */
   modules?: Array<{ value: string; label: string }>;
-  /** Available lessons for dropdown */
-  lessons?: Array<{ value: string; label: string }>;
 };
 
 const defaultGrades = [
@@ -45,58 +45,142 @@ const defaultGrades = [
   { value: "12", label: "Grade 12" },
 ];
 
-const defaultModules = [
-  { value: "1", label: "Module 1" },
-  { value: "2", label: "Module 2" },
-  { value: "3", label: "Module 3" },
-  { value: "4", label: "Module 4" },
-];
-
-const defaultLessons = [
-  { value: "1", label: "Lesson 1" },
-  { value: "2", label: "Lesson 2" },
-  { value: "3", label: "Lesson 3" },
-  { value: "4", label: "Lesson 4" },
-  { value: "5", label: "Lesson 5" },
-  { value: "6", label: "Lesson 6" },
-];
+const defaultModules: Array<{ value: string; label: string }> = [];
 
 export function AddStudentDialog({
   open,
   onClose,
   onAddStudent,
   grades = defaultGrades,
-  modules = defaultModules,
-  lessons = defaultLessons,
+  modules: modulesProp = defaultModules,
 }: AddStudentDialogProps) {
+  const [modules, setModules] = useState<Array<{ value: string; label: string }>>(modulesProp);
+  const [moduleLessons, setModuleLessons] = useState<Array<{ value: string; label: string }>>([]);
+  const [loadingLessons, setLoadingLessons] = useState(false);
   const [formData, setFormData] = useState<AddStudentFormData>({
     firstName: "",
     lastName: "",
     email: "",
+    password: "",
     grade: null,
     startingModule: null,
     lesson: null,
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Reset form when dialog closes
+  // Reset form and sync/load modules when dialog opens
   useEffect(() => {
     if (!open) {
       setFormData({
         firstName: "",
         lastName: "",
         email: "",
+        password: "",
         grade: null,
         startingModule: null,
         lesson: null,
       });
+      setError(null);
+      setModuleLessons([]);
+    } else {
+      if (modulesProp.length > 0) {
+        setModules(modulesProp);
+      } else {
+        let isMounted = true;
+        api.get<{ data?: Array<{ id: string; title: string }> }>("/modules")
+          .then((res) => {
+            const list = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
+            if (isMounted) {
+              setModules(list.map((m: { id: string; title: string }) => ({ value: m.id, label: m.title })));
+            }
+          })
+          .catch(() => { if (isMounted) setModules([]); });
+        return () => { isMounted = false; };
+      }
     }
-  }, [open]);
+  }, [open, modulesProp]);
+
+  // Fetch lessons when starting module changes
+  useEffect(() => {
+    if (!open || !formData.startingModule) {
+      setModuleLessons([]);
+      setLoadingLessons(false);
+      return;
+    }
+    let isMounted = true;
+    setModuleLessons([]); // Clear previous lessons immediately
+    setLoadingLessons(true);
+    setFormData((prev) => ({ ...prev, lesson: null }));
+    api.get<{ data?: Array<{ id: string; title: string }> }>(`/modules/${formData.startingModule}/lessons`)
+      .then((res) => {
+        const list = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
+        if (isMounted) {
+          setModuleLessons(list.map((l: { id: string; title: string }, i: number) => ({
+            value: l.id,
+            label: `Lesson ${i + 1}: ${l.title}`,
+          })));
+        }
+      })
+      .catch(() => { if (isMounted) setModuleLessons([]); })
+      .finally(() => { if (isMounted) setLoadingLessons(false); });
+    return () => { isMounted = false; };
+  }, [open, formData.startingModule]);
 
   if (!open) return null;
 
-  function handleSubmit() {
-    onAddStudent(formData);
-    onClose();
+  async function handleSubmit() {
+    setError(null);
+    const { firstName, lastName, email, password, grade } = formData;
+
+    if (!firstName?.trim()) {
+      setError("First name is required");
+      return;
+    }
+    if (!lastName?.trim()) {
+      setError("Last name is required");
+      return;
+    }
+    if (!email?.trim()) {
+      setError("Email is required");
+      return;
+    }
+    if (!password || password.length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await api.post("/auth/signup", {
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: email.trim(),
+        password,
+        role: "student",
+        grade: grade || undefined,
+      });
+      await onAddStudent(formData);
+      onClose();
+    } catch (err: unknown) {
+      let msg = "";
+      if (err && typeof err === "object" && "response" in err) {
+        const res = (err as { response?: { message?: string; data?: { message?: string } } }).response;
+        msg = res?.message || res?.data?.message || "";
+      }
+      const errMsg = err instanceof Error ? err.message : "Failed to add student";
+      const combined = msg || errMsg;
+      if (
+        combined.toLowerCase().includes("already registered") ||
+        combined.toLowerCase().includes("email already")
+      ) {
+        setError("A student with this email already exists.");
+      } else {
+        setError(combined || "Failed to add student");
+      }
+    } finally {
+      setLoading(false);
+    }
   }
 
   function handleCancel() {
@@ -173,6 +257,19 @@ export function AddStudentDialog({
             />
           </div>
 
+          {/* Password */}
+          <div className="w-full">
+            <InputField
+              label="Password"
+              type="password"
+              placeholder="Enter password (min 6 characters)"
+              value={formData.password || ""}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
+            />
+          </div>
+
           {/* Grade */}
           <div className="w-full">
             <SelectField
@@ -199,19 +296,17 @@ export function AddStudentDialog({
                 }))}
                 value={formData.startingModule || undefined}
                 onChange={(value) =>
-                  setFormData({ ...formData, startingModule: value })
+                  setFormData({ ...formData, startingModule: value, lesson: null })
                 }
                 className="w-full!"
               />
             </div>
             <div className="flex-1 min-w-0">
               <SelectField
+                key={formData.startingModule || "no-module"}
                 label="Lesson"
-                placeholder="Select lesson"
-                options={lessons.map((l) => ({
-                  label: l.label,
-                  value: l.value,
-                }))}
+                placeholder={formData.startingModule ? (loadingLessons ? "Loading lessons..." : "Select lesson") : "Select module first"}
+                options={moduleLessons.map((l) => ({ label: l.label, value: l.value }))}
                 value={formData.lesson || undefined}
                 onChange={(value) =>
                   setFormData({ ...formData, lesson: value })
@@ -221,6 +316,19 @@ export function AddStudentDialog({
             </div>
           </div>
         </div>
+
+        {error && (
+          <p
+            style={{
+              color: "#ff6b6b",
+              fontFamily: "var(--font-orbitron), system-ui, sans-serif",
+              fontSize: "14px",
+              width: "100%",
+            }}
+          >
+            {error}
+          </p>
+        )}
 
         {/* Action Buttons */}
         <div className="flex gap-[32px] items-start justify-center w-full">
@@ -238,15 +346,15 @@ export function AddStudentDialog({
 
           {/* Add Student Button */}
           <PrimaryButton
-            text="Add student"
-            iconSrc="/assets/icons/admin/filter_checkmark.svg"
+            text={loading ? "Adding..." : "Add student"}
+            iconSrc={loading ? undefined : "/assets/icons/admin/filter_checkmark.svg"}
             iconAlt="Add student"
             iconWidth={30}
             iconHeight={30}
             variant="filled"
             onClick={handleSubmit}
             className="flex-1"
-      
+            disabled={loading}
           />
         </div>
       </div>

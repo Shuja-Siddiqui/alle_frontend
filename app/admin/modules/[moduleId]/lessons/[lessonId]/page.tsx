@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, use } from "react";
+import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { LessonStatsCard } from "../../../../../../components/LessonStatsCard";
@@ -8,6 +8,34 @@ import { LessonObjective } from "../../../../../../components/LessonObjective";
 import { PerformanceMarkers } from "../../../../../../components/PerformanceMarkers";
 import { StudentsTable, StudentRowData } from "../../../../../../components/StudentsTable";
 import { AddStudentDialog, AddStudentFormData } from "../../../../../../components/AddStudentDialog";
+import { api } from "../../../../../../lib/api-client";
+
+const LANGUAGE_NAMES: Record<string, string> = {
+  en: "English",
+  es: "Spanish",
+  fr: "French",
+  hi: "Hindi",
+  ar: "Arabic",
+};
+
+type LessonApiData = {
+  id: string;
+  title: string;
+  lessonType?: string;
+  skillFocus?: string[];
+  preview?: string;
+  estimatedTime?: string;
+};
+
+type StudentApiData = {
+  id: string;
+  name: string;
+  grade?: string;
+  languagePreference?: string;
+  avatarUrl?: string;
+  status: string;
+  progress: number;
+};
 
 export default function LessonDetailsPage({
   params,
@@ -17,124 +45,89 @@ export default function LessonDetailsPage({
   const router = useRouter();
   const { moduleId, lessonId } = use(params);
   const [showAddStudentDialog, setShowAddStudentDialog] = useState(false);
+  const [lessonData, setLessonData] = useState<LessonApiData | null>(null);
+  const [lessonStudents, setLessonStudents] = useState<StudentRowData[]>([]);
+  const [loadingLesson, setLoadingLesson] = useState(true);
+  const [loadingStudents, setLoadingStudents] = useState(true);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   function handleBackClick() {
     router.push(`/admin/modules/${moduleId}`);
   }
 
-  function handleAddStudent(data: AddStudentFormData) {
-    // TODO: Implement API call to add student
-    console.log("Adding student:", data);
+  function handleAddStudent() {
+    setRefreshTrigger((prev) => prev + 1);
   }
 
-  // TODO: Fetch lesson data from API using moduleId and lessonId
-  // Mock data for now
-  const lessonData = {
-    id: lessonId,
-    moduleId: moduleId,
-    lessonNumber: 1,
-    title: "AI vowel team",
-    sound: "S",
-    lessonType: "Intro",
-    gradeLevel: "8-9",
-    completionRate: 75,
-    students: 6,
-    estimatedTime: "1 min.",
-    objective:
-      "Students will learn to recognize and blend the AI vowel team, improve pronunciation, and distinguish similar vowel sounds iun words",
-    tags: ["Blending", "Sound recognition", "Pronunciation", "Word sctructure"],
-    performance: {
-      averageAccuracy: 81,
-      totalErrors: 42,
-      topError: "/s/",
-      correctAnswers: 174,
-      incorrectAnswers: 42,
-      partialMastery: 27,
-      criticalErrors: 12,
-    },
-  };
+  useEffect(() => {
+    let isMounted = true;
 
-  // Mock student data for this lesson
-  const lessonStudents: StudentRowData[] = [
-    {
-      id: "1",
-      name: "Maxwell Thompson",
-      avatarSrc: "/assets/icons/avatar_gallery/Avatar-2.png",
-      avatarAlt: "Maxwell Thompson",
-      grade: "9",
-      language: "en",
-      languageName: "English",
-      successRate: 95,
-      progress: "Module 3, Lesson 1",
-      progressHasWarning: false,
-      status: "Active",
-    },
-    {
-      id: "2",
-      name: "Sophia Nguyen",
-      avatarSrc: "/assets/icons/avatar_gallery/Avatar-3.png",
-      avatarAlt: "Sophia Nguyen",
-      grade: "5",
-      language: "en",
-      languageName: "English",
-      successRate: 86,
-      progress: "Module 3, Lesson 1",
-      progressHasWarning: false,
-      status: "Active",
-    },
-    {
-      id: "3",
-      name: "Ethan Patel",
-      avatarSrc: "/assets/icons/avatar_gallery/Avatar-4.png",
-      avatarAlt: "Ethan Patel",
-      grade: "6",
-      language: "en",
-      languageName: "English",
-      successRate: 79,
-      progress: "Module 3, Lesson 1",
-      progressHasWarning: false,
-      status: "Active",
-    },
-    {
-      id: "4",
-      name: "Ava Johnson",
-      avatarSrc: "/assets/icons/avatar_gallery/Avatar-1.png",
-      avatarAlt: "Ava Johnson",
-      grade: "12",
-      language: "es",
-      languageName: "Spanish",
-      successRate: 66,
-      progress: "Module 3, Lesson 1",
-      progressHasWarning: false,
-      status: "Active",
-    },
-    {
-      id: "5",
-      name: "Liam Brown",
-      avatarSrc: "/assets/icons/avatar_gallery/Avatar-2.png",
-      avatarAlt: "Liam Brown",
-      grade: "4",
-      language: "es",
-      languageName: "Spanish",
-      successRate: 51,
-      progress: "Module 3, Lesson 1",
-      progressHasWarning: true,
-      status: "Active",
-    },
-    {
-      id: "6",
-      name: "Olivia Davis",
-      avatarSrc: "/assets/icons/avatar_gallery/Avatar-3.png",
-      avatarAlt: "Olivia Davis",
-      grade: "2",
-      language: "fr",
-      languageName: "French",
-      successRate: 49,
-      progress: "Module 3, Lesson 1",
-      progressHasWarning: true,
-      status: "Active",
-    },
-  ];
+    const fetchLesson = async () => {
+      try {
+        const response = await api.get<{ data?: LessonApiData }>(`/lessons/${lessonId}`);
+        const payload = response?.data ?? response;
+        const lesson = (payload as any)?.data ?? payload;
+        if (isMounted && lesson) {
+          setLessonData(lesson as LessonApiData);
+        }
+      } catch (error) {
+        console.error("❌ Failed to load lesson:", error);
+        if (isMounted) setLessonData(null);
+      } finally {
+        if (isMounted) setLoadingLesson(false);
+      }
+    };
+
+    fetchLesson();
+    return () => { isMounted = false; };
+  }, [lessonId]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchStudents = async () => {
+      try {
+        const response = await api.get<{ data?: StudentApiData[] }>(`/lessons/${lessonId}/students`);
+        const list = Array.isArray(response?.data) ? response.data : Array.isArray(response) ? response : [];
+        if (isMounted) {
+          const mapped: StudentRowData[] = list.map((s: StudentApiData) => {
+            const lang = (s.languagePreference || "en").toLowerCase().slice(0, 2);
+            const langCode = ["en", "es", "fr", "hi", "ar"].includes(lang) ? lang : "en";
+            return {
+              id: s.id,
+              name: s.name,
+              avatarSrc: s.avatarUrl || "/assets/icons/avatar_gallery/Avatar-1.png",
+              avatarAlt: s.name,
+              grade: s.grade || "-",
+              language: langCode as "en" | "es" | "fr" | "hi" | "ar",
+              languageName: LANGUAGE_NAMES[langCode] || "English",
+              successRate: s.progress ?? 0,
+              progress: s.status === "completed" ? "Completed" : s.status === "in_progress" ? "In Progress" : s.status,
+              progressHasWarning: (s.progress ?? 0) < 50,
+              status: s.status === "completed" ? "Completed" : "Active",
+            };
+          });
+          setLessonStudents(mapped);
+        }
+      } catch (error) {
+        console.error("❌ Failed to load students:", error);
+        if (isMounted) setLessonStudents([]);
+      } finally {
+        if (isMounted) setLoadingStudents(false);
+      }
+    };
+
+    fetchStudents();
+    return () => { isMounted = false; };
+  }, [lessonId, refreshTrigger]);
+
+  const studentsCount = lessonStudents.length;
+  const avgProgress =
+    studentsCount > 0
+      ? Math.round(
+          lessonStudents.reduce((sum, s) => sum + s.successRate, 0) / studentsCount
+        )
+      : 0;
 
   return (
     <div className="flex flex-col h-full w-full">
@@ -287,44 +280,56 @@ export default function LessonDetailsPage({
           padding: "0 32px 32px 32px",
         }}
       >
-        {/* Lesson Stats Card */}
-        <div style={{ marginBottom: "24px" }}>
-          <LessonStatsCard
-            lessonTitle={`Lesson ${lessonData.lessonNumber}: ${lessonData.title}`}
-            soundAndType={`Sound ${lessonData.sound} / ${lessonData.lessonType}`}
-            gradeLevel={lessonData.gradeLevel}
-            completionRate={lessonData.completionRate}
-            students={lessonData.students}
-            estimatedTime={lessonData.estimatedTime}
-          />
-        </div>
+        {loadingLesson ? (
+          <div style={{ color: "#FFF", padding: "24px" }}>Loading lesson...</div>
+        ) : lessonData ? (
+          <>
+            {/* Lesson Stats Card */}
+            <div style={{ marginBottom: "24px" }}>
+              <LessonStatsCard
+                lessonTitle={`Lesson: ${lessonData.title}`}
+                soundAndType={lessonData.lessonType || "—"}
+                gradeLevel="—"
+                completionRate={avgProgress}
+                students={studentsCount}
+                estimatedTime={lessonData.estimatedTime || "—"}
+              />
+            </div>
 
-        {/* Lesson Objective and Performance Markers - Side by Side */}
-        <div className="flex gap-[24px] items-start" style={{ marginBottom: "24px" }}>
-          {/* Left: Lesson Objective */}
-          <LessonObjective
-            objective={lessonData.objective}
-            tags={lessonData.tags}
-            className="w-[364px] shrink-0"
-          />
+            {/* Lesson Objective and Performance Markers - Side by Side */}
+            <div className="flex gap-[24px] items-start" style={{ marginBottom: "24px" }}>
+              {/* Left: Lesson Objective */}
+              <LessonObjective
+                objective={lessonData.preview || "No objective provided."}
+                tags={Array.isArray(lessonData.skillFocus) ? lessonData.skillFocus : []}
+                className="w-[364px] shrink-0"
+              />
 
-          {/* Right: Performance Markers */}
-          <PerformanceMarkers
-            averageAccuracy={lessonData.performance.averageAccuracy}
-            totalErrors={lessonData.performance.totalErrors}
-            topError={lessonData.performance.topError}
-            correctAnswers={lessonData.performance.correctAnswers}
-            incorrectAnswers={lessonData.performance.incorrectAnswers}
-            partialMastery={lessonData.performance.partialMastery}
-            criticalErrors={lessonData.performance.criticalErrors}
-            className="flex-1"
-          />
-        </div>
+              {/* Right: Performance Markers (derived from student progress) */}
+              <PerformanceMarkers
+                averageAccuracy={avgProgress}
+                totalErrors={0}
+                topError="—"
+                correctAnswers={0}
+                incorrectAnswers={0}
+                partialMastery={0}
+                criticalErrors={0}
+                className="flex-1"
+              />
+            </div>
 
-        {/* Students Table */}
-        <div>
-          <StudentsTable students={lessonStudents} />
-        </div>
+            {/* Students Table */}
+            <div>
+              {loadingStudents ? (
+                <div style={{ color: "#FFF", padding: "24px" }}>Loading students...</div>
+              ) : (
+                <StudentsTable students={lessonStudents} />
+              )}
+            </div>
+          </>
+        ) : (
+          <div style={{ color: "#FFF", padding: "24px" }}>Lesson not found.</div>
+        )}
       </div>
 
       {/* Add Student Dialog */}

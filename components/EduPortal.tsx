@@ -17,7 +17,7 @@ export function EduPortal({ text = "EduPortal", onClick }: EduPortalProps) {
       onClick();
     } else {
       // Navigate to student home page by default
-      router.push("/student/home");
+      router.push("/student/dashboard");
     }
   };
 

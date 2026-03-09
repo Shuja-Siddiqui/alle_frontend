@@ -1,7 +1,9 @@
 export interface User {
     id: string;
     email: string;
-    name: string;
+    name?: string;
+    firstName?: string;
+    lastName?: string;
     role: 'student' | 'teacher' | 'admin';
     avatarUrl?: string;
     mascot?: {
@@ -19,4 +21,12 @@ export interface User {
       voiceAgent?: string; // Azure TTS voice agent name (e.g., "en-US-JennyNeural")
       [key: string]: any; // Allow any additional metadata
     };
+    badges?: {
+      id: string;
+      title: string;
+      description?: string | null;
+      iconActive?: string | null;
+      iconInactive?: string | null;
+      rarity?: string | null;
+    }[];
   }

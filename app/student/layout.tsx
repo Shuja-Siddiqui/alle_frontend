@@ -4,6 +4,8 @@ import { useRouter, usePathname } from "next/navigation";
 import { StudentNavbar } from "../../components/StudentNavbar";
 import { LevelOverlayProvider, useLevelOverlay } from "./contexts/LevelOverlayContext";
 import { ProtectedRoute } from "../../components/ProtectedRoute";
+import { useAuth } from "../../contexts/AuthContext";
+import { TOTAL_XP_FOR_BAR } from "./constants";
 
 function StudentLayoutContent({
   children,
@@ -13,13 +15,11 @@ function StudentLayoutContent({
   const { isOverlayOpen } = useLevelOverlay();
   const router = useRouter();
   const pathname = usePathname();
-  
-  // TODO: Fetch actual student data from API
-  const studentXp = 150; // Example: student has 150 XP
-  const totalLevels = 44;
-  const xpPerLevel = 10;
-  const totalXpNeeded = totalLevels * xpPerLevel; // 440 XP total
-  const profileImageSrc = "/assets/icons/avatar_gallery/Avatar-1.png"; // TODO: Get from student data
+  const { user } = useAuth();
+
+  const studentXp = user?.xp ?? 0;
+  const totalXpForBar = TOTAL_XP_FOR_BAR;
+  const profileImageSrc = user?.avatarUrl ?? "/assets/icons/avatar_gallery/Avatar-1.png";
 
   // Check if current route should be protected
   // Auth routes (login, signup) are public, all other student routes are protected
@@ -33,7 +33,6 @@ function StudentLayoutContent({
         style={{
           backgroundImage: "url('/assets/bg.png')",
           backgroundSize: "cover",
-          backgroundPosition: "-10% -10%",
           minHeight: "100vh",
           width: "100%",
         }}
@@ -51,7 +50,6 @@ function StudentLayoutContent({
         style={{
           backgroundImage: "url('/assets/bg.png')",
           backgroundSize: "cover",
-          backgroundPosition: "-10% -10%",
           minHeight: "100vh",
           width: "100%",
         }}
@@ -60,7 +58,7 @@ function StudentLayoutContent({
         <div className="w-full flex justify-center" style={{ paddingTop: "40px" }}>
           <StudentNavbar
             xp={studentXp}
-            xpMax={totalXpNeeded}
+            xpMax={totalXpForBar}
             profileImageSrc={profileImageSrc}
             hideXpSlider={isOverlayOpen}
             onProfileClick={() => {

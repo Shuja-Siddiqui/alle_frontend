@@ -124,7 +124,7 @@ export default function MasteryCheckPage() {
                     text="Continue"
                     size="medium"
                     variant="filled"
-                    onClick={() => router.push("/student/home")}
+                    onClick={() => router.push("/student/dashboard")}
                 />
             </div>
 

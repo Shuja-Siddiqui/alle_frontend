@@ -111,6 +111,20 @@ export function useSpeechAssessment() {
         slack?: number;
       } = {}
     ): Promise<AssessmentResult> => {
+      // MOCK MODE: Skip API call, return mock result
+      const mockMode = localStorage.getItem('MOCK_MODE') === 'true';
+      if (mockMode) {
+        console.log('[MOCK MODE] Skipping SpeechSuper API call, returning mock result');
+        setRecordingState((prev) => ({ ...prev, isAssessing: false, error: null }));
+        // Return mock success result (exactMatch)
+        return {
+          success: true,
+          qualityScore: 90,
+          recognizedText: phoneme,
+          feedbackType: "exactMatch",
+        };
+      }
+
       setRecordingState((prev) => ({ ...prev, isAssessing: true, error: null }));
 
       try {
@@ -192,6 +206,20 @@ export function useSpeechAssessment() {
       taskId: string,
       expectedText: string
     ): Promise<AssessmentResult> => {
+      // MOCK MODE: Skip API call, return mock result
+      const mockMode = localStorage.getItem('MOCK_MODE') === 'true';
+      if (mockMode) {
+        console.log('[MOCK MODE] Skipping Azure API call, returning mock result');
+        setRecordingState((prev) => ({ ...prev, isAssessing: false, error: null }));
+        // Return mock success result (exactMatch)
+        return {
+          success: true,
+          qualityScore: 90,
+          recognizedText: expectedText,
+          feedbackType: "exactMatch",
+        };
+      }
+
       setRecordingState((prev) => ({ ...prev, isAssessing: true, error: null }));
 
       try {
@@ -291,4 +319,5 @@ export function useSpeechAssessment() {
     error: recordingState.error,
   };
 }
+
 

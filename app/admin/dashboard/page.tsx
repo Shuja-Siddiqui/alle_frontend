@@ -1,19 +1,149 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { AdminNavbar } from "../../../components/AdminNavbar";
 import { StatCard } from "../../../components/StatCard";
 import { StudentStatCard } from "../../../components/StudentStatCard";
 import { RetentionMetrics } from "../../../components/RetentionMetrics";
 import { ModuleStatCard } from "../../../components/ModuleStatCard";
 import { AddStudentDialog, AddStudentFormData } from "../../../components/AddStudentDialog";
+import { api } from "../../../lib/api-client";
+
+type DashboardStats = {
+  totalStudents: number;
+  lessonCompletionPercentage: number;
+  engagementActivity: {
+    count: number;
+    moduleName: string | null;
+  };
+};
+
+type DashboardModule = {
+  id: string;
+  title: string;
+  lessonsCount: number;
+  currentStudentsCount: number;
+  weeks?: number | null;
+  estimatedTime?: string | null;
+  grades?: string | null;
+};
+
+type DashboardStudent = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  avatarUrl: string | null;
+  grade: string;
+  modulesCompleted: number;
+  lessonsCompleted: number;
+};
+
+const DEFAULT_AVATAR = "/assets/icons/others/profile_avatar_large.png";
 
 export default function AdminDashboardPage() {
   const [showAddStudentDialog, setShowAddStudentDialog] = useState(false);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loadingStats, setLoadingStats] = useState(true);
+  const [dashboardStudents, setDashboardStudents] = useState<DashboardStudent[]>([]);
+  const [loadingStudents, setLoadingStudents] = useState(true);
+  const [dashboardModules, setDashboardModules] = useState<DashboardModule[]>([]);
+  const [loadingModules, setLoadingModules] = useState(true);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  function handleAddStudent(data: AddStudentFormData) {
-    // TODO: Implement API call to add student
-    console.log("Adding student:", data);
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchStats = async () => {
+      try {
+        const response = await api.get<any>("/dashboard/stats");
+        const payload: DashboardStats = response?.data ?? response;
+        if (isMounted) {
+          setStats(payload);
+        }
+      } catch (error) {
+        console.error("❌ Failed to load dashboard stats:", error);
+        if (isMounted) {
+          setStats(null);
+        }
+      } finally {
+        if (isMounted) {
+          setLoadingStats(false);
+        }
+      }
+    };
+
+    fetchStats();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [refreshTrigger]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchModules = async () => {
+      try {
+        const response = await api.get<any>("/modules");
+        const list: DashboardModule[] = Array.isArray(response?.data)
+          ? response.data
+          : Array.isArray(response)
+          ? response
+          : [];
+        if (isMounted) {
+          setDashboardModules(list);
+        }
+      } catch (error) {
+        console.error("❌ Failed to load dashboard modules:", error);
+        if (isMounted) {
+          setDashboardModules([]);
+        }
+      } finally {
+        if (isMounted) {
+          setLoadingModules(false);
+        }
+      }
+    };
+
+    fetchModules();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [refreshTrigger]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchStudents = async () => {
+      try {
+        const response = await api.get<any>("/dashboard/students?limit=4");
+        const list = Array.isArray(response?.data) ? response.data : Array.isArray(response) ? response : [];
+        if (isMounted) {
+          setDashboardStudents(list);
+        }
+      } catch (error) {
+        console.error("❌ Failed to load dashboard students:", error);
+        if (isMounted) {
+          setDashboardStudents([]);
+        }
+      } finally {
+        if (isMounted) {
+          setLoadingStudents(false);
+        }
+      }
+    };
+
+    fetchStudents();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [refreshTrigger]);
+
+  function handleAddStudent() {
+    setRefreshTrigger((prev) => prev + 1);
   }
 
   return (
@@ -41,7 +171,11 @@ export default function AdminDashboardPage() {
         <div className="flex gap-[24px] items-center" style={{ marginBottom: "32px" }}>
           {/* Card 1: Total students */}
           <StatCard
-            title="321"
+            title={
+              loadingStats
+                ? "..."
+                : String(stats?.totalStudents ?? 0)
+            }
             subtitle="Total students"
             iconSrc="/assets/icons/admin/students.svg"
             iconAlt="Students icon"
@@ -50,7 +184,11 @@ export default function AdminDashboardPage() {
 
           {/* Card 2: Lesson completion */}
           <StatCard
-            title="13%"
+            title={
+              loadingStats
+                ? "..."
+                : `${stats?.lessonCompletionPercentage ?? 0}%`
+            }
             subtitle="Lesson completion"
             iconSrc="/assets/icons/admin/modules.svg"
             iconAlt="Modules icon"
@@ -59,8 +197,18 @@ export default function AdminDashboardPage() {
 
           {/* Card 3: Engagement activity */}
           <StatCard
-            title="24"
-            supportiveText="students completed module 'A'"
+            title={
+              loadingStats
+                ? "..."
+                : String(stats?.engagementActivity?.count ?? 0)
+            }
+            supportiveText={
+              loadingStats
+                ? "Loading engagement..."
+                : stats?.engagementActivity?.moduleName
+                ? `students completed module '${stats.engagementActivity.moduleName}'`
+                : "students completed modules"
+            }
             subtitle="Engagement activity"
             iconSrc="/assets/icons/admin/analytics.svg"
             iconAlt="Analytics icon"
@@ -110,13 +258,8 @@ export default function AdminDashboardPage() {
               >
                 Students
               </h2>
-              <a
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  // TODO: Navigate to all students page
-                  console.log("View all students");
-                }}
+              <Link
+                href="/admin/students"
                 style={{
                   color: "#ff00ca",
                   fontFamily: "var(--font-orbitron), system-ui, sans-serif",
@@ -130,58 +273,33 @@ export default function AdminDashboardPage() {
                 }}
               >
                 View all
-              </a>
+              </Link>
             </div>
 
-            {/* Student Cards - 2x2 Grid (2 cards per row, 2 rows) */}
+            {/* Student Cards - 2x2 Grid (from API) */}
             <div className="flex flex-wrap gap-[24px] flex-1" style={{ alignContent: "flex-start" }}>
-              {/* Student 1: Kinsley Harrell */}
-              <StudentStatCard
-                avatarSrc="/assets/icons/avatar_gallery/Avatar-1.png"
-                avatarAlt="Kinsley Harrell"
-                studentName="Kinsley Harrell"
-                grade="12 Grade"
-                modules={5}
-                lessons={41}
-                className="shrink-0"
-                style={{ width: "363px" }}
-              />
-
-              {/* Student 2: Maxwell Thompson */}
-              <StudentStatCard
-                avatarSrc="/assets/icons/avatar_gallery/Avatar-2.png"
-                avatarAlt="Maxwell Thompson"
-                studentName="Maxwell Thompson"
-                grade="9 Grade"
-                modules={3}
-                lessons={23}
-                className="shrink-0"
-                style={{ width: "363px" }}
-              />
-
-              {/* Student 3: Livia Rosales */}
-              <StudentStatCard
-                avatarSrc="/assets/icons/avatar_gallery/Avatar-3.png"
-                avatarAlt="Livia Rosales"
-                studentName="Livia Rosales"
-                grade="8 Grade"
-                modules={2}
-                lessons={9}
-                className="shrink-0"
-                style={{ width: "363px" }}
-              />
-
-              {/* Student 4: Jaquan Kenter */}
-              <StudentStatCard
-                avatarSrc="/assets/icons/avatar_gallery/Avatar-4.png"
-                avatarAlt="Jaquan Kenter"
-                studentName="Jaquan Kenter"
-                grade="5 Grade"
-                modules={1}
-                lessons={3}
-                className="shrink-0"
-                style={{ width: "363px" }}
-              />
+              {loadingStudents ? (
+                <div style={{ color: "#FFF", padding: "24px" }}>Loading students...</div>
+              ) : dashboardStudents.length === 0 ? (
+                <div style={{ color: "#FFF", padding: "24px" }}>No students yet.</div>
+              ) : (
+                dashboardStudents.map((student) => {
+                  const name = [student.firstName, student.lastName].filter(Boolean).join(" ") || "Student";
+                  return (
+                    <StudentStatCard
+                      key={student.id}
+                      avatarSrc={student.avatarUrl || DEFAULT_AVATAR}
+                      avatarAlt={name}
+                      studentName={name}
+                      grade={student.grade || "—"}
+                      modules={student.modulesCompleted}
+                      lessons={student.lessonsCompleted}
+                      className="shrink-0"
+                      style={{ width: "363px" }}
+                    />
+                  );
+                })
+              )}
             </div>
           </div>
         </div>
@@ -227,7 +345,7 @@ export default function AdminDashboardPage() {
             </a>
           </div>
 
-          {/* Module Cards Row - Only 4 cards with custom scrollbar */}
+          {/* Module Cards Row - scrollable, data from API */}
           <div
             className="flex gap-[24px] justify-start items-start overflow-x-auto module-scrollbar"
             style={{
@@ -235,50 +353,31 @@ export default function AdminDashboardPage() {
               scrollbarColor: "#ff00ca #21265d",
             }}
           >
-
-            {/* Module 1 */}
-            <ModuleStatCard
-              moduleNumber="Module 1"
-              title="High-frequency foundations"
-              lessons={10}
-              students={18}
-              weeks="1-2"
-              grades="1-2"
-              className="w-[558px] shrink-0"
-            />
-
-            {/* Module 2 */}
-            <ModuleStatCard
-              moduleNumber="Module 2"
-              title="Digraphs + early multisyllabic"
-              lessons={8}
-              students={18}
-              weeks="3-4"
-              grades="3-4"
-              className="w-[558px] shrink-0"
-            />
-
-            {/* Module 3 */}
-            <ModuleStatCard
-              moduleNumber="Module 3"
-              title="Long vowels"
-              lessons={7}
-              students={18}
-              weeks="5-6"
-              grades="5-6"
-              className="w-[558px] shrink-0"
-            />
-
-            {/* Module 4 */}
-            <ModuleStatCard
-              moduleNumber="Module 4"
-              title="Extended code"
-              lessons={6}
-              students={18}
-              weeks="7-10"
-              grades="7-8"
-              className="w-[558px] shrink-0"
-            />
+            {loadingModules ? (
+              <div style={{ color: "#FFF", padding: "24px" }}>Loading modules...</div>
+            ) : dashboardModules.length === 0 ? (
+              <div style={{ color: "#FFF", padding: "24px" }}>No modules yet.</div>
+            ) : (
+              dashboardModules.map((mod, index) => (
+                <ModuleStatCard
+                  key={mod.id}
+                  moduleId={mod.id}
+                  moduleNumber={`Module ${index + 1}`}
+                  title={mod.title}
+                  lessons={mod.lessonsCount ?? 0}
+                  students={mod.currentStudentsCount ?? 0}
+                  weeks={
+                    mod.estimatedTime
+                      ? mod.estimatedTime
+                      : mod.weeks != null
+                      ? String(mod.weeks)
+                      : ""
+                  }
+                  grades={mod.grades ?? ""}
+                  className="w-[558px] shrink-0"
+                />
+              ))
+            )}
           </div>
         </div>
       </div>
@@ -288,6 +387,7 @@ export default function AdminDashboardPage() {
         open={showAddStudentDialog}
         onClose={() => setShowAddStudentDialog(false)}
         onAddStudent={handleAddStudent}
+        modules={dashboardModules.map((m) => ({ value: m.id, label: m.title }))}
       />
     </div>
   );

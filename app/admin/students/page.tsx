@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AdminNavbar } from "../../../components/AdminNavbar";
-import { StudentsTable, StudentRowData } from "../../../components/StudentsTable";
+import { StudentsTable, StudentRowData, LanguageCode } from "../../../components/StudentsTable";
 import { TablePagination } from "../../../components/TablePagination";
 import { SearchAndFilter } from "../../../components/SearchAndFilter";
 import {
@@ -12,8 +13,24 @@ import {
   StatusFilter,
 } from "../../../components/FilterDialog";
 import { AddStudentDialog, AddStudentFormData } from "../../../components/AddStudentDialog";
+import { api } from "../../../lib/api-client";
+
+const LANGUAGE_NAME_MAP: Record<LanguageCode, string> = {
+  en: "English",
+  es: "Spanish",
+  fr: "French",
+  hi: "Hindi",
+  ar: "Arabic",
+};
+
+type ModuleOption = {
+  value: string;
+  label: string;
+  lessons: Array<{ value: string; label: string }>;
+};
 
 export default function AdminStudentsPage() {
+  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchValue, setSearchValue] = useState("");
   const [showFilterDialog, setShowFilterDialog] = useState(false);
@@ -25,147 +42,188 @@ export default function AdminStudentsPage() {
     status: "all",
   });
   const itemsPerPage = 10;
+  const [students, setStudents] = useState<StudentRowData[]>([]);
+  const [totalItems, setTotalItems] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [moduleOptions, setModuleOptions] = useState<ModuleOption[]>([]);
+  const [loadingFilterOptions, setLoadingFilterOptions] = useState(true);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  function handleAddStudent(data: AddStudentFormData) {
-    // TODO: Implement API call to add student
-    console.log("Adding student:", data);
+  const handleStudentRowClick = (studentId: string) => {
+    router.push(`/admin/students/${studentId}`);
+  };
+
+  function handleAddStudent() {
+    setRefreshTrigger((prev) => prev + 1);
   }
 
-  // Mock student data - replace with actual API call
-  const allStudents: StudentRowData[] = [
-    {
-      id: "1",
-      avatarSrc: "/assets/icons/avatar_gallery/Avatar-2.png",
-      avatarAlt: "Maxwell Thompson",
-      name: "Maxwell Thompson",
-      grade: "9",
-      language: "en",
-      languageName: "English",
-      successRate: 95,
-      progress: "Module 2, Lesson 3",
-      status: "Active",
-    },
-    {
-      id: "2",
-      avatarSrc: "/assets/icons/avatar_gallery/Avatar-3.png",
-      avatarAlt: "Sophia Nguyen",
-      name: "Sophia Nguyen",
-      grade: "5",
-      language: "en",
-      languageName: "English",
-      successRate: 86,
-      progress: "Module 1, Lesson 5",
-      status: "Active",
-    },
-    {
-      id: "3",
-      avatarSrc: "/assets/icons/avatar_gallery/Avatar-4.png",
-      avatarAlt: "Ethan Patel",
-      name: "Ethan Patel",
-      grade: "6",
-      language: "en",
-      languageName: "English",
-      successRate: 79,
-      progress: "Module 2, Lesson 1",
-      status: "Active",
-    },
-    {
-      id: "4",
-      avatarSrc: "/assets/icons/avatar_gallery/Avatar-5.png",
-      avatarAlt: "Ava Johnson",
-      name: "Ava Johnson",
-      grade: "12",
-      language: "es",
-      languageName: "Spanish",
-      successRate: 66,
-      progress: "Module 3, Lesson 4",
-      status: "Active",
-    },
-    {
-      id: "5",
-      avatarSrc: "/assets/icons/avatar_gallery/Avatar-6.png",
-      avatarAlt: "Liam Brown",
-      name: "Liam Brown",
-      grade: "4",
-      language: "es",
-      languageName: "Spanish",
-      successRate: 51,
-      progress: "Module 2, Lesson 2",
-      status: "Active",
-    },
-    {
-      id: "6",
-      avatarSrc: "/assets/icons/avatar_gallery/Avatar-7.png",
-      avatarAlt: "Olivia Davis",
-      name: "Olivia Davis",
-      grade: "2",
-      language: "fr",
-      languageName: "French",
-      successRate: 49,
-      progress: "Module 1, Lesson 6",
-      progressHasWarning: true,
-      status: "Active",
-    },
-    {
-      id: "7",
-      avatarSrc: "/assets/icons/avatar_gallery/Avatar-8.png",
-      avatarAlt: "Noah Wilson",
-      name: "Noah Wilson",
-      grade: "7",
-      language: "fr",
-      languageName: "French",
-      successRate: 28,
-      progress: "Module 2, Lesson 4",
-      progressHasWarning: true,
-      status: "Active",
-    },
-    {
-      id: "8",
-      avatarSrc: "/assets/icons/avatar_gallery/Avatar-9.png",
-      avatarAlt: "Isabella Martinez",
-      name: "Isabella Martinez",
-      grade: "8",
-      language: "hi",
-      languageName: "Hindi",
-      successRate: 24,
-      progress: "Module 3, Lesson 1",
-      status: "Active",
-    },
-    {
-      id: "9",
-      avatarSrc: "/assets/icons/avatar_gallery/Avatar-10.png",
-      avatarAlt: "James Garcia",
-      name: "James Garcia",
-      grade: "2",
-      language: "ar",
-      languageName: "Arabic",
-      successRate: 3,
-      progress: "Module 1, Lesson 7",
-      progressHasWarning: true,
-      status: "Inactive",
-    },
-    {
-      id: "10",
-      avatarSrc: "/assets/icons/avatar_gallery/Avatar-11.png",
-      avatarAlt: "Aaliyah Ramirez",
-      name: "Aaliyah Ramirez",
-      grade: "8",
-      language: "ar",
-      languageName: "Arabic",
-      successRate: 1,
-      progress: "Module 1, Lesson 7",
-      status: "Inactive",
-    },
-  ];
+  // Load modules and their lessons for the filter dialog
+  useEffect(() => {
+    let isMounted = true;
 
-  // Filter and search students
-  const filteredStudents = allStudents.filter((student) => {
+    const fetchModuleFilters = async () => {
+      try {
+        const response = await api.get<any>("/modules");
+        const list = Array.isArray(response?.data)
+          ? response.data
+          : Array.isArray(response)
+          ? response
+          : [];
+
+        if (!isMounted) return;
+
+        const baseOptions: ModuleOption[] = list.map((mod: any) => ({
+          value: mod.id,
+          label: mod.title,
+          lessons: [],
+        }));
+
+        setModuleOptions(baseOptions);
+
+        // For each module, fetch its lessons
+        const lessonsResults = await Promise.all(
+          list.map(async (mod: any) => {
+            try {
+              const lessonsResponse = await api.get<any>(`/modules/${mod.id}/lessons`);
+              const lessonsList = Array.isArray(lessonsResponse?.data)
+                ? lessonsResponse.data
+                : Array.isArray(lessonsResponse)
+                ? lessonsResponse
+                : [];
+
+              return {
+                moduleId: mod.id,
+                lessons: lessonsList.map((lesson: any) => ({
+                  value: lesson.id,
+                  label: lesson.title,
+                })),
+              };
+            } catch (error) {
+              console.error("❌ Failed to load lessons for module:", mod.id, error);
+              return {
+                moduleId: mod.id,
+                lessons: [] as Array<{ value: string; label: string }>,
+              };
+            }
+          })
+        );
+
+        if (!isMounted) return;
+
+        setModuleOptions((prev) =>
+          prev.map((mod) => {
+            const match = lessonsResults.find((r) => r.moduleId === mod.value);
+            return match ? { ...mod, lessons: match.lessons } : mod;
+          })
+        );
+      } catch (error) {
+        console.error("❌ Failed to load modules for filters:", error);
+        if (isMounted) {
+          setModuleOptions([]);
+        }
+      } finally {
+        if (isMounted) {
+          setLoadingFilterOptions(false);
+        }
+      }
+    };
+
+    fetchModuleFilters();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchStudents = async () => {
+      try {
+        setLoading(true);
+        const params = new URLSearchParams();
+        params.set("page", String(currentPage));
+        params.set("limit", String(itemsPerPage));
+        if (searchValue) {
+          params.set("search", searchValue);
+        }
+        // Apply server-side filters when they are not at their default values
+        if (filters.successRate !== "all") {
+          params.set("successRate", filters.successRate);
+        }
+        if (filters.status !== "all") {
+          params.set("status", filters.status);
+        }
+        if (filters.module) {
+          params.set("module", filters.module);
+        }
+        if (filters.lesson) {
+          params.set("lesson", filters.lesson);
+        }
+
+        const response = await api.get<any>(`/users/students?${params.toString()}`);
+        const data = response?.data ?? response;
+        const meta = response?.meta ?? {};
+        const pagination = meta.pagination ?? {};
+
+        const mapped: StudentRowData[] = Array.isArray(data)
+          ? data.map((s: any) => {
+              const lang = (s.languagePreference as LanguageCode) || "en";
+              const name = [s.firstName, s.lastName].filter(Boolean).join(" ") || s.email || "Student";
+              const successRate = typeof s.successRate === "number" ? s.successRate : 0;
+              const lessonsStarted = typeof s.lessonsStarted === "number" ? s.lessonsStarted : 0;
+
+              return {
+                id: s.id,
+                avatarSrc: s.avatarUrl || "/assets/icons/avatar_gallery/Avatar-1.png",
+                avatarAlt: name,
+                name,
+                grade: s.grade || "",
+                language: lang,
+                languageName: LANGUAGE_NAME_MAP[lang] || "English",
+                successRate,
+                progress: lessonsStarted
+                  ? `Lessons started: ${lessonsStarted}`
+                  : "Not started yet",
+                progressHasWarning: successRate > 0 && successRate < 50,
+                status: "Active",
+                onClick: () => handleStudentRowClick(s.id),
+              };
+            })
+          : [];
+
+        if (isMounted) {
+          setStudents(mapped);
+          setTotalItems(pagination.total ?? mapped.length);
+        }
+      } catch (error) {
+        console.error("❌ Failed to load students:", error);
+        if (isMounted) {
+          setStudents([]);
+          setTotalItems(0);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchStudents();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [currentPage, searchValue, itemsPerPage, filters, refreshTrigger]);
+
+  // Filter and search students (client-side filters on top of API page)
+  const filteredStudents = students.filter((student) => {
     // Search filter
     if (searchValue) {
       const searchLower = searchValue.toLowerCase();
       const matchesSearch =
         student.name.toLowerCase().includes(searchLower) ||
-        student.name.toLowerCase().includes(searchLower); // Add email field when available
+        student.name.toLowerCase().includes(searchLower);
       if (!matchesSearch) return false;
     }
 
@@ -204,11 +262,20 @@ export default function AdminStudentsPage() {
     return true;
   });
 
-  // Calculate pagination
-  const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentStudents = filteredStudents.slice(startIndex, endIndex);
+  // Calculate pagination (server-side total, client-side filters on current page)
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const currentStudents = filteredStudents;
+
+  const moduleSelectOptions = moduleOptions.map((mod) => ({
+    value: mod.value,
+    label: mod.label,
+  }));
+
+  const selectedModule = filters.module
+    ? moduleOptions.find((mod) => mod.value === filters.module)
+    : undefined;
+
+  const lessonSelectOptions = selectedModule?.lessons ?? [];
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -272,12 +339,12 @@ export default function AdminStudentsPage() {
           <StudentsTable students={currentStudents} />
 
           {/* Pagination - Only show if there are students */}
-          {filteredStudents.length > 0 && (
+          {totalItems > 0 && (
             <TablePagination
               currentPage={currentPage}
               totalPages={totalPages}
               itemsPerPage={itemsPerPage}
-              totalItems={filteredStudents.length}
+              totalItems={totalItems}
               itemName="students"
               onPageChange={handlePageChange}
             />
@@ -289,23 +356,14 @@ export default function AdminStudentsPage() {
       <FilterDialog
         open={showFilterDialog}
         filters={filters}
-        onFiltersChange={setFilters}
+        // Only apply filters (and trigger refetch) when user clicks Apply/Reset,
+        // not on every change inside the dialog.
+        onFiltersChange={() => {}}
         onApply={handleFilterApply}
         onReset={handleFilterReset}
         onClose={() => setShowFilterDialog(false)}
-        modules={[
-          { value: "1", label: "Module 1" },
-          { value: "2", label: "Module 2" },
-          { value: "3", label: "Module 3" },
-          { value: "4", label: "Module 4" },
-        ]}
-        lessons={[
-          { value: "1", label: "Lesson 1" },
-          { value: "2", label: "Lesson 2" },
-          { value: "3", label: "Lesson 3" },
-          { value: "4", label: "Lesson 4" },
-          { value: "5", label: "Lesson 5" },
-        ]}
+        modules={moduleSelectOptions}
+        lessons={lessonSelectOptions}
       />
 
       {/* Add Student Dialog */}
@@ -313,19 +371,7 @@ export default function AdminStudentsPage() {
         open={showAddStudentDialog}
         onClose={() => setShowAddStudentDialog(false)}
         onAddStudent={handleAddStudent}
-        modules={[
-          { value: "1", label: "Module 1" },
-          { value: "2", label: "Module 2" },
-          { value: "3", label: "Module 3" },
-          { value: "4", label: "Module 4" },
-        ]}
-        lessons={[
-          { value: "1", label: "Lesson 1" },
-          { value: "2", label: "Lesson 2" },
-          { value: "3", label: "Lesson 3" },
-          { value: "4", label: "Lesson 4" },
-          { value: "5", label: "Lesson 5" },
-        ]}
+        modules={moduleOptions.map((m) => ({ value: m.value, label: m.label }))}
       />
     </div>
   );

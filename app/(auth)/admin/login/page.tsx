@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { RolePageLayout } from "../../../../components/RolePageLayout";
 import { EduPortal } from "../../../../components/EduPortal";
 import { InputField } from "../../../../components/InputField";
@@ -9,8 +10,13 @@ import { ResetPasswordDialog } from "../../../../components/ResetPasswordDialog"
 import { Toast } from "../../../../components/Toast";
 import { SetNewPasswordDialog } from "../../../../components/SetNewPasswordDialog";
 import { ConfirmCancelDialog } from "../../../../components/ConfirmCancelDialog";
+import { useAuth } from "../../../../contexts/AuthContext";
+import { useUI } from "../../../../contexts/UIContext";
 
 export default function AdminLoginPage() {
+  const router = useRouter();
+  const { login } = useAuth();
+  const { showSuccess, showError, showLoader, hideLoader } = useUI();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
@@ -21,9 +27,21 @@ export default function AdminLoginPage() {
   const [resetConfirmPassword, setResetConfirmPassword] = useState("");
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // TODO: wire up to admin login API
+    try {
+      showLoader("Signing in...");
+      const user = await login(email, password);
+      hideLoader();
+      showSuccess("Login successful! Redirecting...");
+      // Redirect by role: admin → admin dashboard, student/teacher → student dashboard
+      router.push(user?.role === "admin" ? "/admin" : "/student");
+    } catch (error: unknown) {
+      hideLoader();
+      const err = error as { message?: string; response?: { message?: string } };
+      const message = err?.response?.message || err?.message || "Invalid email or password";
+      showError(message);
+    }
   };
 
   const handleOpenResetDialog = () => {

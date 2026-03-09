@@ -22,7 +22,7 @@ export interface AuthContextType {
   token: string | null;
 
   // Auth actions
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
   updateUser: (data: Partial<User>) => void;
@@ -93,8 +93,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     loadAuthData();
   }, []);
 
-  // Login function
-  const login = async (email: string, password: string) => {
+  // Login function - returns user so callers can redirect by role
+  const login = async (email: string, password: string): Promise<User> => {
     try {
       setIsLoading(true);
       console.log('🔐 AuthContext: Calling login API...');
@@ -122,6 +122,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser(userData);
       
       console.log('✅ AuthContext: Login successful, user authenticated');
+      return userData;
     } catch (error) {
       console.error('❌ AuthContext: Login error:', error);
       throw error;
@@ -154,16 +155,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Logout function
   const logout = () => {
-    // Clear localStorage
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user_data');
-    
-    // Clear state
+    // Invalidate session on backend (if token/session exists)
+    api.post('/auth/logout').catch((error) => {
+      console.error('Error calling logout API:', error);
+    });
+
+    // Clear ALL localStorage for this origin (tokens, user data, cached settings, etc.)
+    if (typeof window !== 'undefined') {
+      localStorage.clear();
+    }
+
+    // Clear in-memory auth state
     setTokenState(null);
     setUser(null);
-
-    // Optionally call logout API
-    // api.post('/auth/logout').catch(console.error);
   };
 
   // Update user data locally
@@ -180,7 +184,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (!token) return;
 
     try {
-      const userData = await api.get<User>('/auth/me', token);
+      const response = await api.get<any>('/users/me', token);
+      const userData = response?.data ?? response;
       setUser(userData);
       localStorage.setItem('user_data', JSON.stringify(userData));
     } catch (error) {
