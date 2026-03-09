@@ -21,7 +21,7 @@ export default function StudentSignupPage() {
 
 function StudentSignupContent() {
   const router = useRouter();
-  const { register } = useAuth();
+  const { register, refreshUser } = useAuth();
   const { showSuccess, showError, showLoader, hideLoader } = useUI();
   const { loading: apiLoading, post, error: apiError } = useApiPost();
 
@@ -36,13 +36,17 @@ function StudentSignupContent() {
   const [showAvatarDialog, setShowAvatarDialog] = useState(false);
   const [showMascotCreation, setShowMascotCreation] = useState(false);
   const [mascotParts, setMascotParts] = useState<{
-    face: string;
+    head: string;
     hair: string;
     body: string;
+    collar: string;
+    hairColor?: string;
   }>({
-    face: "head1",
+    head: "head1",
     hair: "hair1",
     body: "body1",
+    collar: "collar1",
+    hairColor: "#E451FE",
   });
 
   // Store user data after account creation
@@ -173,7 +177,7 @@ function StudentSignupContent() {
   };
 
   // Step 4: Update mascot and complete signup
-  const handleMascotSave = async (parts: { face: string; hair: string; body: string }) => {
+  const handleMascotSave = async (parts: { head: string; hair: string; body: string; collar: string; hairColor?: string }) => {
     try {
       showLoader('Saving your mascot...');
       console.log('🚀 Step 4: Updating mascot:', {
@@ -181,14 +185,20 @@ function StudentSignupContent() {
         mascotParts: parts,
       });
 
-      // Update mascot
+      // Update mascot (map head→face for backend compatibility)
       const response = await post('/users/profile', {
-        mascot: parts,
+        mascot: {
+          face: parts.head,
+          hair: parts.hair,
+          body: parts.body,
+          hairColor: parts.hairColor ?? '#E451FE',
+        },
       });
 
       console.log('✅ Step 4: Mascot saved:', response);
 
       hideLoader();
+      await refreshUser();
       showSuccess('Setup complete! Welcome aboard! 🎉');
       
       // Redirect to student dashboard

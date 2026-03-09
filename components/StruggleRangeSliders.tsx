@@ -56,9 +56,6 @@ export function StruggleRangeSliders({
             {/* Struggle Items */}
             <div className="flex gap-[23px] items-start relative w-full">
                 {struggleData.map((item, index) => {
-                    // Calculate progress bar width
-                    const progressWidth = (item.percentage / 100) * 219; // 219px is the full width
-
                     return (
                         <div
                             key={index}
@@ -90,50 +87,33 @@ export function StruggleRangeSliders({
                             {/* Progress bar container */}
                             <div className="flex flex-col gap-[12px] items-start relative shrink-0 w-full">
                                 <div className="h-[22px] relative shrink-0 w-full">
-                                    {/* Background bar - full width, no shadow */}
+                                    {/* Track bar - full width, pill shape, clips inner gradient */}
                                     <div
-                                        className="absolute border-[rgba(67,75,147,0.24)] border-b-[1.261px] border-l-[1.261px] border-solid border-t-[1.261px] h-[21.054px] left-0 rounded-bl-[40.032px] rounded-br-[40.03px] rounded-tl-[40.032px] rounded-tr-[40.03px] top-[0.05px] w-full"
+                                        className="absolute left-0 top-[0.5px]"
                                         style={{
-                                            backgroundColor: "#434b93",
-                                        }}
-                                    />
-
-                                    {/* Decorative ellipse overlay - positioned from left */}
-                                    <div
-                                        className="absolute mix-blend-color-dodge top-0 left-0"
-                                        style={{
+                                            width: "100%",
                                             height: "21px",
-                                            width: `${progressWidth}px`,
+                                            borderRadius: "40px",
+                                            border: "1.261px solid rgba(67,75,147,0.24)",
+                                            backgroundColor: "#434b93",
+                                            overflow: "hidden",
                                         }}
                                     >
+                                        {/* Filled gradient portion */}
                                         <div
-                                            className="absolute"
+                                            className="h-full"
                                             style={{
-
+                                                width: `${item.percentage}%`,
+                                                borderRadius: "40px",
+                                                borderRight: "1.261px solid rgba(255,255,255,0.24)",
+                                                backgroundImage:
+                                                    "linear-gradient(90deg, rgb(7, 86, 255) 0%, rgb(245, 41, 249) 55%, rgb(255, 33, 199) 100%)",
+                                                backgroundSize: "100% 100%",
+                                                backgroundPosition: "0 0",
+                                                backgroundRepeat: "no-repeat",
                                             }}
-                                        >
-                                            {/* Decorative ellipse gradient effect */}
-                                            <div
-                                                className="absolute"
-                                                style={{
-                                                    width: "100%",
-                                                    height: "100%",
-                                                    background: "radial-gradient(ellipse, rgba(255,255,255,0.3) 0%, transparent 70%)",
-                                                    mixBlendMode: "color-dodge",
-                                                }}
-                                            />
-                                        </div>
+                                        />
                                     </div>
-
-                                    {/* Progress bar with gradient - positioned from left, no shadow */}
-                                    <div
-                                        className="absolute border-[rgba(255,255,255,0.24)] border-b-[1.261px] border-l-[1.261px] border-solid border-t-[1.261px] h-[21px] left-0 rounded-bl-[40.032px] rounded-tl-[40.032px] top-0"
-                                        style={{
-                                            width: `${progressWidth}px`,
-                                            backgroundImage:
-                                                "linear-gradient(85.71deg, rgb(7, 86, 255) 1.6525%, rgb(245, 41, 249) 1.6613%, rgb(255, 33, 199) 89.222%)",
-                                        }}
-                                    />
                                 </div>
 
                                 {/* Struggle count text */}

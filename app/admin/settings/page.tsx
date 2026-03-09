@@ -1,10 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { ContactDetails } from "../../../components/ContactDetails";
 import { EnabledNotifications } from "../../../components/EnabledNotifications";
 import { CustomerSupport } from "../../../components/CustomerSupport";
 import { EditContactDetailsDialog, ContactDetailsFormData } from "../../../components/EditContactDetailsDialog";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const defaultLanguages = [
   { value: "english", label: "English" },
@@ -21,6 +24,9 @@ const defaultTimezones = [
 ];
 
 export default function AdminSettingsPage() {
+  const router = useRouter();
+  const { logout } = useAuth();
+
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [contactData, setContactData] = useState<ContactDetailsFormData>({
     firstName: "James",
@@ -53,22 +59,49 @@ export default function AdminSettingsPage() {
 
   return (
     <div className="flex flex-col h-full w-full">
-      {/* Settings Title - No Navbar */}
+      {/* Settings Title + Logout */}
       <div className="w-full" style={{ padding: "40px 40px 24px 40px" }}>
-        <h1
-          style={{
-            color: "#FFFFFF",
-            fontFamily: "var(--font-orbitron), system-ui, sans-serif",
-            fontSize: "36px",
-            fontStyle: "normal",
-            fontWeight: 700,
-            lineHeight: "42px",
-            letterSpacing: "-0.396px",
-            textTransform: "uppercase",
-          }}
-        >
-          Settings
-        </h1>
+        <div className="flex items-center justify-between w-full gap-4">
+          <h1
+            style={{
+              color: "#FFFFFF",
+              fontFamily: "var(--font-orbitron), system-ui, sans-serif",
+              fontSize: "36px",
+              fontStyle: "normal",
+              fontWeight: 700,
+              lineHeight: "42px",
+              letterSpacing: "-0.396px",
+              textTransform: "uppercase",
+            }}
+          >
+            Settings
+          </h1>
+
+          <button
+            type="button"
+            onClick={() => {
+              logout();
+              router.push("/admin/login");
+            }}
+            style={{
+              border: "none",
+              background: "transparent",
+              padding: 0,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            aria-label="Logout"
+          >
+            <Image
+              src="/assets/icons/others/logout.svg"
+              alt="Logout"
+              width={32}
+              height={32}
+            />
+          </button>
+        </div>
       </div>
 
       {/* Main content area */}

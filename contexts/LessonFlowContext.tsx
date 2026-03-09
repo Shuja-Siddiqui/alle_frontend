@@ -37,25 +37,22 @@ export interface BatchProgress {
   retryCounts: Record<number, number>; // taskIndex -> retry count
 }
 
+/** Canonical checkpoint shape (matches backend). Use these keys when reading/writing. */
 export interface Checkpoint {
-  currentMission: number;
-  currentTaskType: TaskType;
-  currentTaskIndex: number;
-  completedMissions: number[];
-  completedTasks: Record<number, Record<string, number[]>>; // missionSequence -> taskType -> task indices
-  taskRetries: Record<number, Record<string, Record<number, number>>>; // missionSequence -> taskType -> taskIndex -> retry count
-  currentBatchProgress: BatchProgress | null;
-  soundsProgress: Record<string, any>;
-  wordsProgress: Record<string, any>;
-  lastActivity: {
-    type: string;
-    missionSequence: number;
-    taskType: TaskType;
-    taskIndex: number;
-    timestamp: string;
-  } | null;
-  xpEarnedInLesson: number;
-  masteryScore: number | null;
+  missionSequence: number;
+  nextTaskId: string;
+  lastCompletedTaskId: string | null;
+  activeTaskType: TaskType;
+  taskIndexInBatch: number;
+  completedMissionSequences: number[];
+  completedTasksByMissionAndType: Record<number, Record<string, number[]>>; // missionSeq -> taskType -> task indices
+  taskRetryCounts: Record<number, Record<string, Record<number, number>>>; // missionSeq -> taskType -> taskIndex -> retry count
+  inProgressBatch: BatchProgress | null;
+  alphabetSoundProgress: Record<string, { attempted: boolean; mastered?: boolean; xpEarned?: number }>;
+  wordProgress: Record<string, { attempted: boolean; correct?: boolean; retries?: number; xpEarned?: number }>;
+  lastActivity: { type: string; missionSequence?: number; taskType?: TaskType; taskId?: string; timestamp: string } | null;
+  totalXpEarnedInLesson: number;
+  lessonMasteryScore: number | null;
 }
 
 export interface LessonFlowState {
@@ -134,20 +131,21 @@ export function LessonFlowProvider({ children }: LessonFlowProviderProps) {
     (lesson: Lesson) => {
       if (!lesson) return;
 
-      // Load checkpoint from lesson context or create new
       const initialCheckpoint: Checkpoint = {
-        currentMission: 1,
-        currentTaskType: null,
-        currentTaskIndex: 0,
-        completedMissions: [],
-        completedTasks: {},
-        taskRetries: {},
-        currentBatchProgress: null,
-        soundsProgress: {},
-        wordsProgress: {},
+        missionSequence: 1,
+        nextTaskId: "1",
+        lastCompletedTaskId: null,
+        activeTaskType: null,
+        taskIndexInBatch: 0,
+        completedMissionSequences: [],
+        completedTasksByMissionAndType: {},
+        taskRetryCounts: {},
+        inProgressBatch: null,
+        alphabetSoundProgress: {},
+        wordProgress: {},
         lastActivity: null,
-        xpEarnedInLesson: 0,
-        masteryScore: null,
+        totalXpEarnedInLesson: 0,
+        lessonMasteryScore: null,
       };
 
       setState({
@@ -183,9 +181,8 @@ export function LessonFlowProvider({ children }: LessonFlowProviderProps) {
         const missionSeq = prev.currentMissionSequence;
         const checkpoint = prev.checkpoint;
 
-        // Check if we need to reset (failed after 3 retries)
         const retries =
-          checkpoint?.taskRetries[missionSeq]?.[taskType] || {};
+          checkpoint?.taskRetryCounts[missionSeq]?.[taskType] || {};
         const needsReset = Object.values(retries).some((count) => count >= 3);
 
         // Initialize batch progress
@@ -333,35 +330,33 @@ export function LessonFlowProvider({ children }: LessonFlowProviderProps) {
     setState((s) => ({ ...s, isLoading: true }));
 
     try {
-      // Merge batch progress into checkpoint
       const updatedCheckpoint: Checkpoint = {
         ...prev.checkpoint,
-        currentTaskType: null, // Reset for next task type
-        currentTaskIndex: 0,
-        completedTasks: {
-          ...prev.checkpoint.completedTasks,
+        activeTaskType: null,
+        taskIndexInBatch: 0,
+        completedTasksByMissionAndType: {
+          ...prev.checkpoint.completedTasksByMissionAndType,
           [missionSeq]: {
-            ...(prev.checkpoint.completedTasks[missionSeq] || {}),
+            ...(prev.checkpoint.completedTasksByMissionAndType[missionSeq] || {}),
             [taskType]: batchProgress.completedTasks,
           },
         },
-        taskRetries: {
-          ...prev.checkpoint.taskRetries,
+        taskRetryCounts: {
+          ...prev.checkpoint.taskRetryCounts,
           [missionSeq]: {
-            ...(prev.checkpoint.taskRetries[missionSeq] || {}),
+            ...(prev.checkpoint.taskRetryCounts[missionSeq] || {}),
             [taskType]: batchProgress.retryCounts,
           },
         },
-        xpEarnedInLesson:
-          prev.checkpoint.xpEarnedInLesson + batchProgress.xpEarned,
+        totalXpEarnedInLesson:
+          prev.checkpoint.totalXpEarnedInLesson + batchProgress.xpEarned,
         lastActivity: {
           type: "batch_completed",
           missionSequence: missionSeq,
           taskType,
-          taskIndex: batchProgress.completedTasks.length - 1,
           timestamp: new Date().toISOString(),
         },
-        currentBatchProgress: null,
+        inProgressBatch: null,
       };
 
       // Save checkpoint to backend
@@ -429,14 +424,30 @@ export function LessonFlowProvider({ children }: LessonFlowProviderProps) {
       );
 
       if (response.data?.checkpoint) {
-        const checkpoint = response.data.checkpoint as Checkpoint;
+        const cp = response.data.checkpoint as Checkpoint;
+        const checkpoint: Checkpoint = {
+          missionSequence: cp.missionSequence ?? 1,
+          nextTaskId: cp.nextTaskId ?? "1",
+          lastCompletedTaskId: cp.lastCompletedTaskId ?? null,
+          activeTaskType: cp.activeTaskType ?? null,
+          taskIndexInBatch: cp.taskIndexInBatch ?? 0,
+          completedMissionSequences: cp.completedMissionSequences ?? [],
+          completedTasksByMissionAndType: cp.completedTasksByMissionAndType ?? {},
+          taskRetryCounts: cp.taskRetryCounts ?? {},
+          inProgressBatch: cp.inProgressBatch ?? null,
+          alphabetSoundProgress: cp.alphabetSoundProgress ?? {},
+          wordProgress: cp.wordProgress ?? {},
+          lastActivity: cp.lastActivity ?? null,
+          totalXpEarnedInLesson: cp.totalXpEarnedInLesson ?? 0,
+          lessonMasteryScore: cp.lessonMasteryScore ?? null,
+        };
         setState((prev) => ({
           ...prev,
           checkpoint,
-          currentMissionSequence: checkpoint.currentMission,
-          currentTaskType: checkpoint.currentTaskType,
-          currentTaskIndex: checkpoint.currentTaskIndex,
-          currentBatchProgress: checkpoint.currentBatchProgress,
+          currentMissionSequence: checkpoint.missionSequence,
+          currentTaskType: checkpoint.activeTaskType,
+          currentTaskIndex: checkpoint.taskIndexInBatch,
+          currentBatchProgress: checkpoint.inProgressBatch,
           isLoading: false,
         }));
       } else {
@@ -474,9 +485,9 @@ export function LessonFlowProvider({ children }: LessonFlowProviderProps) {
       const currentIndex = taskTypeOrder.indexOf(prev.currentTaskType);
       if (currentIndex === -1) return prev;
 
-      // Find next available task type
       for (let i = currentIndex + 1; i < taskTypeOrder.length; i++) {
         const nextType = taskTypeOrder[i];
+        if (!nextType) continue;
         const tasks = mission.tasks[nextType];
         if (tasks && Array.isArray(tasks) && tasks.length > 0) {
           startTaskType(nextType);
@@ -550,4 +561,5 @@ export function useLessonFlow(): LessonFlowContextType {
 
   return context;
 }
+
 

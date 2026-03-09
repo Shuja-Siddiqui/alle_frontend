@@ -15,6 +15,13 @@ export function VisualBox({
   imageHeight = 100,
   className,
 }: VisualBoxProps) {
+  const isValidImageSrc =
+    typeof imageSrc === "string" &&
+    imageSrc.trim().length > 0 &&
+    (imageSrc.startsWith("/") ||
+      imageSrc.startsWith("http://") ||
+      imageSrc.startsWith("https://"));
+
   return (
     <div
       className={`flex h-[140px] w-[281px] items-center justify-center gap-[10px] px-[77px] py-[45px] ${className ?? ""}`}
@@ -26,14 +33,16 @@ export function VisualBox({
         boxShadow: "0 0 0 0.859px #E451FE",
       }}
     >
-      {imageSrc && (
+      {isValidImageSrc ? (
         <Image
-          src={imageSrc}
+          src={imageSrc as string}
           alt={imageAlt}
           width={imageWidth}
           height={imageHeight}
         />
-      )}
+      ) : imageSrc ? (
+        <span className="text-center text-sm text-white">{imageAlt || imageSrc}</span>
+      ) : null}
     </div>
   );
 }

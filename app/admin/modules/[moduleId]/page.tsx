@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, use } from "react";
+import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ModuleGeneralStats } from "../../../../components/ModuleGeneralStats";
 import { LessonStatCard, LessonType } from "../../../../components/LessonStatCard";
 import { AddStudentDialog, AddStudentFormData } from "../../../../components/AddStudentDialog";
+import { api } from "../../../../lib/api-client";
 
 type LessonData = {
   id: string;
@@ -18,6 +19,15 @@ type LessonData = {
   estimatedTime: string;
 };
 
+type ModuleDetails = {
+  id: string;
+  title: string;
+  lessonsCount: number;
+  currentStudentsCount: number;
+  weeks?: number | null;
+  estimatedTime?: string | null;
+};
+
 export default function ModuleDetailsPage({
   params,
 }: {
@@ -27,101 +37,92 @@ export default function ModuleDetailsPage({
   const { moduleId } = use(params);
   const [selectedLessonType, setSelectedLessonType] = useState<LessonType | "all">("all");
   const [showAddStudentDialog, setShowAddStudentDialog] = useState(false);
+  const [moduleData, setModuleData] = useState<ModuleDetails | null>(null);
+  const [lessons, setLessons] = useState<LessonData[]>([]);
+  const [loadingModule, setLoadingModule] = useState(true);
+  const [loadingLessons, setLoadingLessons] = useState(true);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   function handleBackClick() {
     router.push("/admin/modules");
   }
 
-  function handleAddStudent(data: AddStudentFormData) {
-    // TODO: Implement API call to add student
-    console.log("Adding student:", data);
+  function handleAddStudent() {
+    setRefreshTrigger((prev) => prev + 1);
   }
 
-  // TODO: Fetch module data from API using moduleId
-  // Mock data for now
-  const moduleData = {
-    id: moduleId,
-    moduleNumber: "Module 3",
-    title: "Long vowels",
-    lessons: 7,
-    students: 54,
-    weeks: "5-6",
-    lessonsList: [
-      {
-        id: "1",
-        lessonNumber: 1,
-        title: "AI vowel team",
-        description: "Discover the AI vowel team sound",
-        lessonType: "intro" as LessonType,
-        sound: "S",
-        students: 6,
-        estimatedTime: "1 min.",
-      },
-      {
-        id: "2",
-        lessonNumber: 2,
-        title: "EE vowel team",
-        description: "Practice words with the long EE sound",
-        lessonType: "reading" as LessonType,
-        sound: "A",
-        students: 12,
-        estimatedTime: "2 min.",
-      },
-      {
-        id: "3",
-        lessonNumber: 3,
-        title: "IGH vowel team",
-        description: "Read words with the IGH pattern",
-        lessonType: "practice" as LessonType,
-        sound: "T",
-        students: 11,
-        estimatedTime: "2 min.",
-      },
-      {
-        id: "4",
-        lessonNumber: 4,
-        title: "OA vowel team",
-        description: "Master the OA vowel sound",
-        lessonType: "blending" as LessonType,
-        sound: "P",
-        students: 9,
-        estimatedTime: "3 min.",
-      },
-      {
-        id: "5",
-        lessonNumber: 5,
-        title: "OO vowel team (two sounds!)",
-        description: "Practice words using the OO sounds",
-        lessonType: "practice" as LessonType,
-        sound: "S",
-        students: 6,
-        estimatedTime: "3 min.",
-      },
-      {
-        id: "6",
-        lessonNumber: 6,
-        title: "Alternative Spellings",
-        description: "AY, A-E, OW, O-E, U-E spellings",
-        lessonType: "mastery-check" as LessonType,
-        sound: "A",
-        students: 6,
-        estimatedTime: "5 min.",
-      },
-      {
-        id: "7",
-        lessonNumber: 7,
-        title: "Long Vowel Mastery",
-        description: "+ 2–3 Syllable Words",
-        lessonType: "wrap-up" as LessonType,
-        sound: "S",
-        students: 4,
-        estimatedTime: "6 min.",
-      },
-    ] as LessonData[],
-  };
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchModule = async () => {
+      try {
+        const response = await api.get<any>(`/modules/${moduleId}`);
+        const payload = response?.data ?? response;
+        if (isMounted) {
+          setModuleData({
+            id: payload.id,
+            title: payload.title,
+            lessonsCount: payload.lessonsCount ?? 0,
+            currentStudentsCount: payload.currentStudentsCount ?? 0,
+            weeks: payload.weeks ?? null,
+            estimatedTime: payload.estimatedTime ?? null,
+          });
+        }
+      } catch (error) {
+        console.error("❌ Failed to load module details:", error);
+        if (isMounted) {
+          setModuleData(null);
+        }
+      } finally {
+        if (isMounted) {
+          setLoadingModule(false);
+        }
+      }
+    };
+
+    const fetchLessons = async () => {
+      try {
+        const response = await api.get<any>(`/modules/${moduleId}/lessons`);
+        const list = Array.isArray(response?.data)
+          ? response.data
+          : Array.isArray(response)
+          ? response
+          : [];
+        if (isMounted) {
+          const mapped: LessonData[] = list.map((lesson: any, index: number) => ({
+            id: lesson.id,
+            lessonNumber: index + 1,
+            title: lesson.title,
+            description: lesson.preview || "",
+            lessonType: (lesson.lessonType || "intro") as LessonType,
+            sound: "",
+            students: lesson.studentsCount ?? 0,
+            estimatedTime: lesson.estimatedTime || "",
+          }));
+          setLessons(mapped);
+        }
+      } catch (error) {
+        console.error("❌ Failed to load module lessons:", error);
+        if (isMounted) {
+          setLessons([]);
+        }
+      } finally {
+        if (isMounted) {
+          setLoadingLessons(false);
+        }
+      }
+    };
+
+    fetchModule();
+    fetchLessons();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [moduleId, refreshTrigger]);
 
   // Filter lessons based on selected type
-  const filteredLessons = moduleData.lessonsList.filter(
+  const filteredLessons = lessons.filter(
     (lesson) => selectedLessonType === "all" || lesson.lessonType === selectedLessonType
   );
 
@@ -292,12 +293,20 @@ export default function ModuleDetailsPage({
       >
         {/* Module General Stats */}
         <div style={{ marginBottom: "24px" }}>
-          <ModuleGeneralStats
-            moduleTitle={`${moduleData.moduleNumber}: ${moduleData.title}`}
-            lessons={moduleData.lessons}
-            students={moduleData.students}
-            weeks={moduleData.weeks}
-          />
+          {moduleData && !loadingModule && (
+            <ModuleGeneralStats
+              moduleTitle={moduleData.title}
+              lessons={moduleData.lessonsCount}
+              students={moduleData.currentStudentsCount}
+              weeks={
+                moduleData.estimatedTime
+                  ? moduleData.estimatedTime
+                  : moduleData.weeks != null
+                  ? String(moduleData.weeks)
+                  : ""
+              }
+            />
+          )}
         </div>
 
         {/* Lessons Section */}
@@ -414,6 +423,7 @@ export default function ModuleDetailsPage({
         open={showAddStudentDialog}
         onClose={() => setShowAddStudentDialog(false)}
         onAddStudent={handleAddStudent}
+        modules={moduleData ? [{ value: moduleData.id, label: moduleData.title }] : []}
       />
     </div>
   );

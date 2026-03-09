@@ -21,15 +21,15 @@ export function useVolumeControl(): UseVolumeControlResult {
   const { user, updateUser } = useAuth();
   const { post, loading, error } = useApiPost();
   
-  // Initialize volume from user metadata or default to 50
+  // Initialize volume from user metadata or default to 0
   const [volume, setVolumeState] = useState<number>(() => {
     if (typeof window !== 'undefined') {
       // Try to get from localStorage first (immediate)
       const stored = localStorage.getItem('volume');
       if (stored) return parseInt(stored, 10);
     }
-    // Then check user metadata
-    return user?.metadata?.volume ?? 50;
+    // Then check user metadata (backend source of truth)
+    return user?.metadata?.volume ?? 0;
   });
 
   // Update localStorage when volume changes

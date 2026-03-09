@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AdminNavbar } from "../../../components/AdminNavbar";
 import { ModuleStatCard } from "../../../components/ModuleStatCard";
 import { SearchAndFilter } from "../../../components/SearchAndFilter";
@@ -10,15 +10,16 @@ import {
   ModuleCategory,
 } from "../../../components/ModuleFilterDialog";
 import { AddStudentDialog, AddStudentFormData } from "../../../components/AddStudentDialog";
+import { api } from "../../../lib/api-client";
 
-type ModuleData = {
+type ModuleRow = {
   id: string;
-  moduleNumber: string;
   title: string;
-  lessons: number;
-  students: number;
-  weeks: string;
-  grades: string;
+  lessonsCount: number;
+  currentStudentsCount: number;
+  weeks?: number | null;
+  estimatedTime?: string | null;
+  grades?: string | null;
 };
 
 export default function AdminModulesPage() {
@@ -28,63 +29,49 @@ export default function AdminModulesPage() {
   const [filters, setFilters] = useState<ModuleFilterState>({
     category: "all",
   });
+  const [modules, setModules] = useState<ModuleRow[]>([]);
+  const [loadingModules, setLoadingModules] = useState(true);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  function handleAddStudent(data: AddStudentFormData) {
-    // TODO: Implement API call to add student
-    console.log("Adding student:", data);
+  function handleAddStudent() {
+    setRefreshTrigger((prev) => prev + 1);
   }
 
-  // Mock module data - replace with actual API call
-  const allModules: ModuleData[] = [
-    {
-      id: "1",
-      moduleNumber: "Module 1",
-      title: "High-frequency foundations",
-      lessons: 10,
-      students: 18,
-      weeks: "1-2",
-      grades: "1-2",
-    },
-    {
-      id: "2",
-      moduleNumber: "Module 2",
-      title: "Digraphs + early multisyllabic",
-      lessons: 8,
-      students: 18,
-      weeks: "3-4",
-      grades: "3-4",
-    },
-    {
-      id: "3",
-      moduleNumber: "Module 3",
-      title: "Long vowels",
-      lessons: 7,
-      students: 54,
-      weeks: "5-6",
-      grades: "5-6",
-    },
-    {
-      id: "4",
-      moduleNumber: "Module 4",
-      title: "Extended code",
-      lessons: 6,
-      students: 18,
-      weeks: "7-10",
-      grades: "7-8",
-    },
-    {
-      id: "5",
-      moduleNumber: "Module 5",
-      title: "Multisyllabic mastery + morphology",
-      lessons: 4,
-      students: 18,
-      weeks: "11-18",
-      grades: "9-12",
-    },
-  ];
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchModules = async () => {
+      try {
+        const response = await api.get<any>("/modules");
+        const list: ModuleRow[] = Array.isArray(response?.data)
+          ? response.data
+          : Array.isArray(response)
+          ? response
+          : [];
+        if (isMounted) {
+          setModules(list);
+        }
+      } catch (error) {
+        console.error("❌ Failed to load modules:", error);
+        if (isMounted) {
+          setModules([]);
+        }
+      } finally {
+        if (isMounted) {
+          setLoadingModules(false);
+        }
+      }
+    };
+
+    fetchModules();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [refreshTrigger]);
 
   // Filter modules based on search and category
-  const filteredModules = allModules.filter((module) => {
+  const filteredModules = modules.filter((module) => {
     const matchesSearch = module.title.toLowerCase().includes(searchValue.toLowerCase());
     // TODO: Add category filtering logic when category data is available
     const matchesCategory = filters.category === "all" || true; // Placeholder
@@ -146,19 +133,29 @@ export default function AdminModulesPage() {
             justifyContent: "start",
           }}
         >
-          {filteredModules.map((module) => (
-            <ModuleStatCard
-              key={module.id}
-              moduleNumber={module.moduleNumber}
-              title={module.title}
-              lessons={module.lessons}
-              students={module.students}
-              weeks={module.weeks}
-              grades={module.grades}
-              moduleId={module.id}
-              className="w-[558px]"
-            />
-          ))}
+          {loadingModules ? (
+            <div style={{ color: "#FFF", padding: "24px" }}>Loading modules...</div>
+          ) : (
+            filteredModules.map((module, index) => (
+              <ModuleStatCard
+                key={module.id}
+                moduleNumber={`Module ${index + 1}`}
+                title={module.title}
+                lessons={module.lessonsCount ?? 0}
+                students={module.currentStudentsCount ?? 0}
+                weeks={
+                  module.estimatedTime
+                    ? module.estimatedTime
+                    : module.weeks != null
+                    ? String(module.weeks)
+                    : ""
+                }
+                grades={module.grades ?? ""}
+                moduleId={module.id}
+                className="w-[558px]"
+              />
+            ))
+          )}
         </div>
 
         {/* Empty State */}
@@ -203,6 +200,7 @@ export default function AdminModulesPage() {
         open={showAddStudentDialog}
         onClose={() => setShowAddStudentDialog(false)}
         onAddStudent={handleAddStudent}
+        modules={modules.map((m) => ({ value: m.id, label: m.title }))}
       />
 
       {/* Module Filter Dialog */}

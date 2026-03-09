@@ -5,45 +5,53 @@ import { PrimaryButton } from "../../../components/PrimaryButton";
 import { MascotAvatar } from "../../../components/MascotAvatar";
 import { useEffect, useState } from "react";
 import { useLesson } from "../../../contexts/LessonContext";
+import { useLessonFlow } from "../../../contexts/LessonFlowContext";
 import { useTTS } from "../../../hooks/useTTS";
+import { api } from "../../../lib/api-client";
 
 export default function MissionPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { currentLesson } = useLesson();
+  const { loadCheckpoint } = useLessonFlow();
   const { playTTSWithSSML } = useTTS();
 
   // Get data from URL params
   const lessonId = searchParams.get("lessonId") || "lesson1";
   const missionSequence = parseInt(searchParams.get("missionSequence") || "1", 10);
+  const resumeTaskType = searchParams.get("taskType");
+  const resumeTaskIndex = searchParams.get("taskIndex");
+  const resumeTaskId = searchParams.get("taskId");
 
   const [isLoading, setIsLoading] = useState(true);
   const [hasPlayedIntro, setHasPlayedIntro] = useState(false);
+  const [isContinueDisabled, setIsContinueDisabled] = useState(false);
 
   // Find mission data
   const mission = currentLesson?.missions?.find(
     (m) =>
-      m.mission_sequence === missionSequence ||
-      m.missionSequence === missionSequence
+      (m as any).mission_sequence === missionSequence ||
+      (m as any).missionSequence === missionSequence
   );
 
-  const missionType = mission?.mission_type || mission?.missionType || "Mission";
+  const missionType =
+    ((mission as any)?.mission_type || (mission as any)?.missionType || "Mission") as string;
   const displayTitle =
     missionType === "Mission" ? `${missionType} ${missionSequence}` : missionType;
 
-  // Handle introduction flow (missionSequence === 0)
+  // Handle lesson-level introduction flow (missionSequence === 0)
   useEffect(() => {
     if (missionSequence === 0 && currentLesson && !hasPlayedIntro) {
       setHasPlayedIntro(true);
       setIsLoading(false);
 
       // Play introduction TTS if available
+      const introSource = (currentLesson as any)?.introduction;
       const introTTS =
-        currentLesson.introduction?.tts_missionControlVoice ||
-        currentLesson.introduction?.tts_missionControlVoice_ssml;
+        introSource?.tts_missionControlVoice ||
+        introSource?.tts_missionControlVoice_ssml;
       const introSSML =
-        currentLesson.introduction?.tts_missionControlVoice_ssml ||
-        introTTS;
+        introSource?.tts_missionControlVoice_ssml || introTTS;
 
       if (introTTS) {
         // Play intro and auto-advance after completion
@@ -66,25 +74,110 @@ export default function MissionPage() {
     } else if (mission) {
       setIsLoading(false);
     }
-  }, [missionSequence, currentLesson, hasPlayedIntro, lessonId, router, playTTSWithSSML]);
+  }, [missionSequence, currentLesson, hasPlayedIntro, lessonId, router, playTTSWithSSML, mission]);
 
-  // Detect first task type and route accordingly
+  // Auto-play mission-level intro (mission.introduction) when landing on a mission page
+  useEffect(() => {
+    // Only for real missions (sequence > 0), non-wrap missions, and when mission intro exists
+    if (!mission || missionSequence === 0 || hasPlayedIntro) return;
+
+    const type =
+      (mission as any).mission_type || (mission as any).missionType;
+    if (type === "wrap") return;
+
+    const intro = (mission as any).introduction;
+    if (!intro) return;
+
+    const introTTS =
+      intro.tts_introduction ||
+      intro.tts_missionControlVoice ||
+      intro.tts_coach ||
+      intro.text;
+    const introSSML =
+      intro.tts_introduction_ssml ||
+      intro.tts_missionControlVoice_ssml ||
+      intro.tts_coach_ssml;
+
+    if (!introTTS && !introSSML) return;
+
+    setHasPlayedIntro(true);
+    setIsContinueDisabled(true);
+
+    playTTSWithSSML(introTTS || "", introSSML).finally(() => {
+      setIsContinueDisabled(false);
+    });
+  }, [mission, missionSequence, hasPlayedIntro, playTTSWithSSML]);
+
+  // Auto-play wrap mission summary (last mission) using tasks.summary.tts_coach_ssml
+  useEffect(() => {
+    if (!mission || missionSequence === 0 || hasPlayedIntro) return;
+
+    const type =
+      (mission as any).mission_type || (mission as any).missionType;
+    if (type !== "wrap") return;
+
+    const summary = (mission as any).tasks?.summary as any;
+    if (!summary) return;
+
+    const summaryTTS = summary?.tts_coach || summary?.tts_coach_ssml;
+    const summarySSML = summary?.tts_coach_ssml || summaryTTS;
+
+    if (!summaryTTS && !summarySSML) return;
+
+    setHasPlayedIntro(true);
+    setIsContinueDisabled(true);
+
+    playTTSWithSSML(summaryTTS || "", summarySSML).finally(() => {
+      setIsContinueDisabled(false);
+    });
+  }, [mission, missionSequence, hasPlayedIntro, playTTSWithSSML]);
+
+  // Load checkpoint when lesson is in context (for restore)
+  useEffect(() => {
+    if (currentLesson?.id === lessonId) {
+      loadCheckpoint();
+    }
+  }, [currentLesson?.id, lessonId, loadCheckpoint]);
+
   const handleContinue = () => {
-    if (!mission || !currentLesson) return;
+    if (!mission || !currentLesson || isContinueDisabled) return;
+    setIsContinueDisabled(true);
 
-    // Check if mission has introduction task
-    const hasIntroTask = mission.tasks?.introduction;
-    if (hasIntroTask && !hasPlayedIntro) {
+    const missionTypeValue =
+      (mission as any).mission_type || (mission as any).missionType;
+
+    // Wrap mission: lesson is finished → mark lesson complete and go to dashboard
+    if (missionTypeValue === "wrap") {
+      (async () => {
+        try {
+          // Use authenticated API client so backend can update student_lessons, student_progress, and modules
+          await api.post(`/lessons/${lessonId}/progress/complete`, {
+            // masteryScore and badge are optional; backend derives XP and badges from checkpoint/lesson config
+          });
+        } catch (error) {
+          console.error("[MissionPage] Error completing lesson on wrap:", error);
+        } finally {
+          router.push("/student/dashboard");
+        }
+      })();
+      return;
+    }
+
+    // Check if mission has a mission-level introduction (directly on the mission object)
+    const intro = (mission as any).introduction;
+    if (intro && !hasPlayedIntro) {
       setHasPlayedIntro(true);
 
-      // Play mission introduction TTS
+      // Play mission introduction TTS (mission-level intro, not inside tasks)
       const introTTS =
-        hasIntroTask.tts_introduction ||
-        hasIntroTask.tts_missionControlVoice ||
-        hasIntroTask.text;
+        intro.tts_introduction ||
+        intro.tts_missionControlVoice ||
+        intro.tts_coach ||
+        intro.text;
       const introSSML =
-        hasIntroTask.tts_introduction_ssml ||
-        hasIntroTask.tts_missionControlVoice_ssml;
+        intro.tts_introduction_ssml ||
+        intro.tts_missionControlVoice_ssml ||
+        intro.tts_coach_ssml;
 
       if (introTTS) {
         playTTSWithSSML(introTTS, introSSML).then(() => {
@@ -100,9 +193,28 @@ export default function MissionPage() {
     routeToNextTask();
   };
 
-  // Detect and route to first available task type
+  // Detect and route to task (resume from checkpoint or first available)
   const routeToNextTask = () => {
     if (!mission || !currentLesson) return;
+
+    // Handle wrap mission type (summary only, no tasks)
+    if (
+      (mission as any).mission_type === "wrap" ||
+      (mission as any).missionType === "wrap"
+    ) {
+      const summary = (mission as any).tasks?.summary as any;
+      if (summary) {
+        // Play summary TTS and show wrap-up screen
+        const summaryTTS = summary.tts_coach_ssml || summary.tts_coach;
+        if (summaryTTS) {
+          playTTSWithSSML(summaryTTS).then(() => {
+            // After TTS, could navigate to dashboard or next lesson
+            // For now, just stay on mission page showing summary
+          });
+        }
+      }
+      return; // Don't route to task page for wrap missions
+    }
 
     const taskTypePriority = [
       "alphabet_practice",
@@ -117,8 +229,36 @@ export default function MissionPage() {
       blending_practice: "blending",
       word_practice: "word",
       sentence_practice: "sentence",
-      mastery_check: "mastery-check",
+      mastery_check: "word", // Mastery check uses word page (testing words)
     };
+
+    // Resume from checkpoint: route to saved taskType and taskIndex
+    if (resumeTaskType && pageMapping[resumeTaskType]) {
+      const tasks = mission.tasks?.[resumeTaskType];
+      if (tasks && Array.isArray(tasks) && tasks.length > 0) {
+        const page = pageMapping[resumeTaskType];
+        // Prefer taskId to derive index (in case checkpoint has wrong taskIndex)
+        let safeIndex = resumeTaskIndex ? parseInt(resumeTaskIndex, 10) : 0;
+        let task = tasks[safeIndex];
+        if (resumeTaskId) {
+          const byId = tasks.findIndex(
+            (t: any) => String(t?.task_id ?? t?.id) === String(resumeTaskId)
+          );
+          if (byId >= 0) {
+            safeIndex = byId;
+            task = tasks[safeIndex];
+          }
+        }
+        safeIndex = Math.min(Math.max(0, safeIndex), tasks.length - 1);
+        task = task || tasks[safeIndex];
+        const taskId = resumeTaskId || (task as any)?.task_id || (task as any)?.id || String(safeIndex + 1);
+
+        router.push(
+          `/student/${page}?lessonId=${lessonId}&missionSequence=${missionSequence}&taskId=${taskId}&taskIndex=${safeIndex}`
+        );
+        return;
+      }
+    }
 
     // Find first available task type with tasks
     for (const taskType of taskTypePriority) {
@@ -126,7 +266,7 @@ export default function MissionPage() {
       if (tasks && Array.isArray(tasks) && tasks.length > 0) {
         const page = pageMapping[taskType];
         const firstTask = tasks[0];
-        const taskId = firstTask.task_id || firstTask.id || "0";
+        const taskId = firstTask.task_id || firstTask.id || "1";
 
         router.push(
           `/student/${page}?lessonId=${lessonId}&missionSequence=${missionSequence}&taskId=${taskId}&taskIndex=0`
@@ -139,7 +279,7 @@ export default function MissionPage() {
     const type = Object.keys(pageMapping)[0];
     const page = pageMapping[type];
     router.push(
-      `/student/${page}?lessonId=${lessonId}&missionSequence=${missionSequence}&taskId=0&taskIndex=0`
+      `/student/${page}?lessonId=${lessonId}&missionSequence=${missionSequence}&taskId=1&taskIndex=0`
     );
   };
 
@@ -228,6 +368,7 @@ export default function MissionPage() {
         size="medium"
         variant="filled"
         onClick={handleContinue}
+        disabled={isContinueDisabled}
       />
 
       {/* Mascot Avatar - Left Bottom */}

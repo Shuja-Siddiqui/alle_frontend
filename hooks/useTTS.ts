@@ -33,6 +33,7 @@ export function useTTS() {
   });
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const lastKeyRef = useRef<string | null>(null);
   const queueRef = useRef<string[]>([]);
   const isProcessingQueueRef = useRef(false);
 
@@ -56,6 +57,16 @@ export function useTTS() {
         return Promise.resolve();
       }
 
+      // MOCK MODE: Skip actual TTS API call
+      const mockMode = localStorage.getItem('MOCK_MODE') === 'true';
+      if (mockMode) {
+        console.log('[MOCK MODE] Skipping TTS API call:', text.substring(0, 50) + '...');
+        setState((prev) => ({ ...prev, isGenerating: false, isPlaying: false }));
+        // Simulate audio playback duration (500ms)
+        await new Promise(resolve => setTimeout(resolve, 500));
+        return Promise.resolve();
+      }
+
       return new Promise((resolve, reject) => {
         setState((prev) => ({ ...prev, isGenerating: true, error: null }));
 
@@ -68,6 +79,12 @@ export function useTTS() {
           process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:4000/api";
         const token = localStorage.getItem("auth_token");
 
+        console.log("[LessonTTS] Starting TTS request", {
+          text,
+          voice,
+          lang,
+        });
+        
         fetch(`${API_BASE_URL}/speech/tts`, {
           method: "POST",
           headers: {
@@ -77,15 +94,39 @@ export function useTTS() {
           body: JSON.stringify({ text, voice, lang }),
         })
           .then(async (response) => {
+            console.log("[LessonTTS] Response status", response.status, response.statusText);
+            console.log("[LessonTTS] Response headers", {
+              contentType: response.headers.get("content-type"),
+              contentLength: response.headers.get("content-length"),
+            });
+
             if (!response.ok) {
-              const error = await response.json().catch(() => ({
-                message: "Failed to generate speech",
-              }));
-              throw new Error(error.message || "Failed to generate speech");
+              const errorText = await response.text();
+              console.error("[useTTS] Error response:", errorText);
+              let error;
+              try {
+                error = JSON.parse(errorText);
+              } catch {
+                error = { message: errorText || "Failed to generate speech" };
+              }
+              throw new Error(error.message || error.error || "Failed to generate speech");
             }
+
+            const contentType = response.headers.get("content-type");
+            console.log("[LessonTTS] Content-Type", contentType);
+            
             return response.blob();
           })
           .then((blob) => {
+            console.log("[LessonTTS] Audio blob received", {
+              size: blob.size,
+              type: blob.type,
+            });
+
+            if (blob.size === 0) {
+              throw new Error("Received empty audio blob");
+            }
+
             setState((prev) => ({
               ...prev,
               isGenerating: false,
@@ -97,35 +138,65 @@ export function useTTS() {
             const audio = new Audio(audioUrl);
             audioRef.current = audio;
 
+            // Add more event listeners for debugging
+            audio.addEventListener("loadstart", () => {
+              console.log("[LessonTTS] Audio load started");
+            });
+
+            audio.addEventListener("loadeddata", () => {
+              console.log("[LessonTTS] Audio data loaded");
+            });
+
+            audio.addEventListener("canplay", () => {
+              console.log("[LessonTTS] Audio can play");
+            });
+
+            audio.addEventListener("canplaythrough", () => {
+              console.log("[LessonTTS] Audio can play through");
+            });
+
             // Clean up URL when done
             audio.addEventListener("ended", () => {
+              console.log("[LessonTTS] Audio playback ended");
               URL.revokeObjectURL(audioUrl);
               setState((prev) => ({ ...prev, isPlaying: false }));
               resolve();
             });
 
             audio.addEventListener("error", (error) => {
+              console.error("[useTTS] Audio error:", {
+                error,
+                code: audio.error?.code,
+                message: audio.error?.message,
+              });
               URL.revokeObjectURL(audioUrl);
               setState((prev) => ({
                 ...prev,
                 isPlaying: false,
-                error: "Failed to play audio",
+                error: `Failed to play audio: ${audio.error?.message || "Unknown error"}`,
               }));
-              reject(error);
+              reject(new Error(audio.error?.message || "Failed to play audio"));
             });
 
             // Play audio
-            audio.play().catch((error) => {
-              URL.revokeObjectURL(audioUrl);
-              setState((prev) => ({
-                ...prev,
-                isPlaying: false,
-                error: "Failed to play audio",
-              }));
-              reject(error);
-            });
+            console.log("[LessonTTS] Calling audio.play()...");
+            audio.play()
+              .then(() => {
+                console.log("[LessonTTS] audio.play() succeeded, playback started");
+              })
+              .catch((error) => {
+                console.error("[LessonTTS] audio.play() failed", error);
+                URL.revokeObjectURL(audioUrl);
+                setState((prev) => ({
+                  ...prev,
+                  isPlaying: false,
+                  error: `Failed to start playback: ${error.message}`,
+                }));
+                reject(error);
+              });
           })
           .catch((error) => {
+            console.error("[LessonTTS] Fetch/blob error", error);
             setState((prev) => ({
               ...prev,
               isGenerating: false,
@@ -151,7 +222,22 @@ export function useTTS() {
       // Prefer SSML if available
       const textToUse = ssmlText && ssmlText.trim() ? ssmlText : text;
       const useSSML = !!ssmlText && ssmlText.trim().startsWith("<speak");
+      const key = textToUse.trim();
 
+      // If we already have audio for this exact text/SSML, just replay it
+      if (lastKeyRef.current === key && audioRef.current) {
+        try {
+          audioRef.current.currentTime = 0;
+          await audioRef.current.play();
+          return;
+        } catch (error) {
+          console.error("[useTTS] Replay audio.play() failed:", error);
+          // Fall through to refetch if replay fails
+        }
+      }
+
+      // Remember this text so subsequent calls can replay without refetching
+      lastKeyRef.current = key;
       return playTTS(textToUse, { ...options, useSSML });
     },
     [playTTS]

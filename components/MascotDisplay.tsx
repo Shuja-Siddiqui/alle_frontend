@@ -6,26 +6,33 @@ type MascotDisplayProps = {
   headId: string; // e.g., "head1", "head2"
   hairId: string; // e.g., "hair1", "hair2"
   bodyId: string; // e.g., "body1", "body2"
+  collarId?: string; // e.g., "collar_front1", "collar_front2" (optional, used when assetsBase is set)
   hairColor?: string;
   className?: string;
   style?: React.CSSProperties;
+  /** Base path for assets (e.g. "/assets/example_mascots"). When set, uses flat structure and mascot.svg from this folder. */
+  assetsBase?: string;
 };
 
 export function MascotDisplay({
   headId,
   hairId,
   bodyId,
+  collarId,
   hairColor = "#E451FE",
   className = "",
   style,
+  assetsBase,
 }: MascotDisplayProps) {
   const svgContainerRef = useRef<HTMLDivElement>(null);
   const [svgContent, setSvgContent] = useState<string>("");
-  const previousPartsRef = useRef({ headId: "", hairId: "", bodyId: "", hairColor: "" });
+  const previousPartsRef = useRef({ headId: "", hairId: "", bodyId: "", collarId: "", hairColor: "" });
+
+  const masterPath = assetsBase ? `${assetsBase}/mascot.svg` : "/assets/icons/mascots/mascot.svg";
 
   // Load the master SVG once
   useEffect(() => {
-    fetch("/assets/icons/mascots/mascot.svg")
+    fetch(masterPath)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Failed to load SVG: ${response.status}`);
@@ -39,50 +46,53 @@ export function MascotDisplay({
       .catch((error) => {
         console.error("Error loading mascot SVG:", error);
       });
-  }, []);
+  }, [masterPath]);
 
   // Replace mascot parts when they change
   useEffect(() => {
     if (!svgContainerRef.current || !svgContent) return;
 
     const svg = svgContainerRef.current.querySelector("svg");
+    let svgEl: SVGSVGElement | null = svg as SVGSVGElement | null;
     if (!svg) {
       // First time: insert SVG content
       svgContainerRef.current.innerHTML = svgContent;
-      const newSvg = svgContainerRef.current.querySelector("svg");
-      if (!newSvg) {
+      svgEl = svgContainerRef.current.querySelector("svg");
+      if (!svgEl) {
         console.error("MascotDisplay: SVG element not found");
         return;
       }
-      newSvg.setAttribute("width", "100%");
-      newSvg.setAttribute("height", "100%");
-      newSvg.style.display = "block";
-      
-      // Store initial values
-      previousPartsRef.current = { headId, hairId, bodyId, hairColor };
-      console.log("MascotDisplay: Initial load complete, showing default mascot");
-      return;
+      svgEl.setAttribute("width", "100%");
+      svgEl.setAttribute("height", "100%");
+      svgEl.style.display = "block";
+      // Set previousPartsRef to empty so the change detection below will run replacePart for all parts on initial load
+      previousPartsRef.current = { headId: "", hairId: "", bodyId: "", collarId: "", hairColor: "" };
     }
 
     // Check what changed
     const headChanged = previousPartsRef.current.headId !== headId;
     const hairChanged = previousPartsRef.current.hairId !== hairId;
     const bodyChanged = previousPartsRef.current.bodyId !== bodyId;
+    const collarChanged = collarId != null && previousPartsRef.current.collarId !== collarId;
     const colorChanged = previousPartsRef.current.hairColor !== hairColor;
 
-    console.log("MascotDisplay: Changes detected:", { headChanged, hairChanged, bodyChanged, colorChanged });
+    console.log("MascotDisplay: Changes detected:", { headChanged, hairChanged, bodyChanged, collarChanged, colorChanged });
+
+    if (!svgEl) return;
 
     // Function to load and replace a part
     const replacePart = async (
-      partType: "head" | "hair" | "body",
+      partType: "head" | "hair" | "body" | "collar",
       partId: string
     ) => {
       try {
-        const folderName = partType === "head" ? "heads" : partType === "hair" ? "hair" : "body";
+        const partPath = assetsBase
+          ? `${assetsBase}/${partId}.svg`
+          : `/assets/icons/mascots/${partType === "head" ? "heads" : partType === "collar" ? "collars" : partType === "hair" ? "hairs" : partType}/${partId}.svg`;
         
-        console.log(`Loading ${partType}: ${partId} from /assets/icons/mascots/${folderName}/${partId}.svg`);
+        console.log(`Loading ${partType}: ${partId} from ${partPath}`);
         
-        const response = await fetch(`/assets/icons/mascots/${folderName}/${partId}.svg`);
+        const response = await fetch(partPath);
         if (!response.ok) {
           console.error(`Failed to load ${partId}.svg (${response.status})`);
           return;
@@ -98,84 +108,39 @@ export function MascotDisplay({
           return;
         }
 
-        // Special handling for hair: extract ONLY the hair group (exclude face/head)
+        // Special handling for hair: extract hair group or use full SVG content if no group
         if (partType === "hair") {
-          console.log("Processing hair replacement...");
-          
-          // Log all groups in the loaded hair SVG
           const allGroups = partSvg.querySelectorAll("g[id]");
-          console.log("Groups in loaded hair SVG:", Array.from(allGroups).map(g => g.id));
-          
-          // Find the most specific hair group (usually the last one with "hair" in lowercase)
           const hairGroups = Array.from(allGroups).filter(g => 
-            g.id.toLowerCase().includes('hair') &&
+            g.id && g.id.toLowerCase().includes('hair') &&
             !g.id.toLowerCase().includes('head') &&
             !g.id.toLowerCase().includes('face')
           );
-          
-          console.log("Filtered hair groups:", hairGroups.map(g => g.id));
-          
-          // Prefer the lowercase "hair X" group (most specific) - note: NO 'i' flag for case-sensitive
-          let hairGroupInLoadedSvg = hairGroups.find(g => /^hair\s+\d+$/.test(g.id.trim()));
-          
-          console.log("Lowercase 'hair X' match:", hairGroupInLoadedSvg ? (hairGroupInLoadedSvg as any).id : "none");
-          
-          // Fallback: use the LAST hair group (usually most specific)
+          let hairGroupInLoadedSvg = hairGroups.find(g => /^hair\s*\d*$/i.test(String(g.id || '').trim()));
           if (!hairGroupInLoadedSvg && hairGroups.length > 0) {
             hairGroupInLoadedSvg = hairGroups[hairGroups.length - 1];
-            console.log("Using last hair group:", (hairGroupInLoadedSvg as any).id);
           }
-          
+          // Fallback: mascot hair SVGs may have no groups (flat paths only) - use root svg children
           if (!hairGroupInLoadedSvg) {
-            console.error(`Hair group not found in ${partId}.svg. Available hair groups:`, hairGroups.map(g => g.id));
-            return;
+            hairGroupInLoadedSvg = partSvg;
           }
 
-          const hairGroupInMaster = svg.querySelector('[id*="hair" i], [id*="Hair" i]');
+          const hairGroupInMaster = svgEl.querySelector('[id*="hair" i], [id*="Hair" i]');
           if (!hairGroupInMaster) {
             console.error(`Hair group not found in master SVG`);
             return;
           }
 
-          console.log(`✅ Using hair group: ${(hairGroupInLoadedSvg as any).id}`);
-          console.log(`Replacing in master SVG group: ${hairGroupInMaster.id}`);
-
-          // Get the original hair position before replacing
-          const originalBBox = (hairGroupInMaster as SVGGraphicsElement).getBBox();
-          console.log(`Original hair position:`, originalBBox);
-
-          // Clear and replace content
+          // Clear and replace content (same viewBox - no positioning needed)
+          const sourceChildren = hairGroupInLoadedSvg === partSvg
+            ? Array.from(partSvg.children)
+            : Array.from(hairGroupInLoadedSvg.children);
           hairGroupInMaster.innerHTML = "";
-          Array.from(hairGroupInLoadedSvg.children).forEach((child) => {
+          sourceChildren.forEach((child) => {
             hairGroupInMaster.appendChild(child.cloneNode(true));
           });
 
-          // Get the new hair's bounding box
-          const newBBox = (hairGroupInMaster as SVGGraphicsElement).getBBox();
-          console.log(`New hair position before transform:`, newBBox);
-
-          // Calculate transform to position the new hair where the old one was
-          const translateX = originalBBox.x - newBBox.x;
-          const translateY = originalBBox.y - newBBox.y;
-          const scaleX = originalBBox.width / newBBox.width;
-          const scaleY = originalBBox.height / newBBox.height;
-          const scale = Math.min(scaleX, scaleY);
-
-          console.log(`Hair transform: translate(${translateX}, ${translateY}) scale(${scale})`);
-
-          // Create wrapper group with transform
-          const wrapperGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-          wrapperGroup.setAttribute("transform", `translate(${translateX}, ${translateY}) scale(${scale})`);
-
-          // Move all children into wrapper
-          while (hairGroupInMaster.firstChild) {
-            wrapperGroup.appendChild(hairGroupInMaster.firstChild);
-          }
-
-          // Add wrapper back
-          hairGroupInMaster.appendChild(wrapperGroup);
-
-          console.log(`✅ Replaced hair with ${partId} (positioned at ${translateX}, ${translateY})`);
+          console.log(`✅ Replaced hair with ${partId}`);
 
           // Apply hair color
           if (hairColor) {
@@ -188,13 +153,15 @@ export function MascotDisplay({
           return;
         }
 
-        // For head and body: replace the group's content with proper positioning
+        // For head, body, collar: replace the group's content
         let targetGroup: Element | null = null;
         
         if (partType === "head") {
-          targetGroup = svg.querySelector('[id^="Head"], [id*="head" i]');
+          targetGroup = svgEl.querySelector('[id^="Head"], [id*="head" i]');
         } else if (partType === "body") {
-          targetGroup = svg.querySelector('[id^="Body"], [id*="body" i]');
+          targetGroup = svgEl.querySelector('[id^="Body"], [id*="body" i]');
+        } else if (partType === "collar") {
+          targetGroup = svgEl.querySelector('[id*="collar" i]');
         }
 
         if (!targetGroup) {
@@ -202,20 +169,10 @@ export function MascotDisplay({
           return;
         }
 
-        // Get the bounding box of the original content to preserve positioning
-        const originalBBox = (targetGroup as SVGGraphicsElement).getBBox();
-        console.log(`Original ${partType} position:`, originalBBox);
-
-        // Get viewBoxes
-        const masterViewBox = svg.getAttribute("viewBox");
-        const partViewBox = partSvg.getAttribute("viewBox");
-        
-        console.log(`Master viewBox: ${masterViewBox}, Part viewBox: ${partViewBox}`);
-
         // Find the content in the loaded SVG
-        const loadedGroup = partSvg.querySelector('[id*="head" i], [id*="body" i], g');
+        const loadedGroup = partSvg.querySelector('[id*="head" i], [id*="body" i], [id*="collar" i], g');
         
-        // Clear target and copy content
+        // Clear target and copy content (same viewBox - no positioning needed)
         targetGroup.innerHTML = "";
         
         if (loadedGroup) {
@@ -228,39 +185,7 @@ export function MascotDisplay({
           });
         }
 
-        // Get the new content's bounding box
-        const newBBox = (targetGroup as SVGGraphicsElement).getBBox();
-        console.log(`New ${partType} position before transform:`, newBBox);
-
-        // Calculate the transform to position the new head where the old one was
-        // The head SVG is at (0,0) in its own coordinate system
-        // We need to move it to match the original head's position
-        const translateX = originalBBox.x - newBBox.x;
-        const translateY = originalBBox.y - newBBox.y;
-        
-        // Also might need to scale if sizes don't match
-        const scaleX = originalBBox.width / newBBox.width;
-        const scaleY = originalBBox.height / newBBox.height;
-        
-        console.log(`Transform needed: translate(${translateX}, ${translateY}) scale(${scaleX}, ${scaleY})`);
-        
-        // Apply transform to position correctly
-        // Use the average scale to maintain aspect ratio
-        const scale = Math.min(scaleX, scaleY);
-        
-        // Create a wrapper group with the transform
-        const wrapperGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        wrapperGroup.setAttribute("transform", `translate(${translateX}, ${translateY}) scale(${scale})`);
-        
-        // Move all children into the wrapper
-        while (targetGroup.firstChild) {
-          wrapperGroup.appendChild(targetGroup.firstChild);
-        }
-        
-        // Add wrapper back to target
-        targetGroup.appendChild(wrapperGroup);
-
-        console.log(`✅ Replaced ${partType} with ${partId} (positioned at ${translateX}, ${translateY})`);
+        console.log(`✅ Replaced ${partType} with ${partId}`);
       } catch (error) {
         console.error(`Error replacing ${partType}:`, error);
       }
@@ -270,10 +195,11 @@ export function MascotDisplay({
     if (headChanged) replacePart("head", headId);
     if (hairChanged) replacePart("hair", hairId);
     if (bodyChanged) replacePart("body", bodyId);
+    if (collarChanged && collarId) replacePart("collar", collarId);
     
     // Apply color change without reloading
     if (colorChanged && !hairChanged) {
-      const hairGroupInMaster = svg.querySelector('[id*="hair" i], [id*="Hair" i]');
+      const hairGroupInMaster = svgEl.querySelector('[id*="hair" i], [id*="Hair" i]');
       if (hairGroupInMaster) {
         (hairGroupInMaster as SVGElement).style.filter = `hue-rotate(${getHueRotation(
           hairColor
@@ -284,8 +210,8 @@ export function MascotDisplay({
     }
 
     // Update previous values
-    previousPartsRef.current = { headId, hairId, bodyId, hairColor };
-  }, [svgContent, headId, hairId, bodyId, hairColor]);
+    previousPartsRef.current = { headId, hairId, bodyId, collarId: collarId ?? "", hairColor };
+  }, [svgContent, headId, hairId, bodyId, collarId, hairColor, assetsBase]);
 
   return (
     <div

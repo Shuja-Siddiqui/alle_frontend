@@ -181,7 +181,7 @@ export function ModuleStatCard({
               letterSpacing: "-0.264px",
             }}
           >
-            {weeks}
+            {weeks.split(" ")[0]}
           </p>
           <p
             style={{

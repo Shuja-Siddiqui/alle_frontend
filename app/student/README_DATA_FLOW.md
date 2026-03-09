@@ -5,7 +5,7 @@ This document explains how data flows through the student pages: Home → Missio
 
 ## Data Flow
 
-### 1. **Home Page** (`/student/home`)
+### 1. **Home Page** (`/student/dashboard`)
 - Displays level map and star ring
 - "Continue your mission" button navigates to:
   ```
@@ -62,7 +62,7 @@ This document explains how data flows through the student pages: Home → Missio
   - Score: `{currentScore}/{totalScore}` (e.g., "6/10")
   - Stars earned based on score
   
-- **Navigation:** Continue button → `/student/home`
+- **Navigation:** Continue button → `/student/dashboard`
 
 ## Data Structure
 
@@ -148,7 +148,7 @@ Lesson = {
    - User clicks "Continue"
 
 6. **Returns to Home**
-   - Navigates: `/student/home`
+   - Navigates: `/student/dashboard`
 
 ## Current Implementation
 

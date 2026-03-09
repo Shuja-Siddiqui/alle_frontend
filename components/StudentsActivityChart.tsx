@@ -32,9 +32,6 @@ const defaultData: DailyActivityData[] = [
   { day: "Mon", students: 206, date: "11 Jan" },
 ];
 
-// Maximum value for scaling (200 based on Y-axis)
-const MAX_STUDENTS = 200;
-
 export function StudentsActivityChart({
   dailyData = defaultData,
   totalStudents = 213,
@@ -44,8 +41,18 @@ export function StudentsActivityChart({
   const [tooltipPosition, setTooltipPosition] = useState<{ top: number; left: number } | null>(null);
   const barRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  // Calculate bar heights as percentages
-  const maxValue = Math.max(...dailyData.map((d) => d.students), MAX_STUDENTS);
+  // Calculate dynamic Y-axis scale from data
+  const values = dailyData.map((d) => d.students);
+  const dataMax = values.length ? Math.max(...values) : 0;
+  const safeMax = dataMax === 0 ? 1 : dataMax;
+  // Round up to a \"nice\" step (nearest 10)
+  const maxTick = Math.ceil(safeMax / 10) * 10;
+  const TICKS = 5;
+  const step = maxTick / TICKS;
+  const yTicks = Array.from({ length: TICKS + 1 }, (_, i) => maxTick - step * i);
+
+  // Use maxTick for scaling bar heights
+  const maxValue = maxTick;
 
   function handleBarHover(index: number, event: React.MouseEvent<HTMLDivElement>) {
     setSelectedIndex(index);
@@ -156,13 +163,13 @@ export function StudentsActivityChart({
             fontWeight: 400,
           }}
         >
-          {["200", "150", "100", "50", "25", "0"].map((label, i) => (
+          {yTicks.map((label, i) => (
             <p
               key={label}
               className="absolute left-0"
               style={{ top: `${i * 44}px` }}
             >
-              {label}
+              {Math.round(label)}
             </p>
           ))}
         </div>
@@ -225,7 +232,9 @@ export function StudentsActivityChart({
               return (
                 <div
                   key={index}
-                  ref={(el) => (barRefs.current[index] = el)}
+                  ref={(el: HTMLDivElement | null) => {
+                    barRefs.current[index] = el;
+                  }}
                   className="rounded-[12px] shrink-0 cursor-pointer transition-colors"
                   onMouseEnter={(e) => handleBarHover(index, e)}
                   onMouseLeave={handleBarLeave}

@@ -43,14 +43,14 @@ function StudentLoginContent() {
       console.log('🚀 Starting login with:', { email });
 
       // Use AuthContext login function
-      await login(email, password);
+      const user = await login(email, password);
 
       console.log('✅ Login successful');
 
       hideLoader();
       showSuccess('Login successful! Redirecting...');
-      
-      // Redirect will be handled by AuthContext and page redirect logic
+      // Redirect by role: admin → admin dashboard, student/teacher → student dashboard
+      router.push(user?.role === 'admin' ? '/admin' : '/student');
     } catch (error: any) {
       hideLoader();
       console.error('❌ Login error:', error);

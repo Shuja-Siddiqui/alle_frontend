@@ -35,7 +35,7 @@ export function ProtectedRoute({
       if (allowedRoles && user && !allowedRoles.includes(user.role)) {
         // Redirect based on user role
         if (user.role === 'student') {
-          router.push('/student/home');
+          router.push('/student/dashboard');
         } else if (user.role === 'teacher') {
           router.push('/teacher/dashboard');
         } else if (user.role === 'admin') {

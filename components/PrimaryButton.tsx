@@ -16,6 +16,8 @@ type PrimaryButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: "filled" | "outline";
   /** Hide decorative stars */
   hideStars?: boolean;
+  /** Optional disabled state. When true, button is non-clickable and visually dimmed. Use for loading/API calls. */
+  disabled?: boolean;
 };
 
 export function PrimaryButton({
@@ -30,6 +32,7 @@ export function PrimaryButton({
   size = "default",
   variant = "filled",
   hideStars = false,
+  disabled = false,
   style,
   ...props
 }: PrimaryButtonProps) {
@@ -39,7 +42,8 @@ export function PrimaryButton({
 
   return (
     <button
-      className={`relative flex items-center justify-center overflow-hidden border-2 border-[#FFFFFF3D] text-sm font-medium text-white transition hover:brightness-110 active:scale-[0.99] ${
+      disabled={disabled}
+      className={`relative flex items-center justify-center overflow-hidden border-2 border-[#FFFFFF3D] text-sm font-medium text-white transition hover:brightness-110 active:scale-[0.99] disabled:cursor-not-allowed disabled:hover:brightness-100 disabled:active:scale-100 after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:content-[''] disabled:after:bg-white/50 disabled:after:z-10 ${
         isMedium
           ? "h-[70px] w-[262px] gap-[4px] rounded-full px-[23.902px] py-[9.612px]"
           : "h-[70px] w-[413px] gap-3 rounded-[76.83px] px-[23.9px] py-[9.61px]"

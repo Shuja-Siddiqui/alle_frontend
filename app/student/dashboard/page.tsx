@@ -10,13 +10,28 @@ import { useUI } from "../../../contexts/UIContext";
 import { useLesson } from "../../../contexts/LessonContext";
 import { useApiPost } from "../../../hooks/useApi";
 import { api } from "../../../lib/api-client";
+import { BadgeSkeleton } from "../../../components/Skeletons/BadgeSkeleton";
 import Image from "next/image";
 
 interface ResumePoint {
   lessonId: string;
   missionSequence: number;
   taskId: string;
+  taskType?: string | null;
+  taskIndex?: number;
   lessonTitle?: string;
+  isNew?: boolean;
+  badges?: DashboardBadge[];
+}
+
+interface DashboardBadge {
+  id: string;
+  title: string;
+  description?: string | null;
+  iconActive?: string | null;
+  iconInactive?: string | null;
+  rarity?: string | null;
+  isUnlocked: boolean;
 }
 
 export default function StudentDashboardPage() {
@@ -75,7 +90,7 @@ export default function StudentDashboardPage() {
           return;
         }
 
-        const { lessonId, lessonTitle, missionSequence, taskId, isNew } = nextLessonData;
+        const { lessonId, lessonTitle, missionSequence, taskId, taskType, taskIndex, isNew, badges } = nextLessonData;
         
         // Fetch full lesson data and save to context
         try {
@@ -93,12 +108,18 @@ export default function StudentDashboardPage() {
         if (!isMounted) return;
 
         // Set resume point
-        setResumePoint({
+        const resume: ResumePoint = {
           lessonId: lessonId,
           missionSequence: missionSequence || 1,
           taskId: taskId || '1',
+          taskType: taskType ?? undefined,
+          taskIndex: taskIndex ?? 0,
           lessonTitle: lessonTitle,
-        });
+          isNew: isNew ?? true,
+          badges: Array.isArray(badges) ? badges : undefined,
+        };
+
+        setResumePoint(resume);
 
         if (isNew) {
           console.log('✨ New lesson initialized');
@@ -143,8 +164,15 @@ export default function StudentDashboardPage() {
         await fetchAndSetLesson(resumePoint.lessonId);
       }
       
-      // Navigate to mission page
-      router.push(`/student/mission?lessonId=${resumePoint.lessonId}&missionSequence=${resumePoint.missionSequence}`);
+      // Navigate to mission page with checkpoint params for restore
+      const params = new URLSearchParams({
+        lessonId: resumePoint.lessonId,
+        missionSequence: String(resumePoint.missionSequence),
+      });
+      if (resumePoint.taskType) params.set('taskType', resumePoint.taskType);
+      if (resumePoint.taskIndex !== undefined) params.set('taskIndex', String(resumePoint.taskIndex));
+      if (resumePoint.taskId) params.set('taskId', resumePoint.taskId);
+      router.push(`/student/mission?${params.toString()}`);
     } catch (error: any) {
       console.error('❌ Error starting lesson:', error);
       showError('Failed to start lesson. Please try again.');
@@ -182,13 +210,12 @@ export default function StudentDashboardPage() {
         {/* Main Content */}
         <main className="flex flex-1 flex-row items-start justify-between" style={{ marginTop: "51px", width: "100%" }}>
           {/* Level Map Container - Left Side */}
-          <div className="relative">
+          <div className="relative w-full h-full">
             <LevelMap
               totalLevels={totalLevels}
               xpPerLevel={xpPerLevel}
               currentXp={studentXp}
-              width={846}
-              height={619}
+         
               onLevelClick={handleLevelClick}
             />
           </div>
@@ -234,7 +261,7 @@ export default function StudentDashboardPage() {
                 />
               </div>
 
-              {/* Content inside the box */}
+              {/* Content inside the box - only show lesson/mission text for new lessons, not when resuming */}
               <div
                 className="flex flex-col items-center justify-center"
                 style={{
@@ -242,7 +269,7 @@ export default function StudentDashboardPage() {
                   padding: "0 20px",
                 }}
               >
-                {resumePoint && !isLoading && (
+                {resumePoint && !isLoading && resumePoint.isNew && (
                   <>
                     <p
                       className="text-center"
@@ -273,65 +300,69 @@ export default function StudentDashboardPage() {
 
               {/* Badges - at the bottom of the box */}
               <div className="absolute flex justify-center" style={{ bottom: "13px", left: 0, right: 0, gap: "20px" }}>
-                <div
-                  style={{
-                    display: "flex",
+                {Array.from({ length: 4 }).map((_, index) => {
+                  const isBadgesLoading = isLoading || !resumePoint?.badges;
 
-                    justifyContent: "center",
-                    alignItems: "center",
-                    boxSizing: "border-box",
-                  }}
-                >
-                  <img
-                    src="/assets/icons/badges/badge1.svg"
-                    alt="Badge 1"
-                    style={{ width: "auto", height: "auto" }}
-                  />
-                </div>
-                <div
-                  style={{
-                    display: "flex",
+                  if (isBadgesLoading) {
+                    return (
+                      <div
+                        key={index}
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          boxSizing: "border-box",
+                        }}
+                      >
+                        <BadgeSkeleton />
+                      </div>
+                    );
+                  }
 
-                    justifyContent: "center",
-                    alignItems: "center",
-                    boxSizing: "border-box",
-                  }}
-                >
-                  <img
-                    src="/assets/icons/badges/badge2.svg"
-                    alt="Badge 2"
-                    style={{ width: "auto", height: "auto" }}
-                  />
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    boxSizing: "border-box",
-                  }}
-                >
-                  <img
-                    src="/assets/icons/badges/badge3.svg"
-                    alt="Badge 3"
-                    style={{ width: "auto", height: "auto" }}
-                  />
-                </div>
-                <div
-                  style={{
-                    display: "flex",
+                  const badge = resumePoint?.badges?.[index];
+                  if (!badge) {
+                    // No badge for this slot yet – still show a subtle skeleton
+                    return (
+                      <div
+                        key={index}
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          boxSizing: "border-box",
+                        }}
+                      >
+                        <BadgeSkeleton />
+                      </div>
+                    );
+                  }
 
-                    justifyContent: "center",
-                    alignItems: "center",
-                    boxSizing: "border-box",
-                  }}
-                >
-                  <img
-                    src="/assets/icons/badges/badge16.svg"
-                    alt="Badge 4"
-                    style={{ width: "auto", height: "auto" }}
-                  />
-                </div>
+                  const iconSrc =
+                    badge.isUnlocked
+                      ? badge.iconActive || badge.iconInactive || "/assets/icons/badges/badge1.svg"
+                      : badge.iconInactive || "/assets/icons/badges/badge1.svg";
+
+                  const altText = `${badge.isUnlocked ? "Unlocked" : "Upcoming"} badge: ${badge.title}`;
+
+                  return (
+                    <div
+                      key={badge.id}
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        boxSizing: "border-box",
+                        opacity: !badge.isUnlocked ? 0.6 : 1,
+                      }}
+                    >
+                      <img
+                        src={iconSrc}
+                        alt={altText}
+                        style={{ width: "auto", height: "auto" }}
+                      />
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

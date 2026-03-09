@@ -209,7 +209,7 @@ export function AllBadgesOverlay({
                                 <>
                                     {/* Locked badge (dimmed) */}
                                     <div
-                                        className="absolute flex items-center justify-center mix-blend-luminosity opacity-24"
+                                        className="absolute flex items-center justify-center "
                                         style={{
                                             top: "50%",
                                             left: "50%",
@@ -231,40 +231,7 @@ export function AllBadgesOverlay({
                                             }}
                                         />
                                     </div>
-                                    {/* Lock icon overlay */}
-                                    <div
-                                        className="absolute flex items-center justify-center"
-                                        style={{
-                                            top: "50%",
-                                            left: "50%",
-                                            transform: "translate(-50%, -50%)",
-                                            width: "16.754px",
-                                            height: "16.754px",
-                                        }}
-                                    >
-                                        {/* Lock icon placeholder - replace with actual lock icon when available */}
-                                        <div
-                                            style={{
-                                                width: "16.754px",
-                                                height: "16.754px",
-                                                backgroundColor: "#7478a2",
-                                                borderRadius: "4px",
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                            }}
-                                        >
-                                            <div
-                                                style={{
-                                                    width: "10px",
-                                                    height: "10px",
-                                                    border: "2px solid #FFFFFF",
-                                                    borderRadius: "2px",
-                                                    borderTop: "none",
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
+
                                 </>
                             )}
                         </div>

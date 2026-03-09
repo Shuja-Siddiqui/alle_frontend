@@ -57,6 +57,12 @@ export function WordStatusBox({
 }: WordStatusBoxProps) {
   const variantStyle = VARIANT_STYLES[variant];
 
+  // For words, treat letterHeight as the max height, but allow letters to use a
+  // slightly narrower width so skinny letters like "i" don't create huge visual
+  // gaps. Width stays <= 100, height stays at the requested size.
+  const effectiveLetterHeight = letterHeight;
+  const effectiveLetterWidth = Math.min(effectiveLetterHeight * 0.65, 100);
+
   // Map StatusBox variant to AlphabetDisplay variant
   const getAlphabetVariant = (): "default" | "done" | "error" => {
     if (variant === "success") return "done";
@@ -112,8 +118,8 @@ export function WordStatusBox({
       <AlphabetDisplay
         text={word}
         variant={getAlphabetVariant()}
-        letterWidth={letterHeight} /* Square containers; objectFit:contain handles varying letter widths */
-        letterHeight={letterHeight}
+        letterWidth={effectiveLetterWidth}
+        letterHeight={effectiveLetterHeight}
         gap={letterGap}
         spaceHandling="skip"
         applyBoxModel={false}
