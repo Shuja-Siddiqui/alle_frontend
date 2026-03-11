@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { MascotCreation } from "@/components/MascotCreation";
+import { ConfirmCancelDialog } from "@/components/ConfirmCancelDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUI } from "@/contexts/UIContext";
 import { useApiPost } from "@/hooks/useApi";
@@ -19,6 +20,7 @@ export default function MascotEditPage() {
   const { showSuccess, showError, showLoader, hideLoader } = useUI();
   const { post } = useApiPost();
 
+  // Draft mascot parts while editing (not persisted until user confirms)
   const [mascotParts, setMascotParts] = useState<{
     head: string;
     hair: string;
@@ -33,6 +35,9 @@ export default function MascotEditPage() {
     hairColor: "#E451FE",
   });
 
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
+
   // Load mascot from user when available
   useEffect(() => {
     if (!user?.mascot) return;
@@ -44,33 +49,37 @@ export default function MascotEditPage() {
       collar: getCollarFromBody(m.body ?? "body1"),
       hairColor: m.hairColor ?? "#E451FE",
     });
+    setHasUnsavedChanges(false);
   }, [user?.mascot]);
 
-  const handleSavePart = async (partial: Partial<{ face: string; hair: string; body: string; hairColor: string }>) => {
-    const loadingMessage = partial.body
-      ? "Saving clothes..."
-      : partial.hair
-        ? "Saving hair..."
-        : partial.face
-          ? "Saving head..."
-          : "Saving...";
+  // Persist the full mascot in a single request
+  const saveMascot = async (parts: {
+    head: string;
+    hair: string;
+    body: string;
+    collar: string;
+    hairColor?: string;
+  }) => {
+    const loadingMessage = "Saving mascot...";
     try {
       showLoader(loadingMessage);
       const mascot: Record<string, string> = {};
-      if (partial.face) mascot.face = partial.face;
-      if (partial.hair) mascot.hair = partial.hair;
-      if (partial.body) mascot.body = partial.body;
-      if (partial.hairColor) mascot.hairColor = partial.hairColor;
+      mascot.face = parts.head;
+      mascot.hair = parts.hair;
+      mascot.body = parts.body;
+      if (parts.hairColor) mascot.hairColor = parts.hairColor;
       await post("/users/profile", { mascot });
       setMascotParts((prev) => ({
         ...prev,
-        ...(partial.face && { head: partial.face }),
-        ...(partial.hair && { hair: partial.hair }),
-        ...(partial.body && { body: partial.body, collar: getCollarFromBody(partial.body) }),
-        ...(partial.hairColor && { hairColor: partial.hairColor }),
+        head: mascot.face ?? prev.head,
+        hair: mascot.hair ?? prev.hair,
+        body: mascot.body ?? prev.body,
+        collar: getCollarFromBody(mascot.body ?? prev.body),
+        hairColor: mascot.hairColor ?? prev.hairColor,
       }));
       await refreshUser();
       showSuccess("Saved!");
+      setHasUnsavedChanges(false);
     } catch (err: any) {
       const msg = err?.response?.message || err?.message || "Failed to save";
       showError(msg);
@@ -80,31 +89,50 @@ export default function MascotEditPage() {
   };
 
   const handleMascotBack = () => {
-    router.push("/student/profile");
+    if (hasUnsavedChanges) {
+      setShowUnsavedDialog(true);
+    } else {
+      router.push("/student/profile");
+    }
   };
 
   return (
     <div
       className="relative flex flex-col items-center font-sans"
       style={{
-        width: "1440px",
-        height: "calc(100vh - 40px - 60.864px)",
-        padding: "44px",
+        paddingTop: "44px",
       }}
     >
       <div
         className="w-full h-full flex flex-col"
-        style={{
-          background: "rgba(0, 0, 32, 0.80)",
-        }}
+
       >
         <MascotCreation
           initialParts={mascotParts}
-          onPartSelect={setMascotParts}
-          onSavePart={handleSavePart}
+          onPartSelect={(parts) => {
+            setMascotParts(parts);
+            setHasUnsavedChanges(true);
+          }}
+          onSave={saveMascot}
           onBack={handleMascotBack}
         />
       </div>
+      <ConfirmCancelDialog
+        open={showUnsavedDialog}
+        title="Save changes?"
+        confirmLabel="Save"
+        cancelLabel="Discard"
+        onConfirm={async () => {
+          setShowUnsavedDialog(false);
+          await saveMascot(mascotParts);
+          router.push("/student/profile");
+        }}
+        onCancel={() => {
+          setShowUnsavedDialog(false);
+          router.push("/student/profile");
+        }}
+        onClose={() => setShowUnsavedDialog(false)}
+      />
     </div>
   );
 }

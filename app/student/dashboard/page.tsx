@@ -8,6 +8,7 @@ import { PrimaryButton } from "../../../components/PrimaryButton";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useUI } from "../../../contexts/UIContext";
 import { useLesson } from "../../../contexts/LessonContext";
+import { useLessonFlow } from "../../../contexts/LessonFlowContext";
 import { useApiPost } from "../../../hooks/useApi";
 import { api } from "../../../lib/api-client";
 import { BadgeSkeleton } from "../../../components/Skeletons/BadgeSkeleton";
@@ -21,17 +22,6 @@ interface ResumePoint {
   taskIndex?: number;
   lessonTitle?: string;
   isNew?: boolean;
-  badges?: DashboardBadge[];
-}
-
-interface DashboardBadge {
-  id: string;
-  title: string;
-  description?: string | null;
-  iconActive?: string | null;
-  iconInactive?: string | null;
-  rarity?: string | null;
-  isUnlocked: boolean;
 }
 
 export default function StudentDashboardPage() {
@@ -39,6 +29,7 @@ export default function StudentDashboardPage() {
   const { user } = useAuth();
   const { showError, showLoader, hideLoader } = useUI();
   const { fetchAndSetLesson, currentLesson } = useLesson();
+  const { checkpoint } = useLessonFlow();
   const { post } = useApiPost();
   
   const [resumePoint, setResumePoint] = useState<ResumePoint | null>(null);
@@ -63,45 +54,89 @@ export default function StudentDashboardPage() {
 
   // Fetch student's next lesson and resume point
   useEffect(() => {
-    // Only run if user is a student and we haven't fetched yet
-    if (!user || user.role !== 'student' || hasFetchedRef.current) {
+    // Only run if user is a student and we haven't derived anything yet
+    if (!user || user.role !== "student" || hasFetchedRef.current) {
       return;
     }
 
+    // If we already have a lesson and checkpoint in context, derive resume point from there
+    if (currentLesson && checkpoint) {
+      const missionSequence = checkpoint.missionSequence ?? 1;
+      const taskType = checkpoint.activeTaskType ?? undefined;
+      const taskIndex = checkpoint.taskIndexInBatch ?? 0;
+      const taskId =
+        checkpoint.nextTaskId ||
+        checkpoint.lastCompletedTaskId ||
+        "1";
+
+      const resume: ResumePoint = {
+        lessonId: currentLesson.id,
+        missionSequence,
+        taskId,
+        taskType: taskType ?? undefined,
+        taskIndex,
+        lessonTitle: currentLesson.title,
+        isNew: false,
+      };
+
+      console.log("✅ Using checkpoint from context for resumePoint:", resume);
+      setResumePoint(resume);
+      hasFetchedRef.current = true;
+      setIsLoading(false);
+      return;
+    }
+
+    // Otherwise fall back to backend to compute resume point + badges
     let isMounted = true;
 
     const fetchNextLesson = async () => {
       try {
         setIsLoading(true);
-        console.log('🎮 Fetching next lesson for student...');
+        console.log("🎮 Fetching next lesson for student...");
 
         // Get next lesson (checks in-progress first, then finds next by order)
-        const response = await api.get<{ success: boolean; data: any }>('/lessons/progress/next');
-        
+        const response = await api.get<{ success: boolean; data: any }>(
+          "/lessons/progress/next"
+        );
+
         if (!isMounted) return; // Component unmounted, don't update state
-        
+
         const nextLessonData = response.data || response;
-        console.log('✅ Next lesson response:', nextLessonData);
-        
+        console.log("✅ Next lesson response:", nextLessonData);
+
         if (!nextLessonData || !nextLessonData.lessonId) {
-          console.warn('⚠️ No next lesson found - all lessons may be completed');
-          showError('All lessons completed!');
+          console.warn(
+            "⚠️ No next lesson found - all lessons may be completed"
+          );
+          showError("All lessons completed!");
           setResumePoint(null);
+          hasFetchedRef.current = true;
+          setIsLoading(false);
           return;
         }
 
-        const { lessonId, lessonTitle, missionSequence, taskId, taskType, taskIndex, isNew, badges } = nextLessonData;
-        
+        const {
+          lessonId,
+          lessonTitle,
+          missionSequence,
+          taskId,
+          taskType,
+          taskIndex,
+          isNew,
+        } = nextLessonData;
+
         // Fetch full lesson data and save to context
         try {
-          console.log(`📚 Fetching lesson ${lessonId} and saving to context...`);
+          console.log(
+            `📚 Fetching lesson ${lessonId} and saving to context...`
+          );
           await fetchAndSetLesson(lessonId);
           if (!isMounted) return;
-          console.log('✅ Lesson saved to context');
+          console.log("✅ Lesson saved to context");
         } catch (lessonError: any) {
-          console.error('❌ Error fetching lesson:', lessonError);
+          console.error("❌ Error fetching lesson:", lessonError);
           if (isMounted) {
-            showError('Failed to load lesson data');
+            showError("Failed to load lesson data");
           }
         }
 
@@ -111,26 +146,23 @@ export default function StudentDashboardPage() {
         const resume: ResumePoint = {
           lessonId: lessonId,
           missionSequence: missionSequence || 1,
-          taskId: taskId || '1',
+          taskId: taskId || "1",
           taskType: taskType ?? undefined,
           taskIndex: taskIndex ?? 0,
           lessonTitle: lessonTitle,
           isNew: isNew ?? true,
-          badges: Array.isArray(badges) ? badges : undefined,
         };
 
         setResumePoint(resume);
+        hasFetchedRef.current = true;
 
         if (isNew) {
-          console.log('✨ New lesson initialized');
+          console.log("✨ New lesson initialized");
         }
-        
-        // Mark as fetched to prevent re-running
-        hasFetchedRef.current = true;
       } catch (error: any) {
         if (!isMounted) return;
-        console.error('❌ Error fetching next lesson:', error);
-        showError(error.message || 'Failed to load next lesson');
+        console.error("❌ Error fetching next lesson:", error);
+        showError(error.message || "Failed to load next lesson");
         setResumePoint(null);
         hasFetchedRef.current = true; // Mark as fetched even on error to prevent infinite retries
       } finally {
@@ -147,7 +179,7 @@ export default function StudentDashboardPage() {
     return () => {
       isMounted = false;
     };
-  }, [user?.id]); // Only depend on user.id - ref doesn't need to be in dependencies
+  }, [user?.id, currentLesson, checkpoint]); // depend on context so we can prefer it when available
 
   const handleContinueMission = async () => {
     if (!resumePoint) {
@@ -224,18 +256,22 @@ export default function StudentDashboardPage() {
           <div className="relative flex flex-col items-center justify-center">
             <StarRing />
 
-            {/* Box below Star Ring */}
-            <div
-              className="relative"
-              style={{
-                marginTop: "63.67px",
-                width: "454px",
-                height: "136px",
-                borderRadius: "10.244px 10.244px 51.22px 51.22px",
-                border: "2px solid #E451FE",
-                background: "linear-gradient(155deg, #0B0F37 12.01%, #1B1F4E 94.63%)",
-              }}
-            >
+            {/* Box below Star Ring - full unit (button + box) gets drop shadow on hover */}
+            <div className="group/continue relative w-[454px]" style={{ marginTop: "63.67px" }}>
+              <div
+                className={`relative transition-shadow ${
+                  !(isLoading || !resumePoint)
+                    ? "shadow-none group-hover/continue:shadow-[0px_0px_18.7px_1.6px_#ff00c8]"
+                    : ""
+                }`}
+                style={{
+                  width: "454px",
+                  height: "136px",
+                  borderRadius: "10.244px 10.244px 51.22px 51.22px",
+                  border: "2px solid #E451FE",
+                  background: "linear-gradient(155deg, #0B0F37 12.01%, #1B1F4E 94.63%)",
+                }}
+              >
               {/* PrimaryButton - half inside, half outside */}
               <div
                 className="absolute"
@@ -253,6 +289,7 @@ export default function StudentDashboardPage() {
                   variant="filled"
                   onClick={handleContinueMission}
                   disabled={isLoading || !resumePoint}
+                  disabledBorderColor="#7076AD"
                   style={{
                     width: "454px",
                     backgroundImage:
@@ -301,7 +338,8 @@ export default function StudentDashboardPage() {
               {/* Badges - at the bottom of the box */}
               <div className="absolute flex justify-center" style={{ bottom: "13px", left: 0, right: 0, gap: "20px" }}>
                 {Array.from({ length: 4 }).map((_, index) => {
-                  const isBadgesLoading = isLoading || !resumePoint?.badges;
+                  const userBadges = user?.badges ?? [];
+                  const isBadgesLoading = isLoading || !userBadges;
 
                   if (isBadgesLoading) {
                     return (
@@ -319,7 +357,7 @@ export default function StudentDashboardPage() {
                     );
                   }
 
-                  const badge = resumePoint?.badges?.[index];
+                  const badge = userBadges[index];
                   if (!badge) {
                     // No badge for this slot yet – still show a subtle skeleton
                     return (
@@ -337,12 +375,13 @@ export default function StudentDashboardPage() {
                     );
                   }
 
+                  // For dashboard, any badge present in user.badges is treated as unlocked.
                   const iconSrc =
-                    badge.isUnlocked
-                      ? badge.iconActive || badge.iconInactive || "/assets/icons/badges/badge1.svg"
-                      : badge.iconInactive || "/assets/icons/badges/badge1.svg";
+                    badge.iconActive ||
+                    badge.iconInactive ||
+                    "/assets/icons/badges/badge1.svg";
 
-                  const altText = `${badge.isUnlocked ? "Unlocked" : "Upcoming"} badge: ${badge.title}`;
+                  const altText = `Unlocked badge: ${badge.title}`;
 
                   return (
                     <div
@@ -352,7 +391,6 @@ export default function StudentDashboardPage() {
                         justifyContent: "center",
                         alignItems: "center",
                         boxSizing: "border-box",
-                        opacity: !badge.isUnlocked ? 0.6 : 1,
                       }}
                     >
                       <img
@@ -363,6 +401,7 @@ export default function StudentDashboardPage() {
                     </div>
                   );
                 })}
+              </div>
               </div>
             </div>
           </div>

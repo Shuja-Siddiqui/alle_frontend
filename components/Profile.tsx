@@ -25,7 +25,7 @@ export function Profile({
     <button
       type="button"
       onClick={onClick}
-      className={`relative shrink-0 rounded-full ${className ?? ""}`}
+      className={`relative shrink-0 rounded-full cursor-pointer ${className ?? ""}`}
       style={{
         width: `${size}px`,
         height: `${size}px`,

@@ -1,7 +1,0 @@
-<svg width="1000" height="1000" viewBox="0 0 1000 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Layering order: body (back) -> head -> hair -> collar_front (top). All parts share viewBox 0 0 1000 1000 -->
-  <g id="body"></g>
-  <g id="head"></g>
-  <g id="hair"></g>
-  <g id="collar_front"></g>
-</svg>
