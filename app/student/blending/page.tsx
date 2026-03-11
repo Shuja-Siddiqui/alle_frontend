@@ -15,6 +15,7 @@ import { useTTS } from "../../../hooks/useTTS";
 import { useSpeechAssessment } from "../../../hooks/useSpeechAssessment";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useLesson } from "../../../contexts/LessonContext";
+import { useUI } from "../../../contexts/UIContext";
 import { api } from "../../../lib/api-client";
 import { getNextLessonStep, resolveTaskIndex } from "../../../lib/lesson-navigation";
 import Image from "next/image";
@@ -39,6 +40,7 @@ export default function BlendingPage() {
   const router = useRouter();
   const { user } = useAuth();
   const { currentLesson } = useLesson();
+  const { showLoader, hideLoader, setBackgroundMode } = useUI();
   const { playTTSWithSSML, isPlaying, stopTTS } = useTTS();
   const { startRecording, stopRecording, assessPhoneme } = useSpeechAssessment();
 
@@ -58,6 +60,17 @@ export default function BlendingPage() {
   const missionSequence = searchParams.get("missionSequence");
   const taskId = searchParams.get("taskId");
   const taskIndexParam = searchParams.get("taskIndex");
+
+  // Keep platform background in sync with current mission's mission_type (mission_mode → mission_mode.png)
+  useEffect(() => {
+    if (!currentLesson?.missions || !missionSequence) return;
+    const missionSeqNum = parseInt(missionSequence, 10);
+    const mission = currentLesson.missions.find(
+      (m: any) => (m.mission_sequence ?? m.missionSequence) === missionSeqNum
+    );
+    const missionType = (mission as any)?.mission_type ?? (mission as any)?.missionType;
+    setBackgroundMode(missionType === "mission_mode" ? "mission_mode" : "default");
+  }, [currentLesson?.missions, missionSequence, setBackgroundMode]);
 
   // Refs
   const processedRef = useRef(false);
@@ -181,6 +194,7 @@ export default function BlendingPage() {
     processedRef.current = true;
 
     const fetchTaskData = async () => {
+      showLoader("Loading lesson...");
       try {
         const queryParams = new URLSearchParams({
           missionSequence: String(missionSequence),
@@ -207,6 +221,8 @@ export default function BlendingPage() {
         }
       } catch (error) {
         console.error("Error fetching task data:", error);
+      } finally {
+        hideLoader();
       }
     };
 

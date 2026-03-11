@@ -11,12 +11,15 @@ type StudentMascotAvatarProps = {
   fit?: "overflow" | "contain";
 };
 
-const DEFAULT_SIZE = 128.462;
-const BASE_CIRCLE_SIZE = 128; // design circle size
-// These should match the actual mascot SVG viewBox dimensions
-// so scaling stays proportional when we change the circle size.
-const BASE_MASCOT_WIDTH = 124;
-const BASE_MASCOT_HEIGHT = 255;
+// Default visual spec for student pages:
+// Circle: 204.688 x 204.688
+// Mascot: 197 x 251 (aspect ratio ~ 62/79)
+const DEFAULT_CIRCLE_SIZE = 204.688;
+const DEFAULT_MASCOT_WIDTH = 197;
+const DEFAULT_MASCOT_HEIGHT = 251;
+
+// Public default: circle diameter
+const DEFAULT_SIZE = DEFAULT_CIRCLE_SIZE;
 
 function getCollarFromBody(bodyId: string | undefined): string {
   const match = bodyId?.match(/body(\d+)/i);
@@ -47,13 +50,13 @@ export function StudentMascotAvatar({
   const hairColor = mascot?.hairColor ?? "#E451FE";
 
   // Scale mascot relative to the circle size
-  const scale = size / BASE_CIRCLE_SIZE;
+  const scale = size / DEFAULT_CIRCLE_SIZE;
 
-  const overflowMascotWidth = BASE_MASCOT_WIDTH * scale;
-  const overflowMascotHeight = BASE_MASCOT_HEIGHT * scale;
+  const overflowMascotWidth = DEFAULT_MASCOT_WIDTH * scale;
+  const overflowMascotHeight = DEFAULT_MASCOT_HEIGHT * scale;
 
   // For contain mode, keep mascot fully inside the circle while preserving SVG aspect ratio (width/height)
-  const aspectRatio = BASE_MASCOT_WIDTH / BASE_MASCOT_HEIGHT;
+  const aspectRatio = DEFAULT_MASCOT_WIDTH / DEFAULT_MASCOT_HEIGHT;
   const containMascotHeight = size;
   const containMascotWidth = size * aspectRatio;
 
@@ -70,11 +73,11 @@ export function StudentMascotAvatar({
       : {
           // Overflow: mascot taller than circle so head pops out of the top
           position: "absolute" as const,
-          bottom: 0,
-          left: "50%",
+          bottom: "-4px",
+          left: "53%",
           transform: "translateX(-50%)",
-          width: `${overflowMascotWidth}px`,
-          height: `${overflowMascotHeight}px`,
+          width: `${overflowMascotWidth + 100}px`,
+          height: `${overflowMascotHeight + 50}px`,
         };
 
   return (

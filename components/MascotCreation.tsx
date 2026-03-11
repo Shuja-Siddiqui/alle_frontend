@@ -62,7 +62,7 @@ const CATEGORIES: Category[] = ["head", "hair", "body"];
 
 // Mascot options from /assets/icons/mascots (heads, hairs, body, collars)
 const HEAD_OPTIONS = ["head1", "head2", "head3", "head4", "head5", "head6", "head7", "head8", "head9", "head10"];
-const HAIR_OPTIONS = ["hair1", "hair2", "hair3", "hair4", "hair5", "hair6", "hair7", "hair8", "hair9", "hair10", "hair11", "hair12", "hair13", "hair14", "hair15"];
+const HAIR_OPTIONS = ["hair1", "hair2", "hair3", "hair4", "hair5", "hair6", "hair7", "hair8", "hair9", "hair10", "hair11", "hair12", "hair13", "hair14"];
 const BODY_OPTIONS = ["body1", "body2", "body3", "body4", "body5", "body6", "body7", "body8", "body9", "body10", "body11", "body12", "body13", "body14", "body15"];
 
 const CATEGORY_OPTIONS: Record<Category, string[]> = {
@@ -217,7 +217,7 @@ export function MascotCreation({
   };
 
   return (
-    <div className="flex min-h-screen w-full flex-col font-sans">
+    <div className="flex  w-full flex-col font-sans">
       {/* Header */}
       <div className="flex items-center justify-between">
         {/* Back button */}
@@ -363,10 +363,26 @@ export function MascotCreation({
                   }}
                 >
                   <Image
+                    style={{
+                      position: "absolute",
+                      left: 0,
+                      top:
+                        currentStep === "hair"
+                          ? 50
+                          : currentStep === "head"
+                          ? 30
+                          : -20,
+                    }}
                     src={`${CATEGORY_PATHS[currentStep]}/${optionId}.svg`}
                     alt={`${getCategoryLabel(currentStep)} ${index + 1}`}
                     fill
-                    className="object-contain p-[7px]"
+                    className={
+                      currentStep === "head" || currentStep === "hair"
+                        ? "object-cover scale-[2]"
+                        : currentStep === "body"
+                        ? "object-cover scale-[1.1]"
+                        : "object-contain p-[7px]"
+                    }
                   />
                 </button>
               );
@@ -451,37 +467,3 @@ export function MascotCreation({
   );
 }
 
-// Helper functions for color filtering (simplified - would need more sophisticated color manipulation)
-function getHueRotation(color: string): number {
-  // Simplified hue rotation based on color
-  const colorMap: Record<string, number> = {
-    "#E451FE": 0, // Magenta
-    "#F1B708": 60, // Yellow
-    "#17E0FE": 180, // Cyan
-    "#0479FF": 240, // Blue
-    "#2FFF00": 120, // Green
-    "#FF1F00": 0, // Red
-    "#80D7C3": 160, // Teal
-    "#BB00FF": 280, // Purple
-    "#FF9C7B": 20, // Orange
-    "#808080": 0, // Gray
-    "#FFFFFF": 0, // White
-    "#191919": 0, // Black
-  };
-  return colorMap[color] || 0;
-}
-
-function getSaturation(color: string): number {
-  // For grayscale colors, reduce saturation
-  if (color === "#808080" || color === "#FFFFFF" || color === "#191919") {
-    return 0;
-  }
-  return 100;
-}
-
-function getBrightness(color: string): number {
-  // Adjust brightness based on color
-  if (color === "#191919") return 50; // Black - darker
-  if (color === "#FFFFFF") return 150; // White - brighter
-  return 100; // Default
-}

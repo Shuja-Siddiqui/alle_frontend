@@ -234,7 +234,7 @@ function StudentSignupContent() {
         /* Mascot creation step */
         <div
           className="fixed inset-0 flex min-h-screen w-full flex-col font-sans p-[44px]"
-          style={{ background: "rgba(0, 0, 32, 0.80)" }}
+        
         >
           <div className="relative z-10 mb-[54px] flex justify-center">
             <EduPortal text="EduPortal" />

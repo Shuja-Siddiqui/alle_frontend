@@ -60,6 +60,10 @@ export interface UIContextType {
   theme: 'light' | 'dark';
   toggleTheme: () => void;
   setTheme: (theme: 'light' | 'dark') => void;
+
+  // Platform background: 'default' (bg.png) or 'mission_mode' (mission_mode.png)
+  backgroundMode: 'default' | 'mission_mode';
+  setBackgroundMode: (mode: 'default' | 'mission_mode') => void;
 }
 
 // ============================================
@@ -92,6 +96,9 @@ export function UIProvider({ children }: UIProviderProps) {
 
   // Theme state
   const [theme, setThemeState] = useState<'light' | 'dark'>('light');
+
+  // Platform background (default vs mission_mode)
+  const [backgroundMode, setBackgroundMode] = useState<'default' | 'mission_mode'>('default');
 
   // ============================================
   // Loading Functions
@@ -224,6 +231,8 @@ export function UIProvider({ children }: UIProviderProps) {
     theme,
     toggleTheme,
     setTheme,
+    backgroundMode,
+    setBackgroundMode,
   };
 
   return <UIContext.Provider value={value}>{children}</UIContext.Provider>;

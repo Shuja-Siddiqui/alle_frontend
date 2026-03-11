@@ -1,12 +1,24 @@
 /**
  * Global Loader Component
- * Lightsaber-style loading bar with illuminated glow (Star Wars inspired)
- * Displays when UI context isLoading is true
+ * A line that shines, with an expansion pulse: center expands outward and decreases towards both ends
  */
 
 "use client";
 
 import { useUI } from "../contexts/UIContext";
+
+const loaderKeyframes = `
+  @keyframes loader-expand {
+    0%, 100% {
+      transform: scaleX(0.4);
+      opacity: 0.6;
+    }
+    50% {
+      transform: scaleX(1);
+      opacity: 1;
+    }
+  }
+`;
 
 export function GlobalLoader() {
   const { isLoading, loadingMessage } = useUI();
@@ -15,12 +27,14 @@ export function GlobalLoader() {
 
   return (
     <div
-      className="fixed inset-0 z-9999 flex items-center justify-center"
+      className="fixed inset-0 z-[9999] flex items-center justify-center"
       style={{
         background:
           "radial-gradient(ellipse at center, #1a0e2e 0%, #0d0618 40%, #050308 100%)",
       }}
     >
+      <style>{loaderKeyframes}</style>
+
       {/* Subtle starfield */}
       <div
         className="absolute inset-0 opacity-60"
@@ -35,41 +49,38 @@ export function GlobalLoader() {
       />
 
       <div className="relative flex flex-col items-center gap-8 w-full px-[5%]">
-        {/* Lightsaber blade container - 90% viewport width */}
-        <div className="relative flex items-center justify-center w-[90vw] max-w-[90vw]">
-          {/* Outer glow */}
+        {/* Loader bar - shining line with center expansion */}
+        <div className="relative flex items-center justify-center w-[90vw] max-w-[90vw] overflow-visible">
+          {/* Track - base bar (dim, #484848 with blur per Figma) */}
           <div
-            className="absolute h-4 w-full rounded-full animate-pulse"
+            className="absolute left-1/2 top-1/2 h-2 w-full -translate-x-1/2 -translate-y-1/2 rounded-full origin-center"
             style={{
-              background: "transparent",
-              boxShadow: `
-                0 0 20px 4px rgba(138, 43, 226, 0.5),
-                0 0 40px 12px rgba(200, 50, 255, 0.35),
-                0 0 60px 20px rgba(228, 81, 254, 0.25),
-                0 0 80px 28px rgba(180, 80, 255, 0.15),
-                inset 0 0 30px 2px rgba(255, 200, 255, 0.2)
-              `,
+              background: "#484848",
+              filter: "blur(7.5px)",
+              opacity: 0.9,
             }}
           />
-          {/* Mid glow */}
+          {/* Inner line - #ff24af (Figma State 2) - expands from center, decreases towards ends */}
           <div
-            className="absolute h-2 w-[96%] rounded-full"
+            className="absolute left-1/2 top-1/2 h-1 w-full -translate-x-1/2 -translate-y-1/2 rounded-full origin-center"
             style={{
               background:
-                "linear-gradient(90deg, rgba(100, 50, 255, 0.9) 0%, rgba(228, 81, 254, 0.95) 35%, rgba(255, 120, 255, 0.95) 65%, rgba(160, 80, 255, 0.9) 100%)",
+                "linear-gradient(90deg, rgba(255,36,175,0) 0%, rgba(255,36,175,0.4) 25%, #ff24af 40%, rgba(255,255,255,1) 50%, #ff24af 60%, rgba(255,36,175,0.4) 75%, rgba(255,36,175,0) 100%)",
               boxShadow: `
-                0 0 15px 2px rgba(228, 81, 254, 0.8),
-                inset 0 0 12px 0 rgba(255, 255, 255, 0.4)
+                0 0 8px 1px rgba(255, 36, 175, 0.6),
+                inset 0 0 8px rgba(255, 255, 255, 0.5)
               `,
+              animation: "loader-expand 1.8s ease-in-out infinite",
             }}
           />
-          {/* Bright core */}
+          {/* Blue-purple outer halo - spindle expansion at peak */}
           <div
-            className="absolute h-1 w-[92%] rounded-full"
+            className="absolute left-1/2 top-1/2 h-3 w-full -translate-x-1/2 -translate-y-1/2 rounded-full origin-center pointer-events-none"
             style={{
               background:
-                "linear-gradient(90deg, rgba(255,255,255,0.95) 0%, rgba(255,220,255,0.98) 50%, rgba(255,255,255,0.95) 100%)",
-              boxShadow: "inset 0 0 8px rgba(255,255,255,0.9)",
+                "linear-gradient(90deg, rgba(138,43,226,0) 0%, rgba(138,43,226,0.3) 30%, rgba(200,50,255,0.4) 50%, rgba(138,43,226,0.3) 70%, rgba(138,43,226,0) 100%)",
+              filter: "blur(6px)",
+              animation: "loader-expand 1.8s ease-in-out infinite",
             }}
           />
         </div>

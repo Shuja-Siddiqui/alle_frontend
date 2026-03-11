@@ -17,7 +17,7 @@ export function BackButton({
   return (
     <button
       type="button"
-      className={`flex items-center gap-[16px] self-stretch ${className ?? ""}`}
+      className={`flex items-center gap-[16px] self-stretch cursor-pointer ${className ?? ""}`}
       {...props}
     >
       <Image src={iconSrc} alt="Back" width={36} height={36} />

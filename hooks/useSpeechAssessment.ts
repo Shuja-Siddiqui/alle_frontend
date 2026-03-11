@@ -105,12 +105,26 @@ export function useSpeechAssessment() {
     async (
       audioBlob: Blob,
       phoneme: string,
-      options: {
+      letterOrOptions: string | {
+        dictType?: string;
+        ageGroup?: number;
+        slack?: number;
+      } = {},
+      maybeOptions: {
         dictType?: string;
         ageGroup?: number;
         slack?: number;
       } = {}
     ): Promise<AssessmentResult> => {
+      let letter: string | undefined;
+      let options: { dictType?: string; ageGroup?: number; slack?: number };
+
+      if (typeof letterOrOptions === "string") {
+        letter = letterOrOptions;
+        options = maybeOptions || {};
+      } else {
+        options = letterOrOptions || {};
+      }
       // MOCK MODE: Skip API call, return mock result
       const mockMode = localStorage.getItem('MOCK_MODE') === 'true';
       if (mockMode) {
@@ -131,6 +145,9 @@ export function useSpeechAssessment() {
         const formData = new FormData();
         formData.append("audio", audioBlob, "phoneme.webm");
         formData.append("phoneme", phoneme);
+        if (letter) {
+          formData.append("letter", letter);
+        }
         formData.append("dictType", options.dictType || "CMU");
         formData.append("ageGroup", String(options.ageGroup || 1));
         formData.append("slack", String(options.slack || 0.5));
@@ -153,10 +170,14 @@ export function useSpeechAssessment() {
         const data = await response.json();
 
         if (!response.ok || data.success === false) {
-          throw new Error(data.message || "Assessment failed");
+          throw new Error(data.message || data.error || "Assessment failed");
         }
 
-        const qualityScore = data.qualityScore || 0;
+        const qualityScore =
+          data.qualityScore ??
+          data.accuracyScore ??
+          data.pronunciationScore ??
+          0;
         let feedbackType: "exactMatch" | "closeMatch" | "wrongSound";
 
         // Determine feedback type based on score
@@ -173,7 +194,7 @@ export function useSpeechAssessment() {
         return {
           success: true,
           qualityScore,
-          recognizedText: data.soundLike,
+          recognizedText: data.soundLike || data.recognizedPhoneme,
           feedbackType,
           feedbackText: data.feedbackText,
         };

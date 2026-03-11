@@ -3,9 +3,11 @@
 import { useSearchParams, useRouter } from "next/navigation";
 import { PrimaryButton } from "../../../components/PrimaryButton";
 import { MascotAvatar } from "../../../components/MascotAvatar";
+import { StudentMascotAvatar } from "../../../components/StudentMascotAvatar";
 import { useEffect, useState } from "react";
 import { useLesson } from "../../../contexts/LessonContext";
 import { useLessonFlow } from "../../../contexts/LessonFlowContext";
+import { useUI } from "../../../contexts/UIContext";
 import { useTTS } from "../../../hooks/useTTS";
 import { api } from "../../../lib/api-client";
 
@@ -15,6 +17,7 @@ export default function MissionPage() {
   const { currentLesson } = useLesson();
   const { loadCheckpoint } = useLessonFlow();
   const { playTTSWithSSML } = useTTS();
+  const { setBackgroundMode } = useUI();
 
   // Get data from URL params
   const lessonId = searchParams.get("lessonId") || "lesson1";
@@ -38,6 +41,11 @@ export default function MissionPage() {
     ((mission as any)?.mission_type || (mission as any)?.missionType || "Mission") as string;
   const displayTitle =
     missionType === "Mission" ? `${missionType} ${missionSequence}` : missionType;
+
+  // Switch platform background to mission_mode.png when this mission has mission_type === "mission_mode"
+  useEffect(() => {
+    setBackgroundMode(missionType === "mission_mode" ? "mission_mode" : "default");
+  }, [missionType, setBackgroundMode]);
 
   // Handle lesson-level introduction flow (missionSequence === 0)
   useEffect(() => {
@@ -321,10 +329,7 @@ export default function MissionPage() {
             bottom: "32px",
           }}
         >
-          <MascotAvatar
-            imageSrc="/assets/icons/mascots/mascot.png"
-            alt="Mascot"
-          />
+          <StudentMascotAvatar />
         </div>
       </div>
     );
@@ -379,10 +384,7 @@ export default function MissionPage() {
           bottom: "32px",
         }}
       >
-        <MascotAvatar
-          imageSrc="/assets/icons/mascots/mascot.png"
-          alt="Mascot"
-        />
+        <StudentMascotAvatar />
       </div>
     </div>
   );
