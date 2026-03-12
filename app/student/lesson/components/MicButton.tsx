@@ -49,7 +49,7 @@ export function MicButton({
   return (
     <button
       type="button"
-      className={`inline-flex items-center justify-center bg-transparent border-none p-0 ${className ?? ""}`}
+      className={`inline-flex cursor-pointer items-center justify-center bg-transparent border-none p-0 disabled:cursor-not-allowed ${className ?? ""}`}
       style={{
         width: `${size}px`,
         height: `${size}px`,

@@ -15,7 +15,7 @@ export default function MissionPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { currentLesson } = useLesson();
-  const { loadCheckpoint } = useLessonFlow();
+  const { loadCheckpoint, checkpoint } = useLessonFlow();
   const { playTTSWithSSML } = useTTS();
   const { setBackgroundMode } = useUI();
 
@@ -240,12 +240,12 @@ export default function MissionPage() {
       mastery_check: "word", // Mastery check uses word page (testing words)
     };
 
-    // Resume from checkpoint: route to saved taskType and taskIndex
+    // 1) Highest priority: explicit resume params from URL (dashboard)
     if (resumeTaskType && pageMapping[resumeTaskType]) {
       const tasks = mission.tasks?.[resumeTaskType];
       if (tasks && Array.isArray(tasks) && tasks.length > 0) {
         const page = pageMapping[resumeTaskType];
-        // Prefer taskId to derive index (in case checkpoint has wrong taskIndex)
+        // Prefer taskId to derive index
         let safeIndex = resumeTaskIndex ? parseInt(resumeTaskIndex, 10) : 0;
         let task = tasks[safeIndex];
         if (resumeTaskId) {
@@ -259,7 +259,34 @@ export default function MissionPage() {
         }
         safeIndex = Math.min(Math.max(0, safeIndex), tasks.length - 1);
         task = task || tasks[safeIndex];
-        const taskId = resumeTaskId || (task as any)?.task_id || (task as any)?.id || String(safeIndex + 1);
+        const taskId =
+          resumeTaskId ||
+          (task as any)?.task_id ||
+          (task as any)?.id ||
+          String(safeIndex + 1);
+
+        router.push(
+          `/student/${page}?lessonId=${lessonId}&missionSequence=${missionSequence}&taskId=${taskId}&taskIndex=${safeIndex}`
+        );
+        return;
+      }
+    }
+
+    // 2) Next: resume from checkpoint (activeTaskType + taskIndexInBatch)
+    if (checkpoint?.activeTaskType && pageMapping[checkpoint.activeTaskType]) {
+      const type = checkpoint.activeTaskType as string;
+      const tasks = mission.tasks?.[type];
+      if (tasks && Array.isArray(tasks) && tasks.length > 0) {
+        const page = pageMapping[type];
+        let safeIndex = checkpoint.taskIndexInBatch ?? 0;
+        safeIndex = Math.min(Math.max(0, safeIndex), tasks.length - 1);
+        let task = tasks[safeIndex];
+        const taskId =
+          checkpoint.nextTaskId ||
+          checkpoint.lastCompletedTaskId ||
+          (task as any)?.task_id ||
+          (task as any)?.id ||
+          String(safeIndex + 1);
 
         router.push(
           `/student/${page}?lessonId=${lessonId}&missionSequence=${missionSequence}&taskId=${taskId}&taskIndex=${safeIndex}`

@@ -49,7 +49,9 @@ export function PrimaryButton({
   return (
     <button
       disabled={disabled}
-      className={`group relative flex items-center justify-center overflow-hidden border-2 text-sm font-medium transition active:scale-[0.99] disabled:cursor-not-allowed disabled:hover:brightness-100 disabled:active:scale-100 ${
+      className={`group relative flex items-center justify-center overflow-hidden border-2 text-sm font-medium transition active:scale-[0.99] ${
+        disabled ? "disabled:cursor-not-allowed disabled:hover:brightness-100 disabled:active:scale-100" : "cursor-pointer"
+      } ${
         disabled
           ? disabledBorderColor
             ? ""
