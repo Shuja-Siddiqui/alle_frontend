@@ -29,6 +29,13 @@ function isAutoplayBlockedError(error: unknown): boolean {
   return /user gesture|interaction|not allowed|play\(\) can only be initiated/i.test(msg);
 }
 
+/** True if play() was interrupted by pause() (e.g. user navigated away or component unmounted). */
+function isPlayInterruptedError(error: unknown): boolean {
+  if (error instanceof DOMException && error.name === "AbortError") return true;
+  const msg = error instanceof Error ? error.message : String(error);
+  return /interrupted by a call to pause|play\(\) request was interrupted/i.test(msg);
+}
+
 /**
  * Hook for Text-to-Speech functionality
  */
@@ -177,10 +184,17 @@ export function useTTS() {
               console.log("[LessonTTS] Audio can play through");
             });
 
+            // Helper: revoke blob and invalidate replay cache (prevents ERR_FILE_NOT_FOUND on reuse)
+            const revokeAndInvalidate = () => {
+              URL.revokeObjectURL(audioUrl);
+              lastKeyRef.current = null;
+              audioRef.current = null;
+            };
+
             // Clean up URL when done
             audio.addEventListener("ended", () => {
               console.log("[LessonTTS] Audio playback ended");
-              URL.revokeObjectURL(audioUrl);
+              revokeAndInvalidate();
               setState((prev) => ({ ...prev, isPlaying: false }));
               resolve();
             });
@@ -191,7 +205,7 @@ export function useTTS() {
                 code: audio.error?.code,
                 message: audio.error?.message,
               });
-              URL.revokeObjectURL(audioUrl);
+              revokeAndInvalidate();
               setState((prev) => ({
                 ...prev,
                 isPlaying: false,
@@ -209,13 +223,18 @@ export function useTTS() {
               .catch((error) => {
                 if (isAutoplayBlockedError(error)) {
                   console.warn("[LessonTTS] Audio blocked until user interacts with the page (browser autoplay policy). Playback will work after tap/click.");
-                  // Do NOT revoke the blob here: the Audio element may still be loading it; revoking causes ERR_FILE_NOT_FOUND and MEDIA_ELEMENT_ERROR
+                  setState((prev) => ({ ...prev, isGenerating: false, isPlaying: false }));
+                  resolve();
+                  return;
+                }
+                if (isPlayInterruptedError(error)) {
+                  // play() was interrupted by pause() - e.g. user navigated away or component unmounted
                   setState((prev) => ({ ...prev, isGenerating: false, isPlaying: false }));
                   resolve();
                   return;
                 }
                 console.error("[LessonTTS] audio.play() failed", error);
-                URL.revokeObjectURL(audioUrl);
+                revokeAndInvalidate();
                 setState((prev) => ({
                   ...prev,
                   isPlaying: false,
@@ -263,6 +282,9 @@ export function useTTS() {
         } catch (error) {
           if (isAutoplayBlockedError(error)) {
             console.warn("[useTTS] Replay blocked (no user interaction yet).");
+            return;
+          }
+          if (isPlayInterruptedError(error)) {
             return;
           }
           console.error("[useTTS] Replay audio.play() failed:", error);

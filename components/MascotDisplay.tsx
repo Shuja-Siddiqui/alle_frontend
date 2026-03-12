@@ -40,11 +40,10 @@ export function MascotDisplay({
         return response.text();
       })
       .then((svgText) => {
-        console.log("MascotDisplay: Master SVG loaded successfully");
         setSvgContent(svgText);
       })
-      .catch((error) => {
-        console.error("Error loading mascot SVG:", error);
+      .catch(() => {
+        // Silent in production; errors will just result in no mascot rendering
       });
   }, [masterPath]);
 
@@ -76,8 +75,6 @@ export function MascotDisplay({
     const collarChanged = collarId != null && previousPartsRef.current.collarId !== collarId;
     const colorChanged = previousPartsRef.current.hairColor !== hairColor;
 
-    console.log("MascotDisplay: Changes detected:", { headChanged, hairChanged, bodyChanged, collarChanged, colorChanged });
-
     if (!svgEl) return;
 
     // Function to load and replace a part
@@ -89,8 +86,6 @@ export function MascotDisplay({
         const partPath = assetsBase
           ? `${assetsBase}/${partId}.svg`
           : `/assets/icons/mascots/${partType === "head" ? "heads" : partType === "collar" ? "collars" : partType === "hair" ? "hairs" : partType}/${partId}.svg`;
-        
-        console.log(`Loading ${partType}: ${partId} from ${partPath}`);
         
         const response = await fetch(partPath);
         if (!response.ok) {
@@ -140,8 +135,6 @@ export function MascotDisplay({
             hairGroupInMaster.appendChild(child.cloneNode(true));
           });
 
-          console.log(`✅ Replaced hair with ${partId}`);
-
           // Apply hair color
           if (hairColor) {
             (hairGroupInMaster as SVGElement).style.filter = `hue-rotate(${getHueRotation(
@@ -165,7 +158,6 @@ export function MascotDisplay({
         }
 
         if (!targetGroup) {
-          console.error(`Target group for ${partType} not found in master SVG`);
           return;
         }
 
@@ -184,10 +176,8 @@ export function MascotDisplay({
             targetGroup!.appendChild(child.cloneNode(true));
           });
         }
-
-        console.log(`✅ Replaced ${partType} with ${partId}`);
-      } catch (error) {
-        console.error(`Error replacing ${partType}:`, error);
+      } catch {
+        // Silent failure; mascot will render without this part
       }
     };
 

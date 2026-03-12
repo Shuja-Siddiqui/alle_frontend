@@ -21,6 +21,16 @@ export interface AuthContextType {
   isLoading: boolean;
   token: string | null;
 
+  // Global badge catalog (all badges + locked/unlocked icons)
+  allBadges: {
+    id: string;
+    title: string;
+    description?: string | null;
+    iconActive?: string | null;
+    iconInactive?: string | null;
+    rarity?: string | null;
+  }[];
+
   // Auth actions
   login: (email: string, password: string) => Promise<User>;
   register: (data: RegisterData) => Promise<void>;
@@ -65,6 +75,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setTokenState] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [allBadges, setAllBadges] = useState<
+    {
+      id: string;
+      title: string;
+      description?: string | null;
+      iconActive?: string | null;
+      iconInactive?: string | null;
+      rarity?: string | null;
+    }[]
+  >([]);
 
   // Load token and user from localStorage on mount
   useEffect(() => {
@@ -76,9 +96,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (storedToken && storedUser) {
           setTokenState(storedToken);
           setUser(JSON.parse(storedUser));
-          
-          // Optionally refresh user data from server
-          // await refreshUserFromServer(storedToken);
         }
       } catch (error) {
         console.error('Error loading auth data:', error);
@@ -91,6 +108,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
 
     loadAuthData();
+  }, []);
+
+  // Load global badge catalog once per session
+  useEffect(() => {
+    let cancelled = false;
+    const loadBadges = async () => {
+      try {
+        const response = await api.get<any>('/badges');
+        const data = response?.data ?? response;
+        if (!cancelled && Array.isArray(data)) {
+          setAllBadges(data);
+        }
+      } catch (error) {
+        console.error('Error loading badge catalog:', error);
+      }
+    };
+    loadBadges();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Login function - returns user so callers can redirect by role
@@ -214,6 +251,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     isAuthenticated: !!user && !!token,
     isLoading,
     token,
+    allBadges,
     login,
     register,
     logout,

@@ -2,17 +2,18 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
 import { SettingsDialog } from "./components/SettingsDialog";
 import { MascotDisplay } from "@/components/MascotDisplay";
 import { AllBadgesOverlay } from "@/components/AllBadgesOverlay";
+import { api } from "../../../lib/api-client";
 
 const DEFAULT_AVATAR = "/assets/icons/others/profile_avatar_large.png";
 
 export default function ProfileSettingsPage() {
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const { user, logout, allBadges: badgeCatalog } = useAuth();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [newPassword, setNewPassword] = useState("");
@@ -43,14 +44,38 @@ export default function ProfileSettingsPage() {
     return `collar${num}`;
   };
 
-  // Badge data from user context (unlocked badges) - used for initial 4 badges
-  const unlockedBadgesFromUser = (user?.badges ?? []).map((b) => ({
-    imageSrc: b.iconActive || b.iconInactive || "/assets/icons/badges/badge1.svg",
-    earned: true,
-    alt: b.title,
-    title: b.title,
-    description: b.description ?? undefined,
-  }));
+  // Badge data from user context (unlocked badges) + all badge defs - used for initial 4 badges
+  const userBadges = user?.badges ?? [];
+  const unlockedIds = new Set((userBadges ?? []).map((b: any) => b.id));
+  const baseBadgeDefs = (badgeCatalog.length > 0 ? badgeCatalog : userBadges) as any[];
+
+  // Sort so unlocked badges come first
+  const sortedBadgeDefs = [...baseBadgeDefs].sort((a, b) => {
+    const aUnlocked = unlockedIds.has(a.id);
+    const bUnlocked = unlockedIds.has(b.id);
+    if (aUnlocked === bUnlocked) return 0;
+    return aUnlocked ? -1 : 1; // unlocked first
+  });
+  // Only keep badges that actually have an icon from the API
+  const filteredBadgeDefs = sortedBadgeDefs.filter(
+    (def: any) => def && (def.iconActive || def.iconInactive)
+  );
+
+  // First 4 badges to show in the profile box (unlocked first, then locked)
+  const unlockedBadgesFromUser = filteredBadgeDefs.slice(0, 4).map((def: any) => {
+    const isUnlocked = unlockedIds.has(def.id);
+    const imageSrc = isUnlocked
+      ? def.iconActive || def.iconInactive
+      : def.iconInactive || def.iconActive;
+
+    return {
+      imageSrc,
+      earned: isUnlocked,
+      alt: def.title || (isUnlocked ? "Unlocked badge" : "Locked badge"),
+      title: def.title,
+      description: def.description ?? undefined,
+    };
+  });
 
   // All badges (active + inactive) for dialog
   const [allBadges, setAllBadges] = useState<
@@ -70,25 +95,30 @@ export default function ProfileSettingsPage() {
   };
 
   const handleBadgesClick = () => {
-    // Build full badge list (9 slots) using naming convention:
-    // /assets/icons/badges/active1.svg ... active9.svg
-    // /assets/icons/badges/in_active1.svg ... in_active9.svg
-    const activeCount = (user?.badges ?? []).length;
-    const totalBadges = 9;
+    // Build full badge list: combine all badge definitions with student's earned badges
+    const backendBadges = user?.badges ?? [];
 
-    const fullBadgeList = Array.from({ length: totalBadges }).map((_, index) => {
-      const badgeNumber = index + 1;
-      const isEarned = badgeNumber <= activeCount;
+    const baseBadgeDefsOverlay = (badgeCatalog.length > 0
+      ? badgeCatalog
+      : backendBadges) as any[];
 
-      return {
-        imageSrc: isEarned
-          ? `/assets/icons/badges/active${badgeNumber}.svg`
-          : `/assets/icons/badges/in_active${badgeNumber}.svg`,
-        earned: isEarned,
-        alt: `Badge ${badgeNumber}`,
-        title: `Badge ${badgeNumber}`,
-      };
-    });
+    const fullBadgeList = baseBadgeDefsOverlay
+      // Only include badges that actually have an icon from the API
+      .filter((def: any) => def && (def.iconActive || def.iconInactive))
+      .map((def: any) => {
+        const isUnlocked = unlockedIds.has(def.id);
+        const imageSrc = isUnlocked
+          ? def.iconActive || def.iconInactive
+          : def.iconInactive || def.iconActive;
+
+        return {
+          imageSrc,
+          earned: isUnlocked,
+          alt: def.title || (isUnlocked ? "Unlocked badge" : "Locked badge"),
+          title: def.title,
+          description: def.description ?? undefined,
+        };
+      });
 
     setAllBadges(fullBadgeList);
     setIsBadgesOverlayOpen(true);
@@ -373,7 +403,6 @@ export default function ProfileSettingsPage() {
                     alignItems: "center",
                     justifyContent: "center",
                     position: "relative",
-                    opacity: badge.earned ? 1 : 0.24,
                   }}
                 >
                   <Image
@@ -385,23 +414,6 @@ export default function ProfileSettingsPage() {
                       objectFit: "contain",
                     }}
                   />
-                  {!badge.earned && (
-                    <div
-                      className="absolute"
-                      style={{
-                        top: "50%",
-                        left: "50%",
-                        transform: "translate(-50%, -50%)",
-                      }}
-                    >
-                      <Image
-                        src="/assets/icons/others/lock_icon.png"
-                        alt="Locked"
-                        width={20}
-                        height={20}
-                      />
-                    </div>
-                  )}
                 </div>
               );
             })}
@@ -502,7 +514,6 @@ export default function ProfileSettingsPage() {
         onRepeatPasswordChange={setRepeatPassword}
         onSave={() => {
           // TODO: Implement password save logic
-          console.log("Saving password:", { newPassword, repeatPassword });
           setIsSettingsOpen(false);
         }}
         onClose={() => {
