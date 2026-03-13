@@ -22,13 +22,12 @@ export type LetterData = {
 };
 
 /**
- * Gets the SVG path for a letter with a specific variant
- * File naming: Letter=A, State=Default.svg
+ * Gets the SVG path for a letter with a specific variant.
+ * File naming: letter-A-default.svg, letter-A-done.svg, letter-A-error.svg (no special chars for URL compatibility).
  */
 function getLetterSvgPath(letter: string, variant: AlphabetVariant = "default"): string {
   const uppercaseLetter = letter.toUpperCase();
-  const stateName = variant.charAt(0).toUpperCase() + variant.slice(1); // "default" -> "Default"
-  return `/assets/alphabets/Letter=${uppercaseLetter}, State=${stateName}.svg`;
+  return `/assets/alphabets/letter-${uppercaseLetter}-${variant}.svg`;
 }
 
 export function textToAlphabet(text: string, variant: AlphabetVariant = "default"): LetterData[] {
