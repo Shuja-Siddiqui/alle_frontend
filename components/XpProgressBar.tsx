@@ -36,11 +36,10 @@ function getStepForImage(p: number): number {
 }
 
 /**
- * Returns the public path for State=X%.svg.
- * Percent sign in URL must be encoded as %25.
+ * Returns the public path for state-X.svg (no % in filename to avoid URL issues).
  */
 function getProgressBarSrc(step: number): string {
-  return `${PROGRESS_BAR_BASE}/State=${step}%25.svg`;
+  return `${PROGRESS_BAR_BASE}/state-${step}.svg`;
 }
 
 export function XpProgressBar({
