@@ -16,12 +16,14 @@ import Image from "next/image";
 
 interface ResumePoint {
   lessonId: string;
+  lessonOrder?: number;
   missionSequence: number;
   taskId: string;
   taskType?: string | null;
   taskIndex?: number;
   lessonTitle?: string;
   isNew?: boolean;
+  completedLessonOrders?: number[];
 }
 
 export default function StudentDashboardPage() {
@@ -36,6 +38,7 @@ export default function StudentDashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const hasFetchedRef = useRef(false);
   const [allLessonsCompleted, setAllLessonsCompleted] = useState(false);
+  const [completedLessonMapIds, setCompletedLessonMapIds] = useState<string[]>([]);
   
   const handleLevelClick = (level: number) => {
     // TODO: Navigate to level or show level details
@@ -60,42 +63,8 @@ export default function StudentDashboardPage() {
       return;
     }
 
-    // If we already have a lesson and checkpoint in context, derive resume point from there
-    if (currentLesson && checkpoint) {
-      const missionSequence = checkpoint.missionSequence ?? 1;
-      const taskType = checkpoint.activeTaskType ?? undefined;
-      const taskIndex = checkpoint.taskIndexInBatch ?? 0;
-      const taskId =
-        checkpoint.nextTaskId ||
-        checkpoint.lastCompletedTaskId ||
-        "1";
-
-      const resume: ResumePoint = {
-        lessonId: currentLesson.id,
-        missionSequence,
-        taskId,
-        taskType: taskType ?? undefined,
-        taskIndex,
-        lessonTitle: currentLesson.title,
-        isNew: false,
-      };
-
-      console.log("[Dashboard] Using lesson/checkpoint from context", {
-        hasLesson: !!currentLesson,
-        hasCheckpoint: !!checkpoint,
-        lessonId: resume.lessonId,
-        missionSequence: resume.missionSequence,
-        taskId: resume.taskId,
-        taskType: resume.taskType,
-        taskIndex: resume.taskIndex,
-      });
-
-      setResumePoint(resume);
-      setIsLoading(false);
-      return;
-    }
-
-    // Otherwise fall back to backend to compute resume point
+    // Always use backend to compute next lesson/resume point.
+    // Context can be stale right after completion/navigation and may point to old mastery state.
     let isMounted = true;
 
     const fetchNextLesson = async () => {
@@ -126,6 +95,21 @@ export default function StudentDashboardPage() {
         // Backend can explicitly signal completion with { allCompleted: true }
         if (nextLessonData?.allCompleted) {
           console.warn("[Dashboard] /next reports all lessons completed (200)");
+          // Pull lesson list from backend and mark all as completed for map visuals.
+          const lessonsRes = await api.get<any>("/lessons");
+          const lessonsData = Array.isArray(lessonsRes?.data)
+            ? lessonsRes.data
+            : Array.isArray(lessonsRes?.data?.data)
+            ? lessonsRes.data.data
+            : Array.isArray(lessonsRes)
+            ? lessonsRes
+            : [];
+          const lessonOrders = lessonsData
+            .map((l: any) => l?.lessonOrder)
+            .filter((o: any) => typeof o === "number");
+          setCompletedLessonMapIds(
+            lessonOrders.map((order: number) => `lesson${String(order).padStart(2, "0")}`)
+          );
           setAllLessonsCompleted(true);
           setResumePoint(null);
           setIsLoading(false);
@@ -145,11 +129,13 @@ export default function StudentDashboardPage() {
         const {
           lessonId,
           lessonTitle,
+          lessonOrder,
           missionSequence,
           taskId,
           taskType,
           taskIndex,
           isNew,
+          completedLessonOrders,
         } = nextLessonData;
 
         // Fetch full lesson data and save to context
@@ -168,14 +154,23 @@ export default function StudentDashboardPage() {
         // Set resume point
         const resume: ResumePoint = {
           lessonId: lessonId,
+          lessonOrder: lessonOrder ?? undefined,
           missionSequence: missionSequence || 1,
           taskId: taskId || "1",
           taskType: taskType ?? undefined,
           taskIndex: taskIndex ?? 0,
           lessonTitle: lessonTitle,
           isNew: isNew ?? true,
+          completedLessonOrders: Array.isArray(completedLessonOrders)
+            ? completedLessonOrders
+            : [],
         };
 
+        const completedMapIds =
+          (resume.completedLessonOrders || []).map(
+            (order) => `lesson${String(order).padStart(2, "0")}`
+          ) || [];
+        setCompletedLessonMapIds(completedMapIds);
         setResumePoint(resume);
         hasFetchedRef.current = true;
       } catch (error: any) {
@@ -289,14 +284,12 @@ export default function StudentDashboardPage() {
               onLevelClick={handleLevelClick}
               activeLessonId={
                 resumePoint
-                  ? (() => {
-                      const raw = String(resumePoint.lessonId);
-                      const num = raw.replace(/\D/g, "") || raw;
-                      return `lesson${num.padStart(2, "0")}`;
-                    })()
+                  ? `lesson${String(resumePoint.lessonOrder || 1).padStart(2, "0")}`
                   : undefined
               }
-              completedLessonIds={["lesson01", "lesson02", "lesson03", "lesson04", "lesson05"]}
+              completedLessonIds={
+                completedLessonMapIds
+              }
             />
           </div>
 

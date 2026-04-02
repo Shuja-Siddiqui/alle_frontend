@@ -50,11 +50,11 @@ const LANGUAGE_FLAG_MAP: Record<LanguageCode, string> = {
 
 // Helper function to determine success rate icon based on percentage
 const getSuccessRateIcon = (percentage: number): string => {
-  // High success rate (>= 50%) - positive icon
-  if (percentage >= 50) {
+  // High success rate (> 50%) - positive icon
+  if (percentage > 50) {
     return "/assets/icons/admin/success_rate_positive.svg";
   }
-  // Low success rate (< 50%) - negative icon
+  // Low success rate (<= 50%) - negative icon
   return "/assets/icons/admin/success_rate_negative.svg";
 };
 

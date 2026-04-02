@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 
 type ModuleStatCardProps = {
@@ -36,10 +36,12 @@ export function ModuleStatCard({
   className,
 }: ModuleStatCardProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const roleBase = pathname?.startsWith("/teacher") ? "teacher" : "admin";
 
   function handleArrowClick() {
     if (moduleId) {
-      router.push(`/admin/modules/${moduleId}`);
+      router.push(`/${roleBase}/modules/${moduleId}`);
     }
   }
 

@@ -14,7 +14,7 @@ import { api } from "../../../lib/api-client";
 export default function MissionPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { currentLesson } = useLesson();
+  const { currentLesson, clearLesson } = useLesson();
   const { loadCheckpoint, checkpoint } = useLessonFlow();
   const { playTTSWithSSML } = useTTS();
   const { setBackgroundMode } = useUI();
@@ -165,6 +165,8 @@ export default function MissionPage() {
         } catch (error) {
           console.error("[MissionPage] Error completing lesson on wrap:", error);
         } finally {
+          // Prevent dashboard from resuming stale in-memory lesson/checkpoint.
+          clearLesson();
           router.push("/student/dashboard");
         }
       })();
@@ -280,13 +282,21 @@ export default function MissionPage() {
         const page = pageMapping[type];
         let safeIndex = checkpoint.taskIndexInBatch ?? 0;
         safeIndex = Math.min(Math.max(0, safeIndex), tasks.length - 1);
-        let task = tasks[safeIndex];
         const taskId =
           checkpoint.nextTaskId ||
           checkpoint.lastCompletedTaskId ||
-          (task as any)?.task_id ||
-          (task as any)?.id ||
+          (tasks[safeIndex] as any)?.task_id ||
+          (tasks[safeIndex] as any)?.id ||
           String(safeIndex + 1);
+
+        // Fix: checkpoint.taskIndexInBatch can be stale when mission changes.
+        // Prefer to derive index by taskId when possible.
+        const byId = tasks.findIndex(
+          (t: any) => String(t?.task_id ?? t?.id) === String(taskId)
+        );
+        if (byId >= 0) safeIndex = byId;
+
+        const task = tasks[safeIndex];
 
         router.push(
           `/student/${page}?lessonId=${lessonId}&missionSequence=${missionSequence}&taskId=${taskId}&taskIndex=${safeIndex}`

@@ -1,15 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { AdminNavbar } from "../../../components/AdminNavbar";
 import { ModuleStatCard } from "../../../components/ModuleStatCard";
 import { SearchAndFilter } from "../../../components/SearchAndFilter";
+import { ModulesGridSkeleton } from "../../../components/Skeletons/ModulesGridSkeleton";
 import {
   ModuleFilterDialog,
   ModuleFilterState,
   ModuleCategory,
 } from "../../../components/ModuleFilterDialog";
 import { AddStudentDialog, AddStudentFormData } from "../../../components/AddStudentDialog";
+import { AddTeacherDialog, AddTeacherFormData } from "../../../components/AddTeacherDialog";
 import { api } from "../../../lib/api-client";
 
 type ModuleRow = {
@@ -23,8 +26,11 @@ type ModuleRow = {
 };
 
 export default function AdminModulesPage() {
+  const pathname = usePathname();
+  const roleBase = pathname?.startsWith("/teacher") ? "teacher" : "admin";
   const [searchValue, setSearchValue] = useState("");
   const [showAddStudentDialog, setShowAddStudentDialog] = useState(false);
+  const [showAddTeacherDialog, setShowAddTeacherDialog] = useState(false);
   const [showFilterDialog, setShowFilterDialog] = useState(false);
   const [filters, setFilters] = useState<ModuleFilterState>({
     category: "all",
@@ -34,6 +40,10 @@ export default function AdminModulesPage() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   function handleAddStudent() {
+    setRefreshTrigger((prev) => prev + 1);
+  }
+
+  function handleAddTeacher(_: AddTeacherFormData) {
     setRefreshTrigger((prev) => prev + 1);
   }
 
@@ -104,6 +114,9 @@ export default function AdminModulesPage() {
             console.log("Notification clicked");
           }}
           onAddStudentClick={() => setShowAddStudentDialog(true)}
+          onAddTeacherClick={
+            roleBase === "admin" ? () => setShowAddTeacherDialog(true) : undefined
+          }
         />
       </div>
 
@@ -126,17 +139,17 @@ export default function AdminModulesPage() {
         </div>
 
         {/* Modules Grid - 2 columns */}
-        <div
-          className="grid gap-[24px]"
-          style={{
-            gridTemplateColumns: "repeat(2, 558px)",
-            justifyContent: "start",
-          }}
-        >
-          {loadingModules ? (
-            <div style={{ color: "#FFF", padding: "24px" }}>Loading modules...</div>
-          ) : (
-            filteredModules.map((module, index) => (
+        {loadingModules ? (
+          <ModulesGridSkeleton />
+        ) : (
+          <div
+            className="grid gap-[24px]"
+            style={{
+              gridTemplateColumns: "repeat(2, 558px)",
+              justifyContent: "start",
+            }}
+          >
+            {filteredModules.map((module, index) => (
               <ModuleStatCard
                 key={module.id}
                 moduleNumber={`Module ${index + 1}`}
@@ -154,9 +167,9 @@ export default function AdminModulesPage() {
                 moduleId={module.id}
                 className="w-[558px]"
               />
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* Empty State */}
         {filteredModules.length === 0 && (
@@ -202,6 +215,14 @@ export default function AdminModulesPage() {
         onAddStudent={handleAddStudent}
         modules={modules.map((m) => ({ value: m.id, label: m.title }))}
       />
+
+      {roleBase === "admin" && (
+        <AddTeacherDialog
+          open={showAddTeacherDialog}
+          onClose={() => setShowAddTeacherDialog(false)}
+          onAddTeacher={handleAddTeacher}
+        />
+      )}
 
       {/* Module Filter Dialog */}
       <ModuleFilterDialog

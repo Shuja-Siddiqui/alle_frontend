@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 
 export type LessonType = "intro" | "practice" | "blending" | "reading" | "mastery-check" | "wrap-up";
@@ -12,6 +12,8 @@ type LessonStatCardProps = {
   description: string;
   /** Lesson type */
   lessonType: LessonType;
+  /** Optional display label for lesson type (from backend) */
+  lessonTypeLabel?: string;
   /** Sound letter (e.g., "S", "A", "T") */
   sound: string;
   /** Number of students */
@@ -43,6 +45,7 @@ export function LessonStatCard({
   lessonTitle,
   description,
   lessonType,
+  lessonTypeLabel,
   sound,
   students,
   estimatedTime,
@@ -53,12 +56,14 @@ export function LessonStatCard({
   className,
 }: LessonStatCardProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const roleBase = pathname?.startsWith("/teacher") ? "teacher" : "admin";
 
   function handleArrowClick() {
     if (onClick) {
       onClick();
     } else if (moduleId && lessonId) {
-      router.push(`/admin/modules/${moduleId}/lessons/${lessonId}`);
+      router.push(`/${roleBase}/modules/${moduleId}/lessons/${lessonId}`);
     }
   }
 
@@ -75,9 +80,24 @@ export function LessonStatCard({
       <div className="flex flex-1 gap-[44px] items-center">
         {/* Lesson Details */}
         <div
-          className="flex flex-col gap-[12px] items-start"
+          className="flex flex-col gap-[8px] items-start"
           style={{ width: "385px" }}
         >
+          {/* Lesson type label above title */}
+          <p
+            style={{
+              color: "#7478a2",
+              fontFamily: "var(--font-orbitron), system-ui, sans-serif",
+              fontSize: "14px",
+              fontStyle: "normal",
+              fontWeight: 400,
+              lineHeight: "20px",
+              letterSpacing: "-0.154px",
+              textTransform: "uppercase",
+            }}
+          >
+            {lessonTypeLabel ?? LESSON_TYPE_LABELS[lessonType]}
+          </p>
           <p
             style={{
               color: "#ff00ca",
@@ -138,7 +158,7 @@ export function LessonStatCard({
             </p>
           </div>
 
-          {/* Sound */}
+          {/* Sound(s) */}
           <div className="flex flex-col gap-[8px] items-start" style={{ width: "80px" }}>
             <p
               style={{
@@ -164,7 +184,7 @@ export function LessonStatCard({
                 letterSpacing: "-0.154px",
               }}
             >
-              Sound
+              Sounds
             </p>
           </div>
 

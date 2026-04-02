@@ -44,6 +44,12 @@ export function StudentBadgesGrid({
   badges = defaultBadges,
   className,
 }: StudentBadgesGridProps) {
+  const sortedBadges = [...badges].sort((a, b) => {
+    const aVal = a.earned ? 0 : 1;
+    const bVal = b.earned ? 0 : 1;
+    return aVal - bVal;
+  });
+
   const [hoveredBadgeIndex, setHoveredBadgeIndex] = useState<number | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<{
     top: number;
@@ -57,6 +63,13 @@ export function StudentBadgesGrid({
     index: number,
     event: React.MouseEvent<HTMLDivElement>
   ) {
+    // Only show tooltip for earned badges
+    if (!sortedBadges[index]?.earned) {
+      setHoveredBadgeIndex(null);
+      setTooltipPosition(null);
+      return;
+    }
+
     const badgeElement = event.currentTarget;
     const rect = badgeElement.getBoundingClientRect();
     const containerElement = badgeElement.closest('[data-badge-container]') as HTMLElement;
@@ -87,8 +100,12 @@ export function StudentBadgesGrid({
   function handleBadgeMouseLeave() {
     // Only close if not hovering over tooltip
     if (!isHoveringTooltip) {
-      setHoveredBadgeIndex(null);
-      setTooltipPosition(null);
+      setTimeout(() => {
+        if (!isHoveringTooltip) {
+          setHoveredBadgeIndex(null);
+          setTooltipPosition(null);
+        }
+      }, 80);
     }
   }
 
@@ -159,11 +176,11 @@ export function StudentBadgesGrid({
         className="flex flex-wrap gap-[26px] items-center relative shrink-0 w-full"
         style={{ justifyContent: "center" }}
       >
-        {badges.map((badge, index) => (
+        {sortedBadges.map((badge, index) => (
           <div
             key={index}
             data-badge-index={index}
-            className="overflow-clip relative shrink-0"
+            className="overflow-clip relative shrink-0 cursor-pointer"
             style={{
               width: "103.317px",
               height: "85.323px",
@@ -231,8 +248,7 @@ export function StudentBadgesGrid({
       {/* Badge Tooltip - Only show for earned badges with title */}
       {hoveredBadgeIndex !== null &&
         tooltipPosition &&
-        badges[hoveredBadgeIndex]?.earned &&
-        badges[hoveredBadgeIndex]?.title && (
+        sortedBadges[hoveredBadgeIndex]?.earned && (
           <div
             className="absolute z-50 flex gap-[12px] items-center p-[16px] rounded-[32px]"
             style={{
@@ -327,7 +343,7 @@ export function StudentBadgesGrid({
 
       {/* All Badges Overlay */}
       <AllBadgesOverlay
-        badges={badges}
+                badges={sortedBadges}
         visible={showAllBadgesOverlay}
         onClose={() => setShowAllBadgesOverlay(false)}
       />

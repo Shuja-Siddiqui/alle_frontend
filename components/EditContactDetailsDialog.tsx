@@ -107,29 +107,9 @@ export function EditContactDetailsDialog({
           minWidth: "772px",
           maxHeight: "90vh",
           overflowY: "auto",
-          scrollbarWidth: "thin",
-          scrollbarColor: "#ff00ca #21265d",
         }}
         onClick={(e) => e.stopPropagation()}
-        data-dialog-scrollable
       >
-        <style jsx global>{`
-          [data-dialog-scrollable]::-webkit-scrollbar {
-            width: 8px;
-          }
-          [data-dialog-scrollable]::-webkit-scrollbar-track {
-            background: #21265d;
-            border-radius: 4px;
-          }
-          [data-dialog-scrollable]::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, #ff00ca 0%, #e451fe 100%);
-            border-radius: 4px;
-            border: 1px solid rgba(255, 0, 202, 0.3);
-          }
-          [data-dialog-scrollable]::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, #e451fe 0%, #ff00ca 100%);
-          }
-        `}</style>
         {/* Header */}
         <div className="flex gap-[16px] items-center relative w-full">
           <BackButton onClick={onClose} text="" iconSrc="/assets/icons/others/arrow_back.svg" />

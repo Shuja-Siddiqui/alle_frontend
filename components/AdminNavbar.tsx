@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { PrimaryButton } from "./PrimaryButton";
 
 type AdminNavbarProps = {
   /** Page title to display on the left */
@@ -9,6 +10,8 @@ type AdminNavbarProps = {
   onNotificationClick?: () => void;
   /** Called when Add student button is clicked */
   onAddStudentClick?: () => void;
+  /** Called when Add teacher button is clicked */
+  onAddTeacherClick?: () => void;
   /** Called when Download report button is clicked */
   onDownloadReportClick?: () => void;
   /** Show download report button instead of add student button */
@@ -20,6 +23,7 @@ export function AdminNavbar({
   title,
   onNotificationClick,
   onAddStudentClick,
+  onAddTeacherClick,
   onDownloadReportClick,
   showDownloadReport = false,
   className,
@@ -76,185 +80,35 @@ export function AdminNavbar({
           </div>
         </button>
 
-        {/* Add student or Download report button */}
+        {/* Add student / Add teacher or Download report button */}
         {showDownloadReport ? (
-          <button
+          <PrimaryButton
             type="button"
             onClick={onDownloadReportClick}
-            className="relative flex gap-[4px] h-[52px] items-center justify-center px-[24px] py-[8px] rounded-[76.829px] overflow-hidden"
-            style={{
-              border: "2px solid rgba(255, 255, 255, 0.24)",
-              backgroundImage:
-                "linear-gradient(82.35deg, #F529F9 1.65%, #0756FF 57.2%, #FF21C8 89.22%)",
-              boxShadow: "0px 0px 0px 1.602px #E451FE",
-              cursor: "pointer",
-            }}
-          >
-            {/* Decorative stars */}
-            <div
-              className="absolute flex items-center justify-center"
-              style={{
-                left: "144px",
-                top: "-13px",
-                width: "29.263px",
-                height: "29.263px",
-              }}
-            >
-              <div style={{ transform: "rotate(-30deg)" }}>
-                <Image
-                  src="/assets/icons/others/star2.png"
-                  alt=""
-                  width={21}
-                  height={21}
-                  style={{ opacity: 0.8 }}
-                />
-              </div>
-            </div>
-            <div
-              className="absolute flex items-center justify-center"
-              style={{
-                left: "194px",
-                top: "37px",
-                width: "26.555px",
-                height: "26.555px",
-              }}
-            >
-              <div style={{ transform: "rotate(-30deg)" }}>
-                <Image
-                  src="/assets/icons/others/star2.png"
-                  alt=""
-                  width={19}
-                  height={19}
-                  style={{ opacity: 0.8 }}
-                />
-              </div>
-            </div>
-            <div
-              className="absolute flex items-center justify-center"
-              style={{
-                left: "42px",
-                top: "36px",
-                width: "35.32px",
-                height: "35.32px",
-              }}
-            >
-              <div style={{ transform: "rotate(-23deg)" }}>
-                <Image
-                  src="/assets/icons/others/star2.png"
-                  alt=""
-                  width={27}
-                  height={27}
-                  style={{ opacity: 0.8 }}
-                />
-              </div>
-            </div>
-
-            {/* Button text */}
-            <span
-              className="relative z-10"
-              style={{
-                color: "#FFFFFF",
-                fontFamily: "var(--font-orbitron), system-ui, sans-serif",
-                fontSize: "18px",
-                fontStyle: "normal",
-                fontWeight: 700,
-                lineHeight: "24px",
-                letterSpacing: "-0.198px",
-                textTransform: "uppercase",
-              }}
-            >
-              Download report
-            </span>
-          </button>
+            text="Download report"
+            size="navbar"
+            className="min-w-[220px]"
+          />
         ) : (
-          <button
-            type="button"
-            onClick={onAddStudentClick}
-            className="relative flex gap-[4px] h-[52px] items-center justify-center px-[24px] py-[8px] rounded-[76.829px] overflow-hidden"
-            style={{
-              border: "2px solid rgba(255, 255, 255, 0.24)",
-              backgroundImage:
-                "linear-gradient(84.2deg, #F529F9 1.65%, #0756FF 57.2%, #FF21C8 89.22%)",
-              boxShadow: "0px 0px 0px 1.602px #E451FE",
-              cursor: "pointer",
-            }}
-          >
-            {/* Decorative stars */}
-            <div
-              className="absolute flex items-center justify-center"
-              style={{
-                left: "144px",
-                top: "-13px",
-                width: "29.263px",
-                height: "29.263px",
-              }}
-            >
-              <div style={{ transform: "rotate(-30deg)" }}>
-                <Image
-                  src="/assets/icons/others/star2.png"
-                  alt=""
-                  width={21}
-                  height={21}
-                  style={{ opacity: 0.8 }}
-                />
-              </div>
-            </div>
-            <div
-              className="absolute flex items-center justify-center"
-              style={{
-                left: "194px",
-                top: "37px",
-                width: "26.555px",
-                height: "26.555px",
-              }}
-            >
-              <div style={{ transform: "rotate(-30deg)" }}>
-                <Image
-                  src="/assets/icons/others/star2.png"
-                  alt=""
-                  width={19}
-                  height={19}
-                  style={{ opacity: 0.8 }}
-                />
-              </div>
-            </div>
-            <div
-              className="absolute flex items-center justify-center"
-              style={{
-                left: "42px",
-                top: "36px",
-                width: "35.32px",
-                height: "35.32px",
-              }}
-            >
-              <div style={{ transform: "rotate(-23deg)" }}>
-                <Image
-                  src="/assets/icons/others/star2.png"
-                  alt=""
-                  width={27}
-                  height={27}
-                  style={{ opacity: 0.8 }}
-                />
-              </div>
-            </div>
+          <div className="flex items-center gap-3">
+            {onAddTeacherClick && (
+              <PrimaryButton
+                type="button"
+                onClick={onAddTeacherClick}
+                text="Add teacher"
+                size="navbar"
+                className="min-w-[198px]"
+              />
+            )}
 
-            {/* Button text */}
-            <span
-              className="relative z-10"
-              style={{
-                color: "#FFFFFF",
-                fontFamily: "var(--font-orbitron), system-ui, sans-serif",
-                fontSize: "18px",
-                fontStyle: "normal",
-                fontWeight: 700,
-                lineHeight: "24px",
-                letterSpacing: "-0.198px",
-                textTransform: "uppercase",
-              }}
-            >
-              Add student
-            </span>
-          </button>
+            <PrimaryButton
+              type="button"
+              onClick={onAddStudentClick}
+              text="Add student"
+              size="navbar"
+              className="min-w-[198px]"
+            />
+          </div>
         )}
       </div>
     </div>

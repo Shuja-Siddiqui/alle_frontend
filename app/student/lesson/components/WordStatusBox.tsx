@@ -56,6 +56,7 @@ export function WordStatusBox({
   className,
 }: WordStatusBoxProps) {
   const variantStyle = VARIANT_STYLES[variant];
+  const normalizedWord = (word || "").toUpperCase();
 
   // For words, treat letterHeight as the max height, but allow letters to use a
   // slightly narrower width so skinny letters like "i" don't create huge visual
@@ -116,7 +117,7 @@ export function WordStatusBox({
 
       {/* Alphabet Display for the word — letters at ~100px tall with 16px gap */}
       <AlphabetDisplay
-        text={word}
+        text={normalizedWord}
         variant={getAlphabetVariant()}
         letterWidth={effectiveLetterWidth}
         letterHeight={effectiveLetterHeight}

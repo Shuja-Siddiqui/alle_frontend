@@ -7,6 +7,7 @@ import { StudentsActivityChart } from "../../../components/StudentsActivityChart
 import { StruggleRangeSliders } from "../../../components/StruggleRangeSliders";
 import { AdminNavbar } from "../../../components/AdminNavbar";
 import { DownloadReportDialog, DownloadReportFormData } from "../../../components/DownloadReportDialog";
+import { AdminAnalyticsSkeleton } from "../../../components/Skeletons/AdminAnalyticsSkeleton";
 import { api } from "../../../lib/api-client";
 
 type DailyActivityPoint = {
@@ -34,6 +35,7 @@ export default function AnalyticsPage() {
   const [avgAccuracyChange, setAvgAccuracyChange] = useState<number | null>(null);
   const [avgSessionMinutesThisWeek, setAvgSessionMinutesThisWeek] = useState<number | null>(null);
   const [struggleData, setStruggleData] = useState<StruggleData[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchDailyActiveUsers() {
@@ -93,7 +95,9 @@ export default function AnalyticsPage() {
       }
     }
 
-    fetchDailyActiveUsers();
+    fetchDailyActiveUsers().finally(() => {
+      setLoading(false);
+    });
   }, []);
 
   useEffect(() => {
@@ -246,6 +250,10 @@ export default function AnalyticsPage() {
         padding: "40px 40px 32px 40px",
       }}
     >
+      {loading ? (
+        <AdminAnalyticsSkeleton />
+      ) : (
+        <>
       {/* Navbar */}
       <div style={{ marginBottom: "24px" }}>
         <AdminNavbar
@@ -328,6 +336,8 @@ export default function AnalyticsPage() {
         onDownload={handleDownloadReport}
         onReset={handleResetReport}
       />
+      </>
+      )}
     </div>
   );
 }

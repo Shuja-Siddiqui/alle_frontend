@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { MascotAvatar } from "../../../components/MascotAvatar";
 import { StudentMascotAvatar } from "../../../components/StudentMascotAvatar";
 import { StatusBox } from "../lesson/components/StatusBox";
@@ -79,9 +79,6 @@ export default function WordPage() {
       ? resolveTaskIndex(wordTasksArray, taskId, taskIndexParam)
       : (taskIndexParam ? parseInt(taskIndexParam, 10) : 0) || 0;
 
-  // Refs
-  const processedRef = useRef(false);
-
   // Stop any ongoing TTS when leaving / refreshing this page
   useEffect(() => {
     return () => {
@@ -91,8 +88,15 @@ export default function WordPage() {
 
   // Fetch task data from backend on mount
   useEffect(() => {
-    if (!lessonId || !missionSequence || !taskId || processedRef.current) return;
-    processedRef.current = true;
+    if (!lessonId || !missionSequence || !taskId) return;
+
+    // Reset visual/interaction state when moving to a new task.
+    // Without this, the previous task's success state can carry over (green box).
+    setStatusVariant("initial");
+    setShowingFeedback(false);
+    setFeedbackData(null);
+    setIsMicActive(false);
+    setIsProcessing(false);
 
     const fetchTaskData = async () => {
       try {
@@ -161,12 +165,9 @@ export default function WordPage() {
           success: true,
         };
         setFeedbackData(mockResult);
-        
-        // Skip feedback TTS, auto-advance after short delay
-        setTimeout(() => {
-          setIsProcessing(false);
-          handleContinue();
-        }, 500);
+
+        // Always wait for explicit Continue click (mock and real).
+        setIsProcessing(false);
         return;
       }
 
@@ -206,16 +207,7 @@ export default function WordPage() {
               taskData.feedback?.tts_exactMatch_ssml ||
               taskData.feedback?.tts_correctFeedback_ssml;
             await playTTSWithSSML(successSSML || "", successSSML);
-
-            // For mastery_check, do not auto-advance; wait for user to click Continue.
-            const missionType = (mission as any)?.mission_type ?? (mission as any)?.missionType;
-            const isMasteryMission = missionType === "mastery_check";
-            if (!isMasteryMission) {
-              // Move to next task after success (normal missions)
-              setTimeout(() => {
-                handleContinue();
-              }, 1500);
-            }
+            // Always wait for explicit Continue click (mock and real).
           } else if (result.feedbackType === "closeMatch") {
             setStatusVariant("error");
             setShowingFeedback(false);
@@ -233,9 +225,13 @@ export default function WordPage() {
 
             // Check retry logic
             if (currentRetry + 1 >= (taskData.retryLimit || 3)) {
-              setTimeout(() => {
-                handleContinue();
-              }, 2000);
+              const missionType = (mission as any)?.mission_type ?? (mission as any)?.missionType;
+              const isMasteryMission = missionType === "mastery_check";
+              if (!isMasteryMission) {
+                setTimeout(() => {
+                  handleContinue();
+                }, 2000);
+              }
             } else {
               setCurrentRetry(currentRetry + 1);
               setTimeout(() => {
@@ -257,6 +253,15 @@ export default function WordPage() {
   // Mastery-check helper: evaluate results at end of mastery mission
   const handleMasteryResults = async (missionSeqNum: number) => {
     if (!currentLesson || !lessonId) return;
+
+    const mockMode = typeof window !== "undefined" && localStorage.getItem("MOCK_MODE") === "true";
+    if (mockMode) {
+      // In mock mode, mastery is always treated as passed with no backend calls.
+      router.push(
+        `/student/mission?lessonId=${lessonId}&missionSequence=${missionSeqNum + 1}`
+      );
+      return;
+    }
 
     try {
       console.log("[Mastery] handleMasteryResults: start", {
@@ -318,6 +323,19 @@ export default function WordPage() {
 
       // Decide band from results keys, e.g. tts_0-1_correct, tts_5-7_correct, tts_1-5_correct
       const total = masteryWords.length || 10; // fallback denominator for messaging only
+
+      // Pass/fail threshold can be overridden via env.
+      // When provided, we ignore mission.target for the pass/fail decision.
+      const envMinCorrect = Number(
+        process.env.NEXT_PUBLIC_LESSON_MASTERY_MIN_CORRECT
+      );
+      const envMaxCorrect = Number(
+        process.env.NEXT_PUBLIC_LESSON_MASTERY_MAX_CORRECT
+      );
+      if (!Number.isNaN(envMinCorrect)) targetMin = envMinCorrect;
+      if (!Number.isNaN(envMaxCorrect)) targetMax = envMaxCorrect;
+      else if (!Number.isNaN(envMinCorrect)) targetMax = total;
+
       let bandKey: string | null = null;
 
       const resultKeys = Object.keys(results).filter((k) => k.startsWith("tts_") && k.endsWith("_correct"));
@@ -417,7 +435,8 @@ export default function WordPage() {
   };
 
   const handleContinue = async () => {
-    if (!lessonId || !missionSequence || !taskId) return;
+    if (!lessonId || !missionSequence || !taskId || isProcessing) return;
+    setIsProcessing(true);
 
     try {
       console.log("[Word] handleContinue", {
@@ -426,14 +445,6 @@ export default function WordPage() {
         taskId,
         effectiveTaskIndex,
       });
-      await api.post<any>(
-        `/lessons/${lessonId}/progress/task/complete`,
-        {
-          missionSequence: parseInt(missionSequence),
-          taskId,
-        }
-      );
-
       const missionSeqNum = parseInt(missionSequence);
       const wordTasks = mission?.tasks?.word_practice as Record<string, unknown>[] | undefined;
       const wordTasksLength = Array.isArray(wordTasks) ? wordTasks.length : 0;
@@ -441,6 +452,18 @@ export default function WordPage() {
 
       const missionType = (mission as any)?.mission_type ?? (mission as any)?.missionType;
       const isMasteryMission = missionType === "mastery_check";
+      const mockMode = typeof window !== "undefined" && localStorage.getItem("MOCK_MODE") === "true";
+
+      // In mock mode, mastery should run fully client-side (no API calls).
+      if (!(mockMode && isMasteryMission)) {
+        await api.post<any>(
+          `/lessons/${lessonId}/progress/task/complete`,
+          {
+            missionSequence: parseInt(missionSequence),
+            taskId,
+          }
+        );
+      }
 
       // Last word in this mission
       if (wordTasksLength > 0 && nextIndex >= wordTasksLength) {
@@ -484,6 +507,8 @@ export default function WordPage() {
       );
     } catch (error) {
       console.error("Error completing task:", error);
+    } finally {
+      setIsProcessing(false);
     }
   };
 

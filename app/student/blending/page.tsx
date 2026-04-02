@@ -429,6 +429,7 @@ export default function BlendingPage() {
   // Handle continue (move to next word)
   const handleContinue = async () => {
     if (!lessonId || !missionSequence || !currentLesson || isProcessing || isPlayingTTS) return;
+    setIsProcessing(true);
 
     try {
       // Save checkpoint
@@ -502,7 +503,6 @@ export default function BlendingPage() {
       setFeedbackData(null);
       setCurrentRetry(0);
       setIsMicActive(false);
-      setIsProcessing(false);
       processedRef.current = false; // Allow fetching next task
 
       // Update URL to reflect new task
@@ -513,6 +513,8 @@ export default function BlendingPage() {
       );
     } catch (error) {
       console.error("Error continuing to next task:", error);
+    } finally {
+      setIsProcessing(false);
     }
   };
 

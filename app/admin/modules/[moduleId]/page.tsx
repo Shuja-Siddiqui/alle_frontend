@@ -1,12 +1,22 @@
 "use client";
 
 import { useEffect, useState, use } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { ModuleGeneralStats } from "../../../../components/ModuleGeneralStats";
 import { LessonStatCard, LessonType } from "../../../../components/LessonStatCard";
+import { LessonCapsuleSkeleton } from "../../../../components/Skeletons/LessonCapsuleSkeleton";
 import { AddStudentDialog, AddStudentFormData } from "../../../../components/AddStudentDialog";
 import { api } from "../../../../lib/api-client";
+
+const LESSON_TYPE_LABELS: Record<LessonType, string> = {
+  intro: "Intro",
+  practice: "Practice",
+  blending: "Blending",
+  reading: "Reading",
+  "mastery-check": "Mastery Check",
+  "wrap-up": "Wrap-up",
+};
 
 type LessonData = {
   id: string;
@@ -14,6 +24,7 @@ type LessonData = {
   title: string;
   description: string;
   lessonType: LessonType;
+  lessonTypeLabel: string;
   sound: string;
   students: number;
   estimatedTime: string;
@@ -34,6 +45,8 @@ export default function ModuleDetailsPage({
   params: Promise<{ moduleId: string }>;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const roleBase = pathname?.startsWith("/teacher") ? "teacher" : "admin";
   const { moduleId } = use(params);
   const [selectedLessonType, setSelectedLessonType] = useState<LessonType | "all">("all");
   const [showAddStudentDialog, setShowAddStudentDialog] = useState(false);
@@ -44,7 +57,7 @@ export default function ModuleDetailsPage({
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   function handleBackClick() {
-    router.push("/admin/modules");
+    router.push(`/${roleBase}/modules`);
   }
 
   function handleAddStudent() {
@@ -89,16 +102,55 @@ export default function ModuleDetailsPage({
           ? response
           : [];
         if (isMounted) {
-          const mapped: LessonData[] = list.map((lesson: any, index: number) => ({
-            id: lesson.id,
-            lessonNumber: index + 1,
-            title: lesson.title,
-            description: lesson.preview || "",
-            lessonType: (lesson.lessonType || "intro") as LessonType,
-            sound: "",
-            students: lesson.studentsCount ?? 0,
-            estimatedTime: lesson.estimatedTime || "",
-          }));
+          const mapped: LessonData[] = list.map((lesson: any, index: number) => {
+            const rawType: string = lesson.lessonType || "";
+            // Map raw backend lessonType string to internal LessonType union for filtering
+            const normalizedType: LessonType =
+              rawType.toLowerCase().includes("intro")
+                ? "intro"
+                : rawType.toLowerCase().includes("practice")
+                ? "practice"
+                : rawType.toLowerCase().includes("blend")
+                ? "blending"
+                : rawType.toLowerCase().includes("read")
+                ? "reading"
+                : rawType.toLowerCase().includes("mastery")
+                ? "mastery-check"
+                : rawType.toLowerCase().includes("wrap")
+                ? "wrap-up"
+                : "intro";
+
+            // Derive sounds from skillFocus array (e.g., ["Sound S", "Sound A"] or ["S","A"])
+            let soundLabel = "";
+            const focusArr = Array.isArray(lesson.skillFocus) ? lesson.skillFocus : [];
+            if (focusArr.length > 0) {
+              const sounds = focusArr
+                .map((entry: any) => {
+                  if (typeof entry !== "string") return "";
+                  const trimmed = entry.trim();
+                  // If entry looks like "Sound S", "Sound A", take last token
+                  if (/^sound\s+/i.test(trimmed)) {
+                    const parts = trimmed.split(/\s+/);
+                    return parts[parts.length - 1];
+                  }
+                  return trimmed;
+                })
+                .filter((s: string) => s.length > 0);
+              soundLabel = Array.from(new Set(sounds)).join(", ");
+            }
+
+            return {
+              id: lesson.id,
+              lessonNumber: index + 1,
+              title: lesson.title,
+              description: lesson.preview || "",
+              lessonType: normalizedType,
+              lessonTypeLabel: rawType || LESSON_TYPE_LABELS[normalizedType],
+              sound: soundLabel,
+              students: lesson.studentsCount ?? 0,
+              estimatedTime: lesson.estimatedTime || "",
+            };
+          });
           setLessons(mapped);
         }
       } catch (error) {
@@ -364,21 +416,26 @@ export default function ModuleDetailsPage({
           </div>
 
           {/* Lesson Cards */}
-          <div className="flex flex-col gap-[16px]">
-            {filteredLessons.map((lesson) => (
+          {loadingLessons ? (
+            <LessonCapsuleSkeleton />
+          ) : (
+            <div className="flex flex-col gap-[16px]">
+              {filteredLessons.map((lesson) => (
               <LessonStatCard
                 key={lesson.id}
                 lessonTitle={`Lesson ${lesson.lessonNumber}: ${lesson.title}`}
                 description={lesson.description}
                 lessonType={lesson.lessonType}
+                lessonTypeLabel={lesson.lessonTypeLabel}
                 sound={lesson.sound}
                 students={lesson.students}
                 estimatedTime={lesson.estimatedTime}
                 moduleId={moduleId}
                 lessonId={lesson.id}
               />
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
           {/* Empty State */}
           {filteredLessons.length === 0 && (

@@ -44,12 +44,16 @@ const VARIANT_STYLES: Record<"initial" | "default" | "success" | "error", React.
 export function SentenceStatusBox({
   sentence,
   variant = "default",
-  letterWidth = 67.51, // Calculated: spacer = 95 * 0.4 = 38px, with gap=1px gives 38+1+1 = 40px word spacing
+  letterWidth = 56,
   letterHeight = 50,
-  letterGap = 1, // Reduced gap between letters (1px for tight letter spacing)
+  letterGap = 1,
   className,
 }: SentenceStatusBoxProps) {
   const variantStyle = VARIANT_STYLES[variant];
+  const words = sentence
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
 
   // Map StatusBox variant to AlphabetDisplay variant
   const getAlphabetVariant = (): "default" | "done" | "error" => {
@@ -75,19 +79,30 @@ export function SentenceStatusBox({
         boxSizing: "border-box",
       }}
     >
-      {/* Alphabet Display for the sentence - no images, only text
-          letterGap reduced for tighter letter spacing
-          letterWidth set to 100px so spacer = 40px (100 * 0.4 = 40px) for word spacing */}
-      <AlphabetDisplay
-        text={sentence}
-        variant={getAlphabetVariant()}
-        letterWidth={letterWidth}
-        letterHeight={letterHeight}
-        gap={letterGap}
-        spaceHandling="spacer"
-        applyBoxModel={false}
-        exactGap={true} // Use gap value as-is without reduction
-      />
+      {/* Render by word groups so letters stay visually grouped as words */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "24px",
+          flexWrap: "wrap",
+        }}
+      >
+        {(words.length > 0 ? words : [sentence]).map((word, index) => (
+          <AlphabetDisplay
+            key={`${word}-${index}`}
+            text={word}
+            variant={getAlphabetVariant()}
+            letterWidth={letterWidth}
+            letterHeight={letterHeight}
+            gap={letterGap}
+            spaceHandling="skip"
+            applyBoxModel={false}
+            exactGap={true}
+          />
+        ))}
+      </div>
     </div>
   );
 }

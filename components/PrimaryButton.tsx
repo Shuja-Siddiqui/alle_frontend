@@ -14,7 +14,7 @@ type PrimaryButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   iconColor?: string;
   children?: ReactNode;
   /** size="medium" uses the dialog confirm button size, default keeps current wide style */
-  size?: "default" | "medium";
+  size?: "default" | "medium" | "navbar";
   /** variant="outline" makes background transparent, "filled" keeps gradient */
   variant?: "filled" | "outline";
   /** Hide decorative stars */
@@ -45,6 +45,7 @@ export function PrimaryButton({
   const content = text ?? children;
 
   const isMedium = size === "medium";
+  const isNavbar = size === "navbar";
 
   return (
     <button
@@ -64,7 +65,9 @@ export function PrimaryButton({
           ? "hover:brightness-110"
           : ""
       } ${
-        isMedium
+        isNavbar
+          ? "h-[52px] w-auto gap-[4px] rounded-[76.829px] px-[24px] py-[8px]"
+          : isMedium
           ? "h-[70px] w-[262px] gap-[4px] rounded-full px-[23.902px] py-[9.612px]"
           : "h-[70px] w-[413px] gap-3 rounded-[76.83px] px-[23.9px] py-[9.61px]"
       } ${className ?? ""}`}
@@ -98,7 +101,25 @@ export function PrimaryButton({
               !disabled && variant === "filled" ? "group-hover:opacity-0" : ""
             }`}
           >
-            {isMedium ? (
+            {isNavbar ? (
+              <>
+                <div className="absolute left-[144px] top-[-10px] flex size-[29.263px] items-center justify-center opacity-70">
+                  <div style={{ transform: "rotate(-30deg)" }}>
+                    <Image src="/assets/icons/others/star1.png" alt="" width={21} height={21} />
+                  </div>
+                </div>
+                <div className="absolute left-[42px] top-[29px] flex size-[35.32px] items-center justify-center opacity-60">
+                  <div style={{ transform: "rotate(-23deg)" }}>
+                    <Image src="/assets/icons/others/star2.png" alt="" width={27} height={27} />
+                  </div>
+                </div>
+                <div className="absolute left-[194px] top-[37px] flex size-[26.555px] items-center justify-center opacity-60">
+                  <div style={{ transform: "rotate(-30deg)" }}>
+                    <Image src="/assets/icons/others/star3.png" alt="" width={19} height={19} />
+                  </div>
+                </div>
+              </>
+            ) : isMedium ? (
               <div className="absolute left-[45px] bottom-0 opacity-80">
                 <Image src="/assets/icons/others/star2.png" alt="" width={39} height={39} />
               </div>
@@ -119,7 +140,25 @@ export function PrimaryButton({
           {/* Hover only (filled, not disabled): SVG stars with white glow */}
           {!disabled && variant === "filled" && (
             <div className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100">
-              {isMedium ? (
+              {isNavbar ? (
+                <>
+                  <div className="absolute left-[144px] top-[-10px] flex size-[29.263px] items-center justify-center">
+                    <div style={{ transform: "rotate(-30deg)" }}>
+                      <Star1Icon width={21} height={21} />
+                    </div>
+                  </div>
+                  <div className="absolute left-[42px] top-[29px] flex size-[35.32px] items-center justify-center">
+                    <div style={{ transform: "rotate(-23deg)" }}>
+                      <Star2Icon width={27} height={27} />
+                    </div>
+                  </div>
+                  <div className="absolute left-[194px] top-[37px] flex size-[26.555px] items-center justify-center">
+                    <div style={{ transform: "rotate(-30deg)" }}>
+                      <Star3Icon width={19} height={19} />
+                    </div>
+                  </div>
+                </>
+              ) : isMedium ? (
                 <div className="absolute left-[45px] bottom-0">
                   <Star2Icon width={40} height={40} />
                 </div>
@@ -167,11 +206,11 @@ export function PrimaryButton({
         style={{
           color: disabled ? "#7076AD" : "#FFFFFF",
           fontFamily: "var(--font-orbitron), system-ui, sans-serif",
-          fontSize: "22.927px",
+          fontSize: isNavbar ? "18px" : "22.927px",
           fontStyle: "normal",
           fontWeight: 700,
-          lineHeight: "150%",
-          letterSpacing: "-0.252px",
+          lineHeight: isNavbar ? "24px" : "150%",
+          letterSpacing: isNavbar ? "-0.198px" : "-0.252px",
           textTransform: "uppercase",
         }}
       >
