@@ -1,15 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, usePathname } from "next/navigation";
 import Image from "next/image";
-import { BackButton } from "../../../../components/BackButton";
 import { StudentInfoCard } from "../../../../components/StudentInfoCard";
 import { StudentEngagementCard } from "../../../../components/StudentEngagementCard";
 import { StudentStatsBar } from "../../../../components/StudentStatsBar";
 import { LearningTimeChart } from "../../../../components/LearningTimeChart";
 import { StudentBadgesGrid } from "../../../../components/StudentBadgesGrid";
 import { api } from "../../../../lib/api-client";
+import { StudentDetailsSkeleton } from "../../../../components/Skeletons/StudentDetailsSkeleton";
 
 type StudentData = {
   id: string;
@@ -93,14 +93,17 @@ const createDefaultStudentData = (id: string): StudentData => ({
 
 export default function StudentDetailsPage() {
   const router = useRouter();
+  const pathname = usePathname();
+  const roleBase = pathname?.startsWith("/teacher") ? "teacher" : "admin";
   const params = useParams<{ id: string }>();
   const studentId = params?.id ?? "";
   const [studentData, setStudentData] = useState<StudentData>(
     createDefaultStudentData(studentId)
   );
+  const [loading, setLoading] = useState(true);
 
   function handleBackClick() {
-    router.push("/admin/students");
+    router.push(`/${roleBase}/students`);
   }
 
   useEffect(() => {
@@ -117,6 +120,10 @@ export default function StudentDetailsPage() {
 
         const user = payload.user ?? payload;
         const progress = payload.progress ?? {};
+        const lessonsCompletedFromStudentLessons =
+          typeof payload.lessonsCompletedFromStudentLessons === "number"
+            ? payload.lessonsCompletedFromStudentLessons
+            : undefined;
         const modules = Array.isArray(payload.modules) ? payload.modules : [];
         const badges = Array.isArray(payload.badges) ? payload.badges : [];
         const timeSpent = Array.isArray(payload.timeSpentLast7Days)
@@ -142,8 +149,12 @@ export default function StudentDetailsPage() {
         // Map badges from API to UI shape
         const mappedBadges =
           badges.map((b: any) => ({
-            imageSrc: b.icon || "/assets/icons/badges/badge1.svg",
-            earned: true,
+            imageSrc:
+              (b.earned ? b.iconActive : b.iconInactive) ||
+              b.iconActive ||
+              b.icon ||
+              "/assets/icons/badges/badge1.svg",
+            earned: Boolean(b.earned),
             title: b.title,
             description: b.description,
           })) ?? [];
@@ -184,7 +195,9 @@ export default function StudentDetailsPage() {
           avatarAlt: name,
           grade: Number.isNaN(gradeNumber) ? prev.grade : gradeNumber,
           lessonsCompleted:
-            typeof progress.lessonsCompleted === "number"
+            typeof lessonsCompletedFromStudentLessons === "number"
+              ? lessonsCompletedFromStudentLessons
+              : typeof progress.lessonsCompleted === "number"
               ? progress.lessonsCompleted
               : prev.lessonsCompleted,
           // Simple proxy for "progress" using totalXp if present
@@ -199,8 +212,10 @@ export default function StudentDetailsPage() {
             daily: learningDailyData,
           },
         }));
+        setLoading(false);
       } catch (error) {
         console.error("❌ Failed to load student details:", error);
+        setLoading(false);
       }
     };
 
@@ -212,6 +227,10 @@ export default function StudentDetailsPage() {
   }, [studentId]);
 
   return (
+    <>
+    {loading ? (
+      <StudentDetailsSkeleton />
+    ) : (
     <div className="flex flex-col h-full w-full">
       {/* Navbar */}
       <div className="w-full" style={{ padding: "24px 32px" }}>
@@ -403,6 +422,8 @@ export default function StudentDetailsPage() {
         </div>
       </div>
     </div>
+    )}
+    </>
   );
 }
 

@@ -2,12 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { AdminNavbar } from "../../../components/AdminNavbar";
 import { StatCard } from "../../../components/StatCard";
 import { StudentStatCard } from "../../../components/StudentStatCard";
 import { RetentionMetrics } from "../../../components/RetentionMetrics";
 import { ModuleStatCard } from "../../../components/ModuleStatCard";
 import { AddStudentDialog, AddStudentFormData } from "../../../components/AddStudentDialog";
+import { AddTeacherDialog, AddTeacherFormData } from "../../../components/AddTeacherDialog";
+import { AdminDashboardSkeleton } from "../../../components/Skeletons/AdminDashboardSkeleton";
 import { api } from "../../../lib/api-client";
 
 type DashboardStats = {
@@ -42,7 +45,10 @@ type DashboardStudent = {
 const DEFAULT_AVATAR = "/assets/icons/others/profile_avatar_large.png";
 
 export default function AdminDashboardPage() {
+  const pathname = usePathname();
+  const roleBase = pathname?.startsWith("/teacher") ? "teacher" : "admin";
   const [showAddStudentDialog, setShowAddStudentDialog] = useState(false);
+  const [showAddTeacherDialog, setShowAddTeacherDialog] = useState(false);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loadingStats, setLoadingStats] = useState(true);
   const [dashboardStudents, setDashboardStudents] = useState<DashboardStudent[]>([]);
@@ -146,6 +152,10 @@ export default function AdminDashboardPage() {
     setRefreshTrigger((prev) => prev + 1);
   }
 
+  function handleAddTeacher(_: AddTeacherFormData) {
+    setRefreshTrigger((prev) => prev + 1);
+  }
+
   return (
     <div className="flex flex-col h-full w-full">
       {/* Navbar */}
@@ -157,6 +167,9 @@ export default function AdminDashboardPage() {
             console.log("Notification clicked");
           }}
           onAddStudentClick={() => setShowAddStudentDialog(true)}
+          onAddTeacherClick={
+            roleBase === "admin" ? () => setShowAddTeacherDialog(true) : undefined
+          }
         />
       </div>
 
@@ -167,6 +180,10 @@ export default function AdminDashboardPage() {
           padding: "0 32px 32px 32px",
         }}
       >
+        {loadingStats && loadingStudents && loadingModules ? (
+          <AdminDashboardSkeleton />
+        ) : (
+          <>
         {/* Stats Cards Row */}
         <div className="flex gap-[24px] items-center" style={{ marginBottom: "32px" }}>
           {/* Card 1: Total students */}
@@ -224,22 +241,23 @@ export default function AdminDashboardPage() {
             height: "336px",
           }}
         >
-          {/* Left Side: Retention Metrics */}
-          <RetentionMetrics
-            percentage={66}
-            changePercentage={4}
-            className="shrink-0"
-            style={{
-              width: "364px",
-              height: "100%",
-            }}
-          />
+          {roleBase === "admin" && (
+            <RetentionMetrics
+              percentage={66}
+              changePercentage={4}
+              className="shrink-0"
+              style={{
+                width: "364px",
+                height: "100%",
+              }}
+            />
+          )}
 
-          {/* Right Side: Students Section */}
+          {/* Students Section */}
           <div
             className="flex flex-col shrink-0"
             style={{
-              width: "752px",
+              width: roleBase === "admin" ? "752px" : "1140px",
             }}
           >
             {/* Header */}
@@ -259,7 +277,7 @@ export default function AdminDashboardPage() {
                 Students
               </h2>
               <Link
-                href="/admin/students"
+                href={`/${roleBase}/students`}
                 style={{
                   color: "#ff00ca",
                   fontFamily: "var(--font-orbitron), system-ui, sans-serif",
@@ -380,6 +398,8 @@ export default function AdminDashboardPage() {
             )}
           </div>
         </div>
+        </>
+        )}
       </div>
 
       {/* Add Student Dialog */}
@@ -389,6 +409,14 @@ export default function AdminDashboardPage() {
         onAddStudent={handleAddStudent}
         modules={dashboardModules.map((m) => ({ value: m.id, label: m.title }))}
       />
+
+      {roleBase === "admin" && (
+        <AddTeacherDialog
+          open={showAddTeacherDialog}
+          onClose={() => setShowAddTeacherDialog(false)}
+          onAddTeacher={handleAddTeacher}
+        />
+      )}
     </div>
   );
 }

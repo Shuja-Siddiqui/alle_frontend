@@ -79,23 +79,6 @@ export function RetentionMetrics({
   // Colors
   const remainingColor = "#21265d"; // Dark blue
 
-  // Calculate thumb position on the chart using animated percentage
-  // Chart starts at 90 degrees (top) and goes clockwise
-  // For percentage, calculate the angle: 90 - (percentage * 360 / 100)
-  const chartRadius = 70; // Pie outerRadius
-  const thumbRadius = 66; // Slightly inside the ring so it doesn't pop outside
-  const chartCenterX = 70; // half of 140px width
-  const chartCenterY = 70; // half of 140px height
-  
-  // Convert animated percentage to angle (in degrees)
-  // startAngle is 90, and it goes clockwise, so we subtract
-  const angleDegrees = 90 - (animatedPercentage * 360 / 100);
-  const angleRadians = (angleDegrees * Math.PI) / 180;
-  
-  // Calculate thumb position on the outer edge of the chart
-  const thumbX = chartCenterX + thumbRadius * Math.cos(angleRadians);
-  const thumbY = chartCenterY - thumbRadius * Math.sin(angleRadians); // Negative because SVG Y increases downward
-
   return (
     <div
       className={`relative overflow-clip rounded-[32px] ${className ?? ""}`}
@@ -173,49 +156,6 @@ export function RetentionMetrics({
               </Pie>
             </PieChart>
           </ResponsiveContainer>
-
-          {/* Chart Thumb Indicator - Custom Rounded Thumb */}
-          <div
-            className="absolute"
-            style={{
-              left: `${thumbX}px`,
-              top: `${thumbY + 10}px`,
-              transform: "translate(-50%, -50%)",
-              width: "24px",
-              height: "24px",
-              // No CSS transitions - position is controlled entirely by JavaScript animation
-              transition: "none",
-            }}
-          >
-            {/* Outer circle with gradient and border */}
-            <div
-              style={{
-                width: "24px",
-                height: "24px",
-                borderRadius: "24.756px",
-                border: "1.073px solid rgba(255, 255, 255, 0.24)",
-                background: `
-                  radial-gradient(3119.74% 102.03% at 20.08% -0.37%, rgba(255, 18, 239, 0.70) 0%, rgba(255, 255, 255, 0.00) 100%),
-                  linear-gradient(88deg, #F529F9 1.65%, #0756FF 57.2%, #FF21C7 89.22%)
-                `,
-                boxShadow: "0 0 0 0.86px #E451FE",
-                position: "relative",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              {/* Inner white circle */}
-              <div
-                style={{
-                  width: "18px",
-                  height: "18px",
-                  borderRadius: "18px",
-                  background: "#FFF",
-                }}
-              />
-            </div>
-          </div>
 
           {/* Center Percentage Text */}
           <div

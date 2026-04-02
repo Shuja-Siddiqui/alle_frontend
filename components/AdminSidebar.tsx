@@ -52,12 +52,19 @@ const MENU_ITEMS: MenuItem[] = [
 export function AdminSidebar({ onLogoClick }: AdminSidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const roleBase = pathname?.startsWith("/teacher") ? "teacher" : "admin";
+  const menuItems = MENU_ITEMS
+    .filter((item) => !(roleBase === "teacher" && item.id === "analytics"))
+    .map((item) => ({
+      ...item,
+      path: `/${roleBase}/${item.id}`,
+    }));
 
   const handleLogoClick = () => {
     if (onLogoClick) {
       onLogoClick();
     } else {
-      router.push("/admin/dashboard");
+      router.push(`/${roleBase}/dashboard`);
     }
   };
 
@@ -131,7 +138,7 @@ export function AdminSidebar({ onLogoClick }: AdminSidebarProps) {
           width: "188px",
         }}
       >
-        {MENU_ITEMS.map((item) => {
+        {menuItems.map((item) => {
           const isActive = pathname === item.path || pathname?.startsWith(item.path + "/");
           
           if (isActive) {

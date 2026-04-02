@@ -81,7 +81,7 @@ export default function AdminSettingsPage() {
             type="button"
             onClick={() => {
               logout();
-              router.push("/admin/login");
+              router.push("/");
             }}
             style={{
               border: "none",

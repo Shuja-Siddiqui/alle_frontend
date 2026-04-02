@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { LessonStatsCard } from "../../../../../../components/LessonStatsCard";
 import { LessonObjective } from "../../../../../../components/LessonObjective";
 import { PerformanceMarkers } from "../../../../../../components/PerformanceMarkers";
 import { StudentsTable, StudentRowData } from "../../../../../../components/StudentsTable";
+import { LessonDetailsSkeleton } from "../../../../../../components/Skeletons/LessonDetailsSkeleton";
+import { StudentsTableSkeleton } from "../../../../../../components/Skeletons/StudentsTableSkeleton";
 import { AddStudentDialog, AddStudentFormData } from "../../../../../../components/AddStudentDialog";
 import { api } from "../../../../../../lib/api-client";
 
@@ -43,6 +45,8 @@ export default function LessonDetailsPage({
   params: Promise<{ moduleId: string; lessonId: string }>;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const roleBase = pathname?.startsWith("/teacher") ? "teacher" : "admin";
   const { moduleId, lessonId } = use(params);
   const [showAddStudentDialog, setShowAddStudentDialog] = useState(false);
   const [lessonData, setLessonData] = useState<LessonApiData | null>(null);
@@ -52,7 +56,7 @@ export default function LessonDetailsPage({
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   function handleBackClick() {
-    router.push(`/admin/modules/${moduleId}`);
+    router.push(`/${roleBase}/modules/${moduleId}`);
   }
 
   function handleAddStudent() {
@@ -281,7 +285,7 @@ export default function LessonDetailsPage({
         }}
       >
         {loadingLesson ? (
-          <div style={{ color: "#FFF", padding: "24px" }}>Loading lesson...</div>
+          <LessonDetailsSkeleton />
         ) : lessonData ? (
           <>
             {/* Lesson Stats Card */}
@@ -321,7 +325,7 @@ export default function LessonDetailsPage({
             {/* Students Table */}
             <div>
               {loadingStudents ? (
-                <div style={{ color: "#FFF", padding: "24px" }}>Loading students...</div>
+                <StudentsTableSkeleton />
               ) : (
                 <StudentsTable students={lessonStudents} />
               )}

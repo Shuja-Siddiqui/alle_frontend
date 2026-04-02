@@ -179,13 +179,22 @@ export function StudentsActivityChart({
           {/* Tooltip */}
           {selectedIndex !== null && tooltipPosition && (
             <div
-              className="absolute flex gap-[12px] items-center p-[16px] rounded-[32px] z-10"
+              className="absolute flex gap-[12px] items-center p-[16px] rounded-[32px] z-20 pointer-events-none"
               style={{
                 backgroundColor: "#1b1f4e",
                 border: "1px solid #e451fe",
                 top: `${tooltipPosition.top}px`,
                 left: `${tooltipPosition.left}px`,
-                transform: "translateX(-50%)",
+                // Keep tooltip fully visible at chart edges:
+                // - first bar: align tooltip to the right of the bar
+                // - last bar: align tooltip to the left of the bar
+                // - others: center over the bar
+                transform:
+                  selectedIndex === 0
+                    ? "translateX(0)" // right of leftmost bar
+                    : selectedIndex === dailyData.length - 1
+                    ? "translateX(-100%)" // left of rightmost bar
+                    : "translateX(-50%)",
                 whiteSpace: "nowrap",
               }}
             >
@@ -215,7 +224,7 @@ export function StudentsActivityChart({
                   letterSpacing: "-0.28px",
                 }}
               >
-                {dailyData[selectedIndex].day}, {dailyData[selectedIndex].date || ""} - {dailyData[selectedIndex].students} students interacted
+                {(dailyData[selectedIndex].date || "").trim()} - {dailyData[selectedIndex].students} students interacted
               </p>
             </div>
           )}

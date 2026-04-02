@@ -254,7 +254,7 @@ export function TablePagination({
               alt="Next page"
               width={22}
               height={22}
-              className="block max-w-none size-full"
+              className="block max-w-none size-full rotate-180"
             />
           </div>
         </button>

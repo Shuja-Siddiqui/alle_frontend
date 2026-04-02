@@ -13,7 +13,7 @@ const DEFAULT_AVATAR = "/assets/icons/others/profile_avatar_large.png";
 
 export default function ProfileSettingsPage() {
   const router = useRouter();
-  const { user, logout, allBadges: badgeCatalog } = useAuth();
+  const { user, allBadges: badgeCatalog } = useAuth();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [newPassword, setNewPassword] = useState("");
@@ -290,32 +290,6 @@ export default function ProfileSettingsPage() {
                   }}
                 >
                   Settings
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    logout();
-                    router.push("/login");
-                  }}
-                  style={{
-                    width: "100%",
-                    padding: "4px 0",
-                    border: "none",
-                    background: "transparent",
-                    textAlign: "left",
-                    color: "var(--Colors-Primary, #FF00CA)",
-                    fontFamily: "var(--font-orbitron), system-ui, sans-serif",
-                    fontSize: "18px",
-                    fontStyle: "normal",
-                    fontWeight: 500,
-                    lineHeight: "24px",
-                    letterSpacing: "-0.198px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Logout
                 </button>
               </div>
             )}

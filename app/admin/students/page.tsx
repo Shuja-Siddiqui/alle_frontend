@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { AdminNavbar } from "../../../components/AdminNavbar";
 import { StudentsTable, StudentRowData, LanguageCode } from "../../../components/StudentsTable";
+import { StudentsTableSkeleton } from "../../../components/Skeletons/StudentsTableSkeleton";
 import { TablePagination } from "../../../components/TablePagination";
 import { SearchAndFilter } from "../../../components/SearchAndFilter";
 import {
@@ -13,6 +14,7 @@ import {
   StatusFilter,
 } from "../../../components/FilterDialog";
 import { AddStudentDialog, AddStudentFormData } from "../../../components/AddStudentDialog";
+import { AddTeacherDialog, AddTeacherFormData } from "../../../components/AddTeacherDialog";
 import { api } from "../../../lib/api-client";
 
 const LANGUAGE_NAME_MAP: Record<LanguageCode, string> = {
@@ -31,10 +33,13 @@ type ModuleOption = {
 
 export default function AdminStudentsPage() {
   const router = useRouter();
+  const pathname = usePathname();
+  const roleBase = pathname?.startsWith("/teacher") ? "teacher" : "admin";
   const [currentPage, setCurrentPage] = useState(1);
   const [searchValue, setSearchValue] = useState("");
   const [showFilterDialog, setShowFilterDialog] = useState(false);
   const [showAddStudentDialog, setShowAddStudentDialog] = useState(false);
+  const [showAddTeacherDialog, setShowAddTeacherDialog] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     successRate: "all",
     module: null,
@@ -48,13 +53,24 @@ export default function AdminStudentsPage() {
   const [moduleOptions, setModuleOptions] = useState<ModuleOption[]>([]);
   const [loadingFilterOptions, setLoadingFilterOptions] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [selectedModuleForDialog, setSelectedModuleForDialog] = useState<string | null>(null);
+  const [dialogFilters, setDialogFilters] = useState<FilterState>({
+    successRate: "all",
+    module: null,
+    lesson: null,
+    status: "all",
+  });
 
   const handleStudentRowClick = (studentId: string) => {
-    router.push(`/admin/students/${studentId}`);
+    router.push(`/${roleBase}/students/${studentId}`);
   };
 
   function handleAddStudent() {
     setRefreshTrigger((prev) => prev + 1);
+  }
+
+  function handleAddTeacher(_: AddTeacherFormData) {
+    // No students table refresh needed, but keep action hook for future UX extensions.
   }
 
   // Load modules and their lessons for the filter dialog
@@ -172,6 +188,8 @@ export default function AdminStudentsPage() {
               const name = [s.firstName, s.lastName].filter(Boolean).join(" ") || s.email || "Student";
               const successRate = typeof s.successRate === "number" ? s.successRate : 0;
               const lessonsStarted = typeof s.lessonsStarted === "number" ? s.lessonsStarted : 0;
+              const currentLessonNumber =
+                typeof s.currentLessonNumber === "number" ? s.currentLessonNumber : null;
 
               return {
                 id: s.id,
@@ -182,9 +200,12 @@ export default function AdminStudentsPage() {
                 language: lang,
                 languageName: LANGUAGE_NAME_MAP[lang] || "English",
                 successRate,
-                progress: lessonsStarted
-                  ? `Lessons started: ${lessonsStarted}`
-                  : "Not started yet",
+                progress:
+                  currentLessonNumber !== null
+                    ? `Lesson ${currentLessonNumber}`
+                    : lessonsStarted
+                    ? `Lessons started: ${lessonsStarted}`
+                    : "Not started yet",
                 progressHasWarning: successRate > 0 && successRate < 50,
                 status: "Active",
                 onClick: () => handleStudentRowClick(s.id),
@@ -271,8 +292,9 @@ export default function AdminStudentsPage() {
     label: mod.label,
   }));
 
-  const selectedModule = filters.module
-    ? moduleOptions.find((mod) => mod.value === filters.module)
+  const activeModuleId = selectedModuleForDialog ?? dialogFilters.module ?? filters.module;
+  const selectedModule = activeModuleId
+    ? moduleOptions.find((mod) => mod.value === activeModuleId)
     : undefined;
 
   const lessonSelectOptions = selectedModule?.lessons ?? [];
@@ -284,8 +306,18 @@ export default function AdminStudentsPage() {
   };
 
   const handleFilterApply = (newFilters: FilterState) => {
+    // Apply filters to the table
     setFilters(newFilters);
     setCurrentPage(1); // Reset to first page when filters change
+
+    // Reset dialog filters so next open starts from defaults
+    setDialogFilters({
+      successRate: "all",
+      module: null,
+      lesson: null,
+      status: "all",
+    });
+    setSelectedModuleForDialog(null);
   };
 
   const handleFilterReset = () => {
@@ -295,8 +327,13 @@ export default function AdminStudentsPage() {
       lesson: null,
       status: "all",
     };
+    // Reset applied filters
     setFilters(resetFilters);
     setCurrentPage(1);
+
+    // Also reset dialog filters
+    setDialogFilters(resetFilters);
+    setSelectedModuleForDialog(null);
   };
 
   // Reset to first page when search changes
@@ -316,6 +353,9 @@ export default function AdminStudentsPage() {
             console.log("Notification clicked");
           }}
           onAddStudentClick={() => setShowAddStudentDialog(true)}
+          onAddTeacherClick={
+            roleBase === "admin" ? () => setShowAddTeacherDialog(true) : undefined
+          }
         />
       </div>
 
@@ -331,12 +371,26 @@ export default function AdminStudentsPage() {
           <SearchAndFilter
             searchValue={searchValue}
             onSearchChange={handleSearchChange}
-            onFilterClick={() => setShowFilterDialog(true)}
+            onFilterClick={() => {
+              // Reset dialog-specific filters when opening
+              setDialogFilters({
+                successRate: "all",
+                module: null,
+                lesson: null,
+                status: "all",
+              });
+              setSelectedModuleForDialog(null);
+              setShowFilterDialog(true);
+            }}
             className="mb-[16px]"
           />
 
           {/* Students Table */}
-          <StudentsTable students={currentStudents} />
+          {loading ? (
+            <StudentsTableSkeleton />
+          ) : (
+            <StudentsTable students={currentStudents} />
+          )}
 
           {/* Pagination - Only show if there are students */}
           {totalItems > 0 && (
@@ -355,10 +409,13 @@ export default function AdminStudentsPage() {
       {/* Filter Dialog */}
       <FilterDialog
         open={showFilterDialog}
-        filters={filters}
+        filters={dialogFilters}
         // Only apply filters (and trigger refetch) when user clicks Apply/Reset,
         // not on every change inside the dialog.
-        onFiltersChange={() => {}}
+        onFiltersChange={(newFilters) => {
+          setDialogFilters(newFilters);
+          setSelectedModuleForDialog(newFilters.module);
+        }}
         onApply={handleFilterApply}
         onReset={handleFilterReset}
         onClose={() => setShowFilterDialog(false)}
@@ -373,6 +430,14 @@ export default function AdminStudentsPage() {
         onAddStudent={handleAddStudent}
         modules={moduleOptions.map((m) => ({ value: m.value, label: m.label }))}
       />
+
+      {roleBase === "admin" && (
+        <AddTeacherDialog
+          open={showAddTeacherDialog}
+          onClose={() => setShowAddTeacherDialog(false)}
+          onAddTeacher={handleAddTeacher}
+        />
+      )}
     </div>
   );
 }
