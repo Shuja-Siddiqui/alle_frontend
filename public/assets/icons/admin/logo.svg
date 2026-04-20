@@ -1,0 +1,12 @@
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 40.0978 40.0978" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Logo icon">
+<rect width="40.0978" height="40.0978" rx="20.0489" fill="url(#paint0_linear_0_29)"/>
+<path id="Star 4" d="M17.3241 13.1905C18.107 11.0748 21.0995 11.0748 21.8824 13.1905L22.8255 15.7392C23.0716 16.4044 23.5961 16.9288 24.2612 17.175L26.8099 18.118C28.9256 18.9009 28.9256 21.8934 26.8099 22.6763L24.2612 23.6194C23.5961 23.8655 23.0716 24.39 22.8255 25.0552L21.8824 27.6038C21.0995 29.7196 18.107 29.7196 17.3241 27.6038L16.381 25.0552C16.1349 24.39 15.6104 23.8655 14.9452 23.6194L12.3966 22.6763C10.2808 21.8934 10.2808 18.9009 12.3966 18.118L14.9452 17.175C15.6104 16.9288 16.1349 16.4044 16.381 15.7392L17.3241 13.1905Z" fill="var(--fill-0, white)"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_0_29" x1="37.5917" y1="-3.9678e-07" x2="-3.13264" y2="42.6039" gradientUnits="userSpaceOnUse">
+<stop stop-color="#FB1DFF"/>
+<stop offset="1" stop-color="#0175E2"/>
+</linearGradient>
+</defs>
+</svg>

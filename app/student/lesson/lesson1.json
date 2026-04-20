@@ -1,0 +1,236 @@
+{
+  "lesson_id": "lesson_1",
+  "lesson_sequence": 1,
+  "lesson_title": "Core Sounds - SATPIN",
+  "learning_objectives": [
+    "S",
+    "A",
+    "T",
+    "P",
+    "I",
+    "N"
+  ],
+  "missions": [
+    {
+      "mission_id": "lesson_1_mission_1",
+      "mission_sequence": 1,
+      "mission_type": "mission_mode",
+      "mission_name": "Mission Mode - Core Sounds & Blending",
+      "is_required": true,
+      "introduction": {
+        "tts_missionControlVoice": "Welcome, operative! First mission: crack the core code. Six sounds unlock English. Master these, you're operational. Ready? Let's activate the grid!",
+        "tts_missionControlVoice_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice><prosody rate=\"medium\" pitch=\"+5%\">Welcome, operative!<break time=\"300ms\"/> First mission: crack the core code.<break time=\"200ms\"/> Six sounds unlock English.<break time=\"200ms\"/> Master these, you're operational.<break time=\"300ms\"/> Ready?<break time=\"400ms\"/> Let's activate the grid!</prosody></voice></speak>",
+        "visual": [
+          {
+            "scene": "Command center activates. Six letter stations power up: S-A-T-P-I-N.",
+            "sfx": "activation sequence → each letter hums with distinct tone"
+          }
+        ]
+      },
+      "tasks": {
+        "alphabet_practice": [
+          {
+            "task_id": "1",
+            "letter": "S",
+            "tts_ss1": "First up: S. Listen: /sss/. Like a silent signal. Say it: /sss/. Hold it steady.",
+            "tts_ss1_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>First up: <say-as interpret-as=\"characters\">S</say-as>.<break time=\"200ms\"/> Listen: <phoneme alphabet=\"ipa\" ph=\"s\">/sss/</phoneme>.<break time=\"200ms\"/> Like a silent signal.<break time=\"200ms\"/> Say it: <phoneme alphabet=\"ipa\" ph=\"s\">/sss/</phoneme>.<break time=\"200ms\"/> Hold it steady.</voice></speak>",
+            "xp": 5,
+            "visual": [
+              {
+                "prompt": "Sound Station 1 - S",
+                "mouthCue": "Side profile of mouth: teeth together, tongue behind teeth, air flowing out.",
+                "association": "Snake moving through grass (think snake sound /sss/).",
+                "image": "Snake moving through grass"
+              }
+            ],
+            "feedback": {
+              "tts_exactMatch": "Signal clear! S activated!",
+              "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Signal clear!<break time=\"200ms\"/> S activated!</voice></speak>",
+              "tts_closeMatch": "Almost—keep it smooth: /sss/, not /suh/.",
+              "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Almost—keep it smooth:<break time=\"200ms\"/> /sss/, not /suh/.</voice></speak>",
+              "tts_wrongSound": "That's not /sss/. Check the screen—teeth together, air only. Try again.",
+              "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>That's not /sss/.<break time=\"200ms\"/> Check the screen—teeth together, air only.<break time=\"200ms\"/> Try again.</voice></speak>"
+            }
+          }
+        ],
+        "blending_practice": [
+          {
+            "task_id": "2",
+            "word": "sat",
+            "image": "Person sitting on a chair",
+            "tts_instruction": "Now we combine! Watch: /s/ /a/ /t/ → sat. Each sound connects smoothly. Your turn—blend it!",
+            "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Now we combine!<break time=\"300ms\"/> Watch:<break time=\"200ms\"/> <phoneme alphabet=\"ipa\" ph=\"s\">/s/</phoneme> <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme> <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme><break time=\"200ms\"/> <say-as interpret-as=\"characters\">s</say-as><break time=\"50ms\"/><say-as interpret-as=\"characters\">a</say-as><break time=\"50ms\"/><say-as interpret-as=\"characters\">t</say-as> → <emphasis>sat</emphasis>.<break time=\"300ms\"/> Each sound connects smoothly.<break time=\"200ms\"/> Your turn—blend it!</voice></speak>",
+            "feedback": {
+              "tts_exactMatch": "Correct.",
+              "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Correct.</voice></speak>",
+              "tts_closeMatch": "Not quite. Sound it out: /s/... /a/... /t/. Blend them.",
+              "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Not quite.<break time=\"200ms\"/> Sound it out: /s/... /a/... /t/. Blend them.</voice></speak>",
+              "tts_wrongSound": "That's not /sss/. Check the screen—teeth together, air only. Try again.",
+              "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>That's not /sss/.<break time=\"200ms\"/> Check the screen—teeth together, air only.<break time=\"200ms\"/> Try again.</voice></speak>"
+            },
+            "xp": 5
+          }
+        ],
+        "word_practice": [],
+        "sentence_practice": []
+      }
+    },
+    {
+      "mission_id": "lesson_1_mission_2",
+      "mission_sequence": 2,
+      "mission_type": "direct_instruction",
+      "mission_name": "Direct Instruction - SATPIN Sounds",
+      "is_required": true,
+      "introduction": {
+        "tts_coach": "Alright, let's get straight to it. Six sounds today. These unlock actual English words you'll see everywhere—texts, signs, homework, all of it. No fluff. Let's go.",
+        "tts_coach_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Alright, let's get straight to it.<break time=\"200ms\"/> Six sounds today.<break time=\"300ms\"/> These unlock actual English words you'll see everywhere—texts, signs, homework, all of it.<break time=\"200ms\"/> No fluff.<break time=\"300ms\"/> Let's go.</voice></speak>",
+        "visual": []
+      },
+      "tasks": {
+        "alphabet_practice": [
+          {
+            "task_id": "1",
+            "letter": "S",
+            "tts_coach": "Letter S makes /sss/. It's all air, no voice. Watch the screen—teeth almost together, tongue stays behind. Listen: /sss/. Say it: /sss/.",
+            "tts_coach_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Letter <say-as interpret-as=\"characters\">S</say-as> makes <phoneme alphabet=\"ipa\" ph=\"s\">/sss/</phoneme>.<break time=\"200ms\"/> It's all air, no voice.<break time=\"200ms\"/> Watch the screen—teeth almost together, tongue stays behind.<break time=\"300ms\"/> Listen: <phoneme alphabet=\"ipa\" ph=\"s\">/sss/</phoneme>.<break time=\"200ms\"/> Say it: <phoneme alphabet=\"ipa\" ph=\"s\">/sss/</phoneme>.</voice></speak>",
+            "visual": [
+              {
+                "word": "S",
+                "mouthCue": "Teeth almost together, tongue stays behind; air flows out.",
+                "association": "Snake sound /sss/."
+              }
+            ],
+            "feedback": {
+              "tts_exactMatch": "Perfect. That's exactly /sss/. Locked in.",
+              "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Perfect.<break time=\"200ms\"/> That's exactly /sss/. Locked in.</voice></speak>",
+              "tts_closeMatch": "Almost—you're adding voice. It's just air: /sss/, not /zzz/. Watch the animation again.",
+              "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Almost—you're adding voice.<break time=\"200ms\"/> It's just air: /sss/, not /zzz/. Watch the animation again.</voice></speak>",
+              "tts_wrongSound": "That's not /sss/. Check the screen—teeth together, air only. Try again.",
+              "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>That's not /sss/.<break time=\"200ms\"/> Check the screen—teeth together, air only.<break time=\"200ms\"/> Try again.</voice></speak>"
+            }
+          }
+        ],
+        "blending_practice": [
+          {
+            "task_id": "2",
+            "word": "sat",
+            "image": "Person sitting on a chair",
+            "tts_instruction": "Now we put sounds together. Watch: /s/ /a/ /t/ → sat. Each sound connects smoothly. Your turn—blend it!",
+            "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Now we put sounds together.<break time=\"300ms\"/> Watch:<break time=\"200ms\"/> <phoneme alphabet=\"ipa\" ph=\"s\">/s/</phoneme> <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme> <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme><break time=\"200ms\"/> <say-as interpret-as=\"characters\">s</say-as><break time=\"50ms\"/><say-as interpret-as=\"characters\">a</say-as><break time=\"50ms\"/><say-as interpret-as=\"characters\">t</say-as> → <emphasis>sat</emphasis>.<break time=\"300ms\"/> Each sound connects smoothly.<break time=\"200ms\"/> Your turn—blend it!</voice></speak>",
+            "feedback": {
+              "tts_exactMatch": "Correct.",
+              "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Correct.</voice></speak>",
+              "tts_closeMatch": "Not quite. Sound it out: /s/... /a/... /t/. Blend them.",
+              "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Not quite.<break time=\"200ms\"/> Sound it out: /s/... /a/... /t/. Blend them.</voice></speak>",
+              "tts_wrongSound": "Not quite. Sound it out: /s/... /a/... /t/. Blend them.",
+              "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Not quite.<break time=\"200ms\"/> Sound it out: /s/... /a/... /t/. Blend them.</voice></speak>"
+            },
+            "xp": 5
+          }
+        ],
+        "word_practice": [
+          {
+            "task_id": "3",
+            "word": "fish",
+            "image": "Person sitting on a chair",
+            "tts_instruction": "Now we put sounds together. Watch: /s/ /a/ /t/ → sat. Each sound connects smoothly. Your turn—blend it!",
+            "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Now we put sounds together.<break time=\"300ms\"/> Watch:<break time=\"200ms\"/> <phoneme alphabet=\"ipa\" ph=\"s\">/s/</phoneme> <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme> <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme><break time=\"200ms\"/> <say-as interpret-as=\"characters\">s</say-as><break time=\"50ms\"/><say-as interpret-as=\"characters\">a</say-as><break time=\"50ms\"/><say-as interpret-as=\"characters\">t</say-as> → <emphasis>sat</emphasis>.<break time=\"300ms\"/> Each sound connects smoothly.<break time=\"200ms\"/> Your turn—blend it!</voice></speak>",
+            "feedback": {
+              "tts_exactMatch": "Correct.",
+              "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Correct.</voice></speak>",
+              "tts_closeMatch": "Not quite. Sound it out: /s/... /a/... /t/. Blend them.",
+              "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Not quite.<break time=\"200ms\"/> Sound it out: /s/... /a/... /t/. Blend them.</voice></speak>",
+              "tts_wrongSound": "Not quite. Sound it out: /s/... /a/... /t/. Blend them.",
+              "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Not quite.<break time=\"200ms\"/> Sound it out: /s/... /a/... /t/. Blend them.</voice></speak>"
+            },
+            "xp": 5
+          }
+        ],
+        "sentence_practice": [
+          {
+            "task_id": "4",
+            "word": "i see a map",
+            "image": "Person sitting on a chair",
+            "tts_instruction": "Now we put sounds together. Watch: /s/ /a/ /t/ → sat. Each sound connects smoothly. Your turn—blend it!",
+            "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Now we put sounds together.<break time=\"300ms\"/> Watch:<break time=\"200ms\"/> <phoneme alphabet=\"ipa\" ph=\"s\">/s/</phoneme> <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme> <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme><break time=\"200ms\"/> <say-as interpret-as=\"characters\">s</say-as><break time=\"50ms\"/><say-as interpret-as=\"characters\">a</say-as><break time=\"50ms\"/><say-as interpret-as=\"characters\">t</say-as> → <emphasis>sat</emphasis>.<break time=\"300ms\"/> Each sound connects smoothly.<break time=\"200ms\"/> Your turn—blend it!</voice></speak>",
+            "feedback": {
+              "tts_exactMatch": "Correct.",
+              "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Correct.</voice></speak>",
+              "tts_closeMatch": "Not quite. Sound it out: /s/... /a/... /t/. Blend them.",
+              "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Not quite.<break time=\"200ms\"/> Sound it out: /s/... /a/... /t/. Blend them.</voice></speak>",
+              "tts_wrongSound": "Not quite. Sound it out: /s/... /a/... /t/. Blend them.",
+              "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Not quite.<break time=\"200ms\"/> Sound it out: /s/... /a/... /t/. Blend them.</voice></speak>"
+            },
+            "xp": 5
+          }
+        ]
+      }
+    },
+    {
+      "mission_id": "lesson_1_mission_3",
+      "mission_sequence": 3,
+      "mission_type": "mastery_check",
+      "mission_name": "Assessment - Mastery Check",
+      "is_required": true,
+      "target": "0-1",
+      "introduction": {
+        "tts_coach": "Now let's check what stuck. You'll read words built from S, A, T, P, I, N. Aim for at least eight out of ten to hit mastery.",
+        "tts_coach_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Now let's check what stuck.<break time=\"200ms\"/> You'll read words built from <say-as interpret-as=\"characters\">S A T P I N</say-as>.<break time=\"300ms\"/> Aim for at least eight out of ten to hit mastery.</voice></speak>",
+        "visual": []
+      },
+      "tasks": {
+        "word_practice": [
+          {
+            "task_id": "1",
+            "word": "sat",
+            "image": "Person sitting on a chair",
+            "retryLimit": 3,
+            "feedback": {
+              "tts_exactMatch": "Correct.",
+              "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Correct.</voice></speak>",
+              "tts_closeMatch": "Not quite. Sound it out: /s/... /a/... /t/. Blend them.",
+              "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Not quite.<break time=\"200ms\"/> Sound it out: /s/... /a/... /t/. Blend them.</voice></speak>",
+              "tts_wrongSound": "Not quite. Sound it out: /s/... /a/... /t/. Blend them.",
+              "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Not quite.<break time=\"200ms\"/> Sound it out: /s/... /a/... /t/. Blend them.</voice></speak>"
+            },
+            "xp": 5
+          }
+        ],
+        "results": {
+          "tts_0-1_correct": "You've got it. That's mastery—8 out of 10 or better. Moving forward.",
+          "tts_0-1_correct_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>You've got it.<break time=\"200ms\"/> That's mastery—eight out of ten or better.<break time=\"200ms\"/> Moving forward.</voice></speak>",
+          "tts_5-7_correct": "You're close—got {obtained_correct}/10. Let's drill the ones you missed, then retry.",
+          "tts_5-7_correct_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>You're close—got {obtained_correct} out of ten.<break time=\"200ms\"/> Let's drill the ones you missed, then retry.</voice></speak>",
+          "tts_1-5_correct": "Not quite there yet. We're going to break this down more. Sound-by-sound practice coming up.",
+          "tts_1-5_correct_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Not quite there yet.<break time=\"200ms\"/> We're going to break this down more.<break time=\"200ms\"/> Sound-by-sound practice coming up.</voice></speak>"
+        }
+      }
+    },
+    {
+      "mission_id": "lesson_1_mission_4",
+      "mission_sequence": 4,
+      "mission_type": "wrap",
+      "mission_name": "Lesson Wrap",
+      "is_required": true,
+      "tasks": {
+        "summary": {
+          "tts_coach": "Done. You learned six sounds: S, A, T, P, I, N. With just these six, you can read actual English words. That's not kids' stuff—that's functional literacy building. Next session, we add four more sounds, and your word count explodes. English has about 44 sounds total. You just learned 6. By the end of next lesson, you'll have 10. That's almost 25% of English phonics in two sessions. Stay sharp.",
+          "tts_coach_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>Done.<break time=\"200ms\"/> You learned six sounds: <say-as interpret-as=\"characters\">S, A, T, P, I, N</say-as>.<break time=\"300ms\"/> With just these six, you can read actual English words.<break time=\"200ms\"/> That's not kids' stuff—that's functional literacy building.<break time=\"400ms\"/> Next session, we add four more sounds, and your word count explodes.<break time=\"300ms\"/> English has about forty-four sounds total.<break time=\"200ms\"/> You just learned six.<break time=\"300ms\"/> By the end of next lesson, you'll have ten.<break time=\"200ms\"/> That's almost twenty-five percent of English phonics in two sessions.<break time=\"300ms\"/> Stay sharp.</voice></speak>",
+          "visual": [
+            {
+              "progressBar": "6/44 sounds learned",
+              "sessionStats": {
+                "soundsMastered": 6,
+                "totalSounds": 6,
+                "wordsRead": 10,
+                "masteryThreshold": 80,
+                "xpEarned": 110
+              },
+              "nextUnlock": "MDGO sounds"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

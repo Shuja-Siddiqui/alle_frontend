@@ -1,0 +1,27 @@
+{
+  "missionSequence": 1,
+  "nextTaskId": "16",
+  "lastCompletedTaskId": "15",
+  "activeTaskType": "blending_practice",
+  "taskIndexInBatch": 9,
+  "completedMissionSequences": [],
+  "completedTasksByMissionAndType": {
+    "1": {
+      "alphabet_practice": [0, 1, 2, 3, 4, 5],
+      "blending_practice": [0, 1, 2, 3, 4, 5, 6, 7, 8]
+    }
+  },
+  "taskRetryCounts": {},
+  "inProgressBatch": null,
+  "alphabetSoundProgress": {},
+  "wordProgress": {},
+  "lastActivity": {
+    "type": "task_completed",
+    "missionSequence": 1,
+    "taskId": "15",
+    "taskType": "blending_practice",
+    "timestamp": "2026-02-25T07:28:23.975Z"
+  },
+  "totalXpEarnedInLesson": 75,
+  "lessonMasteryScore": null
+}

@@ -1,0 +1,1385 @@
+{
+  "lesson_id": "lesson_1",
+  "lesson_sequence": 1,
+  "lesson_title": "Core Sounds - SATPIN",
+  "learning_objectives": ["S", "A", "T", "P", "I", "N"],
+  "total_xp_available": 110,
+  "estimated_duration_minutes": 25,
+  "missions": [
+    {
+      "mission_id": "lesson_1_mission_1",
+      "mission_sequence": 1,
+      "mission_type": "opening",
+      "mission_name": "Mission Mode - Core Sounds & Blending",
+      "is_required": true,
+      "tasks": {
+        "introduction": {
+          "task_id": "lesson_1_mission_1_intro",
+          "task_type": "introduction",
+          "task_sequence": 0,
+          "requires_interaction": false,
+          "tts_instruction": "Welcome, operative! First mission: crack the core code. Six sounds unlock English. Master these, you're operational. Ready? Let's activate the grid!",
+          "tts_instruction_ssml": "<speak><prosody rate=\"medium\" pitch=\"+5%\">Welcome, operative!<break time=\"300ms\"/> First mission: crack the core code.<break time=\"200ms\"/> Six sounds unlock English.<break time=\"200ms\"/> Master these, you're operational.<break time=\"300ms\"/> Ready?<break time=\"400ms\"/> Let's activate the grid!</prosody></speak>",
+          "visual": [
+            {
+              "scene": "Command center activates. Six letter stations power up: S-A-T-P-I-N.",
+              "sfx": "activation sequence → each letter hums with distinct tone"
+            }
+          ]
+        },
+        "alphabet_practice": [
+          {
+            "task_id": "lesson_1_mission_1_alphabet_1",
+            "task_type": "alphabet_practice",
+            "task_sequence": 1,
+            "letter": "S",
+            "expected_phoneme": "s",
+            "expected_ipa": "s",
+            "acceptable_variations": ["z"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "tts_instruction": "First up: S. Listen: /sss/. Like a silent signal. Say it: /sss/. Hold it steady.",
+            "tts_instruction_ssml": "<speak>First up: <say-as interpret-as=\"characters\">S</say-as>.<break time=\"200ms\"/> Listen: <phoneme alphabet=\"ipa\" ph=\"s\">/sss/</phoneme>.<break time=\"200ms\"/> Like a silent signal.<break time=\"200ms\"/> Say it: <phoneme alphabet=\"ipa\" ph=\"s\">/sss/</phoneme>.<break time=\"200ms\"/> Hold it steady.</speak>",
+            "visual": [
+              {
+                "prompt": "Sound Station 1 - S",
+                "mouthCue": "Side profile of mouth: teeth together, tongue behind teeth, air flowing out.",
+                "association": "Snake moving through grass (think snake sound /sss/).",
+                "image": "Snake moving through grass"
+              }
+            ],
+            "feedback": {
+              "exactMatch": {
+                "tts": "Signal clear! S activated!",
+                "tts_ssml": "<speak>Signal clear!<break time=\"200ms\"/> S activated!</speak>",
+                "xp_earned": 5
+              },
+              "closeMatch": {
+                "tts": "Almost—keep it smooth: /sss/, not /suh/.",
+                "tts_ssml": "<speak>Almost—keep it smooth:<break time=\"200ms\"/> /sss/, not /suh/.</speak>",
+                "allow_retry": true
+              },
+              "wrongSound": {
+                "tts": "That's not /sss/. Check the screen—teeth together, air only. Try again.",
+                "tts_ssml": "<speak>That's not /sss/.<break time=\"200ms\"/> Check the screen—teeth together, air only.<break time=\"200ms\"/> Try again.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_1_alphabet_2",
+            "task_type": "alphabet_practice",
+            "task_sequence": 2,
+            "letter": "A",
+            "expected_phoneme": "a",
+            "expected_ipa": "æ",
+            "acceptable_variations": ["ə"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "tts_instruction": "Next: A. Short and sharp: /a/ like 'ant'. Your turn: /a/.",
+            "tts_instruction_ssml": "<speak>Next: <say-as interpret-as=\"characters\">A</say-as>.<break time=\"200ms\"/> Short and sharp: <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme> like \"ant\".<break time=\"200ms\"/> Your turn: <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme>.</speak>",
+            "visual": [
+              {
+                "prompt": "Sound Station 2 - A",
+                "mouthCue": "Mouth open medium-wide, jaw drops slightly, tongue flat and low.",
+                "association": "Apple, ant.",
+                "image": "Apple"
+              }
+            ],
+            "feedback": {
+              "exactMatch": {
+                "tts": "Locked in! A operational!",
+                "tts_ssml": "<speak>Locked in!<break time=\"200ms\"/> A operational!</speak>",
+                "xp_earned": 5
+              },
+              "closeMatch": {
+                "tts": "Keep it short: /a/, not 'ay'.",
+                "tts_ssml": "<speak>Keep it short:<break time=\"200ms\"/> /a/, not \"ay\".</speak>",
+                "allow_retry": true
+              },
+              "wrongSound": {
+                "tts": "That's 'ay' like the letter name. We need the short sound: /a/ like 'ant'.",
+                "tts_ssml": "<speak>That's \"ay\" like the letter name.<break time=\"200ms\"/> We need the short sound: /a/ like \"ant\".</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_1_alphabet_3",
+            "task_type": "alphabet_practice",
+            "task_sequence": 3,
+            "letter": "T",
+            "expected_phoneme": "t",
+            "expected_ipa": "t",
+            "acceptable_variations": ["d"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "tts_instruction": "Letter T makes /t/. It's a quick tap—tongue up, then release. No 'tuh' at the end. Just /t/.",
+            "tts_instruction_ssml": "<speak>Letter <say-as interpret-as=\"characters\">T</say-as> makes <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme>.<break time=\"200ms\"/> It's a quick tap—tongue up, then release.<break time=\"200ms\"/> No \"tuh\" at the end.<break time=\"200ms\"/> Just <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme>.</speak>",
+            "visual": [
+              {
+                "prompt": "Sound Station 3 - T",
+                "mouthCue": "Tongue tip taps roof of mouth just behind teeth, then releases with a small burst of air.",
+                "association": "Timer, tick.",
+                "image": "Timer/clock"
+              }
+            ],
+            "feedback": {
+              "exactMatch": {
+                "tts": "Clean. That's /t/.",
+                "tts_ssml": "<speak>Clean.<break time=\"200ms\"/> That's /t/.</speak>",
+                "xp_earned": 5
+              },
+              "closeMatch": {
+                "tts": "You're saying 'tuh'. Stop before the vowel—just /t/.",
+                "tts_ssml": "<speak>You're saying \"tuh\".<break time=\"200ms\"/> Stop before the vowel—just /t/.</speak>",
+                "allow_retry": true
+              },
+              "wrongSound": {
+                "tts": "Tongue needs to be up. Watch where it touches.",
+                "tts_ssml": "<speak>Tongue needs to be up.<break time=\"200ms\"/> Watch where it touches.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_1_alphabet_4",
+            "task_type": "alphabet_practice",
+            "task_sequence": 4,
+            "letter": "P",
+            "expected_phoneme": "p",
+            "expected_ipa": "p",
+            "acceptable_variations": ["b"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "tts_instruction": "Letter P makes /p/. Lips together, then pop. No voice, just air pressure release.",
+            "tts_instruction_ssml": "<speak>Letter <say-as interpret-as=\"characters\">P</say-as> makes <phoneme alphabet=\"ipa\" ph=\"p\">/p/</phoneme>.<break time=\"200ms\"/> Lips together, then pop.<break time=\"200ms\"/> No voice, just air pressure release.</speak>",
+            "visual": [
+              {
+                "prompt": "Sound Station 4 - P",
+                "mouthCue": "Lips pressed together, then pop open with air burst; no vocal cord vibration.",
+                "association": "Popcorn popping.",
+                "image": "Popcorn"
+              }
+            ],
+            "feedback": {
+              "exactMatch": {
+                "tts": "Exact. /p/ locked.",
+                "tts_ssml": "<speak>Exact.<break time=\"200ms\"/> /p/ locked.</speak>",
+                "xp_earned": 5
+              },
+              "closeMatch": {
+                "tts": "Just /p/—don't add 'puh'. Lips pop and stop.",
+                "tts_ssml": "<speak>Just /p/—don't add \"puh\".<break time=\"200ms\"/> Lips pop and stop.</speak>",
+                "allow_retry": true
+              },
+              "wrongSound": {
+                "tts": "That's /b/. P has no voice—just air.",
+                "tts_ssml": "<speak>That's /b/.<break time=\"200ms\"/> P has no voice—just air.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_1_alphabet_5",
+            "task_type": "alphabet_practice",
+            "task_sequence": 5,
+            "letter": "I",
+            "expected_phoneme": "i",
+            "expected_ipa": "ɪ",
+            "acceptable_variations": ["i", "e"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "tts_instruction": "Letter I makes /i/. Quick, tight sound. Not 'eye'—just /i/ like 'it'.",
+            "tts_instruction_ssml": "<speak>Letter <say-as interpret-as=\"characters\">I</say-as> makes <phoneme alphabet=\"ipa\" ph=\"ɪ\">/i/</phoneme>.<break time=\"200ms\"/> Quick, tight sound.<break time=\"200ms\"/> Not \"eye\"—just <phoneme alphabet=\"ipa\" ph=\"ɪ\">/i/</phoneme> like \"it\".</speak>",
+            "visual": [
+              {
+                "prompt": "Sound Station 5 - I",
+                "mouthCue": "Mouth slightly open, tongue high in the middle, short duration.",
+                "association": "Insect.",
+                "image": "Insect"
+              }
+            ],
+            "feedback": {
+              "exactMatch": {
+                "tts": "Perfect /i/.",
+                "tts_ssml": "<speak>Perfect /i/.</speak>",
+                "xp_earned": 5
+              },
+              "closeMatch": {
+                "tts": "Tighter. Make it quick: /i/.",
+                "tts_ssml": "<speak>Tighter.<break time=\"200ms\"/> Make it quick: /i/.</speak>",
+                "allow_retry": true
+              },
+              "wrongSound": {
+                "tts": "That's 'ee' or 'eye'. We need short /i/ like 'sit'.",
+                "tts_ssml": "<speak>That's \"ee\" or \"eye\".<break time=\"200ms\"/> We need short /i/ like \"sit\".</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_1_alphabet_6",
+            "task_type": "alphabet_practice",
+            "task_sequence": 6,
+            "letter": "N",
+            "expected_phoneme": "n",
+            "expected_ipa": "n",
+            "acceptable_variations": ["m"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "tts_instruction": "Letter N makes /nnn/. Tongue up, sound comes through your nose. Feel the buzz in your nose? That's it.",
+            "tts_instruction_ssml": "<speak>Letter <say-as interpret-as=\"characters\">N</say-as> makes <phoneme alphabet=\"ipa\" ph=\"n\">/nnn/</phoneme>.<break time=\"200ms\"/> Tongue up, sound comes through your nose.<break time=\"200ms\"/> Feel the buzz in your nose? That's it.</speak>",
+            "visual": [
+              {
+                "prompt": "Sound Station 6 - N",
+                "mouthCue": "Tongue tip touches roof of mouth, air goes through nose (nasal airflow).",
+                "association": "Nose; feel it buzz.",
+                "image": "Nose"
+              }
+            ],
+            "feedback": {
+              "exactMatch": {
+                "tts": "Solid. That's /nnn/.",
+                "tts_ssml": "<speak>Solid.<break time=\"200ms\"/> That's /nnn/.</speak>",
+                "xp_earned": 5
+              },
+              "closeMatch": {
+                "tts": "Not enough nose sound. Tongue up, push air through your nose.",
+                "tts_ssml": "<speak>Not enough nose sound.<break time=\"200ms\"/> Tongue up, push air through your nose.</speak>",
+                "allow_retry": true
+              },
+              "wrongSound": {
+                "tts": "That's /m/. N has your tongue up, M has lips closed.",
+                "tts_ssml": "<speak>That's /m/.<break time=\"200ms\"/> N has your tongue up, M has lips closed.</speak>",
+                "allow_retry": true
+              }
+            }
+          }
+        ],
+        "blending_practice": [
+          {
+            "task_id": "lesson_1_mission_1_blend_1",
+            "task_type": "blending_practice",
+            "task_sequence": 7,
+            "word": "sat",
+            "phonemes": ["s", "æ", "t"],
+            "expected_pronunciation": "sat",
+            "expected_ipa": "sæt",
+            "acceptable_variations": ["sət"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Person sitting on a chair",
+            "tts_instruction": "Now we combine! Watch: /s/ /a/ /t/ → sat. Each sound connects smoothly. Your turn—blend it!",
+            "tts_instruction_ssml": "<speak>Now we combine!<break time=\"300ms\"/> Watch:<break time=\"200ms\"/> <phoneme alphabet=\"ipa\" ph=\"s\">/s/</phoneme> <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme> <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme><break time=\"200ms\"/> <say-as interpret-as=\"characters\">s</say-as><break time=\"50ms\"/><say-as interpret-as=\"characters\">a</say-as><break time=\"50ms\"/><say-as interpret-as=\"characters\">t</say-as> → <emphasis>sat</emphasis>.<break time=\"300ms\"/> Each sound connects smoothly.<break time=\"200ms\"/> Your turn—blend it!</speak>",
+            "feedback": {
+              "correct": {
+                "tts": "Correct.",
+                "tts_ssml": "<speak>Correct.</speak>",
+                "xp_earned": 5
+              },
+              "incorrect": {
+                "tts": "Not quite. Sound it out: /s/... /a/... /t/. Blend them.",
+                "tts_ssml": "<speak>Not quite.<break time=\"200ms\"/> Sound it out: /s/... /a/... /t/. Blend them.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_1_blend_2",
+            "task_type": "blending_practice",
+            "task_sequence": 8,
+            "word": "tap",
+            "phonemes": ["t", "æ", "p"],
+            "expected_pronunciation": "tap",
+            "expected_ipa": "tæp",
+            "acceptable_variations": ["təp"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Finger tapping on surface",
+            "tts_instruction": "Now blend: /t/ /a/ /p/ → tap.",
+            "tts_instruction_ssml": "<speak>Now blend:<break time=\"200ms\"/> <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme> <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme> <phoneme alphabet=\"ipa\" ph=\"p\">/p/</phoneme> → <emphasis>tap</emphasis>.</speak>",
+            "feedback": {
+              "correct": {
+                "tts": "Got it.",
+                "tts_ssml": "<speak>Got it.</speak>",
+                "xp_earned": 5
+              },
+              "incorrect": {
+                "tts": "Try again. /t/... /a/... /p/.",
+                "tts_ssml": "<speak>Try again.<break time=\"200ms\"/> /t/... /a/... /p/.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_1_blend_3",
+            "task_type": "blending_practice",
+            "task_sequence": 9,
+            "word": "pin",
+            "phonemes": ["p", "ɪ", "n"],
+            "expected_pronunciation": "pin",
+            "expected_ipa": "pɪn",
+            "acceptable_variations": ["pin"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Safety pin",
+            "tts_instruction": "Blend: /p/ /i/ /n/ → pin.",
+            "tts_instruction_ssml": "<speak>Blend:<break time=\"200ms\"/> <phoneme alphabet=\"ipa\" ph=\"p\">/p/</phoneme> <phoneme alphabet=\"ipa\" ph=\"ɪ\">/i/</phoneme> <phoneme alphabet=\"ipa\" ph=\"n\">/n/</phoneme> → <emphasis>pin</emphasis>.</speak>",
+            "feedback": {
+              "correct": {
+                "tts": "Right.",
+                "tts_ssml": "<speak>Right.</speak>",
+                "xp_earned": 5
+              },
+              "incorrect": {
+                "tts": "Break it down: /p/... /i/... /n/.",
+                "tts_ssml": "<speak>Break it down:<break time=\"200ms\"/> /p/... /i/... /n/.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_1_blend_4",
+            "task_type": "blending_practice",
+            "task_sequence": 10,
+            "word": "nap",
+            "phonemes": ["n", "æ", "p"],
+            "expected_pronunciation": "nap",
+            "expected_ipa": "næp",
+            "acceptable_variations": ["nəp"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Person sleeping with 'ZZZ'",
+            "tts_instruction": "Blend: /n/ /a/ /p/ → nap.",
+            "tts_instruction_ssml": "<speak>Blend:<break time=\"200ms\"/> <phoneme alphabet=\"ipa\" ph=\"n\">/n/</phoneme> <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme> <phoneme alphabet=\"ipa\" ph=\"p\">/p/</phoneme> → <emphasis>nap</emphasis>.</speak>",
+            "feedback": {
+              "correct": {
+                "tts": "Correct.",
+                "tts_ssml": "<speak>Correct.</speak>",
+                "xp_earned": 5
+              },
+              "incorrect": {
+                "tts": "/n/... /a/... /p/. Blend it smooth.",
+                "tts_ssml": "<speak>/n/... /a/... /p/.<break time=\"200ms\"/> Blend it smooth.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_1_blend_5",
+            "task_type": "blending_practice",
+            "task_sequence": 11,
+            "word": "pit",
+            "phonemes": ["p", "ɪ", "t"],
+            "expected_pronunciation": "pit",
+            "expected_ipa": "pɪt",
+            "acceptable_variations": ["pit"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Hole/pit in the ground",
+            "tts_instruction": "Blend: /p/ /i/ /t/ → pit.",
+            "tts_instruction_ssml": "<speak>Blend:<break time=\"200ms\"/> <phoneme alphabet=\"ipa\" ph=\"p\">/p/</phoneme> <phoneme alphabet=\"ipa\" ph=\"ɪ\">/i/</phoneme> <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme> → <emphasis>pit</emphasis>.</speak>",
+            "feedback": {
+              "correct": {
+                "tts": "Yes.",
+                "tts_ssml": "<speak>Yes.</speak>",
+                "xp_earned": 5
+              },
+              "incorrect": {
+                "tts": "Sound it: /p/... /i/... /t/.",
+                "tts_ssml": "<speak>Sound it:<break time=\"200ms\"/> /p/... /i/... /t/.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_1_blend_6",
+            "task_type": "blending_practice",
+            "task_sequence": 12,
+            "word": "tip",
+            "phonemes": ["t", "ɪ", "p"],
+            "expected_pronunciation": "tip",
+            "expected_ipa": "tɪp",
+            "acceptable_variations": ["tip"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Arrow pointing to tip of pencil",
+            "tts_instruction": "Blend: /t/ /i/ /p/ → tip.",
+            "tts_instruction_ssml": "<speak>Blend:<break time=\"200ms\"/> <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme> <phoneme alphabet=\"ipa\" ph=\"ɪ\">/i/</phoneme> <phoneme alphabet=\"ipa\" ph=\"p\">/p/</phoneme> → <emphasis>tip</emphasis>.</speak>",
+            "feedback": {
+              "correct": {
+                "tts": "Good.",
+                "tts_ssml": "<speak>Good.</speak>",
+                "xp_earned": 5
+              },
+              "incorrect": {
+                "tts": "/t/... /i/... /p/. Keep going.",
+                "tts_ssml": "<speak>/t/... /i/... /p/.<break time=\"200ms\"/> Keep going.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_1_blend_7",
+            "task_type": "blending_practice",
+            "task_sequence": 13,
+            "word": "pan",
+            "phonemes": ["p", "æ", "n"],
+            "expected_pronunciation": "pan",
+            "expected_ipa": "pæn",
+            "acceptable_variations": ["pən"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Frying pan",
+            "tts_instruction": "Blend: /p/ /a/ /n/ → pan.",
+            "tts_instruction_ssml": "<speak>Blend:<break time=\"200ms\"/> <phoneme alphabet=\"ipa\" ph=\"p\">/p/</phoneme> <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme> <phoneme alphabet=\"ipa\" ph=\"n\">/n/</phoneme> → <emphasis>pan</emphasis>.</speak>",
+            "feedback": {
+              "correct": {
+                "tts": "Nice.",
+                "tts_ssml": "<speak>Nice.</speak>",
+                "xp_earned": 5
+              },
+              "incorrect": {
+                "tts": "Try: /p/... /a/... /n/.",
+                "tts_ssml": "<speak>Try:<break time=\"200ms\"/> /p/... /a/... /n/.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_1_blend_8",
+            "task_type": "blending_practice",
+            "task_sequence": 14,
+            "word": "sit",
+            "phonemes": ["s", "ɪ", "t"],
+            "expected_pronunciation": "sit",
+            "expected_ipa": "sɪt",
+            "acceptable_variations": ["sit"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Chair with 'sit' sign",
+            "tts_instruction": "Blend: /s/ /i/ /t/ → sit.",
+            "tts_instruction_ssml": "<speak>Blend:<break time=\"200ms\"/> <phoneme alphabet=\"ipa\" ph=\"s\">/s/</phoneme> <phoneme alphabet=\"ipa\" ph=\"ɪ\">/i/</phoneme> <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme> → <emphasis>sit</emphasis>.</speak>",
+            "feedback": {
+              "correct": {
+                "tts": "Correct.",
+                "tts_ssml": "<speak>Correct.</speak>",
+                "xp_earned": 5
+              },
+              "incorrect": {
+                "tts": "Break it down. /s/... /i/... /t/.",
+                "tts_ssml": "<speak>Break it down.<break time=\"200ms\"/> /s/... /i/... /t/.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_1_blend_9",
+            "task_type": "blending_practice",
+            "task_sequence": 15,
+            "word": "tan",
+            "phonemes": ["t", "æ", "n"],
+            "expected_pronunciation": "tan",
+            "expected_ipa": "tæn",
+            "acceptable_variations": ["tən"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Tan/brown color swatch",
+            "tts_instruction": "Blend: /t/ /a/ /n/ → tan.",
+            "tts_instruction_ssml": "<speak>Blend:<break time=\"200ms\"/> <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme> <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme> <phoneme alphabet=\"ipa\" ph=\"n\">/n/</phoneme> → <emphasis>tan</emphasis>.</speak>",
+            "feedback": {
+              "correct": {
+                "tts": "Right.",
+                "tts_ssml": "<speak>Right.</speak>",
+                "xp_earned": 5
+              },
+              "incorrect": {
+                "tts": "/t/... /a/... /n/. Connect them.",
+                "tts_ssml": "<speak>/t/... /a/... /n/.<break time=\"200ms\"/> Connect them.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_1_blend_10",
+            "task_type": "blending_practice",
+            "task_sequence": 16,
+            "word": "sap",
+            "phonemes": ["s", "æ", "p"],
+            "expected_pronunciation": "sap",
+            "expected_ipa": "sæp",
+            "acceptable_variations": ["səp"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Tree sap dripping",
+            "tts_instruction": "Blend: /s/ /a/ /p/ → sap.",
+            "tts_instruction_ssml": "<speak>Blend:<break time=\"200ms\"/> <phoneme alphabet=\"ipa\" ph=\"s\">/s/</phoneme> <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme> <phoneme alphabet=\"ipa\" ph=\"p\">/p/</phoneme> → <emphasis>sap</emphasis>.</speak>",
+            "feedback": {
+              "correct": {
+                "tts": "Got it.",
+                "tts_ssml": "<speak>Got it.</speak>",
+                "xp_earned": 5
+              },
+              "incorrect": {
+                "tts": "One more time: /s/... /a/... /p/.",
+                "tts_ssml": "<speak>One more time:<break time=\"200ms\"/> /s/... /a/... /p/.</speak>",
+                "allow_retry": true
+              }
+            }
+          }
+        ],
+        "word_practice": [],
+        "sentence_practice": []
+      }
+    },
+    {
+      "mission_id": "lesson_1_mission_2",
+      "mission_sequence": 2,
+      "mission_type": "direct_instruction",
+      "mission_name": "Direct Instruction - SATPIN Sounds",
+      "is_required": true,
+      "tasks": {
+        "introduction": {
+          "task_id": "lesson_1_mission_2_intro",
+          "task_type": "introduction",
+          "task_sequence": 0,
+          "requires_interaction": false,
+          "tts_instruction": "Alright, let's get straight to it. Six sounds today. These unlock actual English words you'll see everywhere—texts, signs, homework, all of it. No fluff. Let's go.",
+          "tts_instruction_ssml": "<speak>Alright, let's get straight to it.<break time=\"200ms\"/> Six sounds today.<break time=\"300ms\"/> These unlock actual English words you'll see everywhere—texts, signs, homework, all of it.<break time=\"200ms\"/> No fluff.<break time=\"300ms\"/> Let's go.</speak>",
+          "visual": []
+        },
+        "alphabet_practice": [
+          {
+            "task_id": "lesson_1_mission_2_alphabet_1",
+            "task_type": "alphabet_practice",
+            "task_sequence": 1,
+            "letter": "S",
+            "expected_phoneme": "s",
+            "expected_ipa": "s",
+            "acceptable_variations": ["z"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "tts_instruction": "Letter S makes /sss/. It's all air, no voice. Watch the screen—teeth almost together, tongue stays behind. Listen: /sss/. Say it: /sss/.",
+            "tts_instruction_ssml": "<speak>Letter <say-as interpret-as=\"characters\">S</say-as> makes <phoneme alphabet=\"ipa\" ph=\"s\">/sss/</phoneme>.<break time=\"200ms\"/> It's all air, no voice.<break time=\"200ms\"/> Watch the screen—teeth almost together, tongue stays behind.<break time=\"300ms\"/> Listen: <phoneme alphabet=\"ipa\" ph=\"s\">/sss/</phoneme>.<break time=\"200ms\"/> Say it: <phoneme alphabet=\"ipa\" ph=\"s\">/sss/</phoneme>.</speak>",
+            "visual": [
+              {
+                "word": "S",
+                "mouthCue": "Teeth almost together, tongue stays behind; air flows out.",
+                "association": "Snake sound /sss/."
+              }
+            ],
+            "feedback": {
+              "exactMatch": {
+                "tts": "Perfect. That's exactly /sss/. Locked in.",
+                "tts_ssml": "<speak>Perfect.<break time=\"200ms\"/> That's exactly /sss/. Locked in.</speak>",
+                "xp_earned": 5
+              },
+              "closeMatch": {
+                "tts": "Almost—you're adding voice. It's just air: /sss/, not /zzz/. Watch the animation again.",
+                "tts_ssml": "<speak>Almost—you're adding voice.<break time=\"200ms\"/> It's just air: /sss/, not /zzz/. Watch the animation again.</speak>",
+                "allow_retry": true
+              },
+              "wrongSound": {
+                "tts": "That's not /sss/. Check the screen—teeth together, air only. Try again.",
+                "tts_ssml": "<speak>That's not /sss/.<break time=\"200ms\"/> Check the screen—teeth together, air only.<break time=\"200ms\"/> Try again.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_2_alphabet_2",
+            "task_type": "alphabet_practice",
+            "task_sequence": 2,
+            "letter": "A",
+            "expected_phoneme": "a",
+            "expected_ipa": "æ",
+            "acceptable_variations": ["ə"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "tts_instruction": "Letter A makes /a/. Short and sharp, like when you're surprised. Not 'ay'—just /a/ like 'ant'. Listen: /a/. Say it: /a/.",
+            "tts_instruction_ssml": "<speak>Letter <say-as interpret-as=\"characters\">A</say-as> makes <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme>.<break time=\"200ms\"/> Short and sharp, like when you're surprised.<break time=\"200ms\"/> Not \"ay\"—just <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme> like \"ant\".<break time=\"300ms\"/> Listen: <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme>.<break time=\"200ms\"/> Say it: <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme>.</speak>",
+            "visual": [
+              {
+                "word": "A",
+                "mouthCue": "Mouth open medium-wide, jaw drops slightly, tongue flat and low.",
+                "association": "Apple, ant."
+              }
+            ],
+            "feedback": {
+              "exactMatch": {
+                "tts": "That's it. Perfect /a/.",
+                "tts_ssml": "<speak>That's it.<break time=\"200ms\"/> Perfect /a/.</speak>",
+                "xp_earned": 5
+              },
+              "closeMatch": {
+                "tts": "You're holding it too long. Make it quick: /a/.",
+                "tts_ssml": "<speak>You're holding it too long.<break time=\"200ms\"/> Make it quick: /a/.</speak>",
+                "allow_retry": true
+              },
+              "wrongSound": {
+                "tts": "That's 'ay' like the letter name. We need the short sound: /a/ like 'ant'.",
+                "tts_ssml": "<speak>That's \"ay\" like the letter name.<break time=\"200ms\"/> We need the short sound: /a/ like \"ant\".</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_2_alphabet_3",
+            "task_type": "alphabet_practice",
+            "task_sequence": 3,
+            "letter": "T",
+            "expected_phoneme": "t",
+            "expected_ipa": "t",
+            "acceptable_variations": ["d"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "tts_instruction": "Letter T makes /t/. It's a quick tap—tongue up, then release. No 'tuh' at the end. Just /t/. Listen: /t/. Say it: /t/.",
+            "tts_instruction_ssml": "<speak>Letter <say-as interpret-as=\"characters\">T</say-as> makes <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme>.<break time=\"200ms\"/> It's a quick tap—tongue up, then release.<break time=\"200ms\"/> No \"tuh\" at the end.<break time=\"200ms\"/> Just <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme>.<break time=\"300ms\"/> Listen: <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme>.<break time=\"200ms\"/> Say it: <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme>.</speak>",
+            "visual": [
+              {
+                "word": "T",
+                "mouthCue": "Tongue tip taps roof of mouth just behind teeth, then releases with a small burst of air.",
+                "association": "Timer, tick."
+              }
+            ],
+            "feedback": {
+              "exactMatch": {
+                "tts": "Clean. That's /t/.",
+                "tts_ssml": "<speak>Clean.<break time=\"200ms\"/> That's /t/.</speak>",
+                "xp_earned": 5
+              },
+              "closeMatch": {
+                "tts": "You're saying 'tuh'. Stop before the vowel—just /t/.",
+                "tts_ssml": "<speak>You're saying \"tuh\".<break time=\"200ms\"/> Stop before the vowel—just /t/.</speak>",
+                "allow_retry": true
+              },
+              "wrongSound": {
+                "tts": "Tongue needs to be up. Watch where it touches.",
+                "tts_ssml": "<speak>Tongue needs to be up.<break time=\"200ms\"/> Watch where it touches.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_2_alphabet_4",
+            "task_type": "alphabet_practice",
+            "task_sequence": 4,
+            "letter": "P",
+            "expected_phoneme": "p",
+            "expected_ipa": "p",
+            "acceptable_variations": ["b"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "tts_instruction": "Letter P makes /p/. Lips together, then pop. No voice, just air pressure release. Listen: /p/. Say it: /p/.",
+            "tts_instruction_ssml": "<speak>Letter <say-as interpret-as=\"characters\">P</say-as> makes <phoneme alphabet=\"ipa\" ph=\"p\">/p/</phoneme>.<break time=\"200ms\"/> Lips together, then pop.<break time=\"200ms\"/> No voice, just air pressure release.<break time=\"300ms\"/> Listen: <phoneme alphabet=\"ipa\" ph=\"p\">/p/</phoneme>.<break time=\"200ms\"/> Say it: <phoneme alphabet=\"ipa\" ph=\"p\">/p/</phoneme>.</speak>",
+            "visual": [
+              {
+                "word": "P",
+                "mouthCue": "Lips pressed together, then pop open with air burst; no vocal cord vibration.",
+                "association": "Popcorn popping."
+              }
+            ],
+            "feedback": {
+              "exactMatch": {
+                "tts": "Exact. /p/ locked.",
+                "tts_ssml": "<speak>Exact.<break time=\"200ms\"/> /p/ locked.</speak>",
+                "xp_earned": 5
+              },
+              "closeMatch": {
+                "tts": "Just /p/—don't add 'puh'. Lips pop and stop.",
+                "tts_ssml": "<speak>Just /p/—don't add \"puh\".<break time=\"200ms\"/> Lips pop and then stop.</speak>",
+                "allow_retry": true
+              },
+              "wrongSound": {
+                "tts": "That's /b/. P has no voice—just air.",
+                "tts_ssml": "<speak>That's /b/.<break time=\"200ms\"/> P has no voice—just air.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_2_alphabet_5",
+            "task_type": "alphabet_practice",
+            "task_sequence": 5,
+            "letter": "I",
+            "expected_phoneme": "i",
+            "expected_ipa": "ɪ",
+            "acceptable_variations": ["i", "e"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "tts_instruction": "Letter I makes /i/. Quick, tight sound. Not 'eye'—just /i/ like 'it'. Listen: /i/. Say it: /i/.",
+            "tts_instruction_ssml": "<speak>Letter <say-as interpret-as=\"characters\">I</say-as> makes <phoneme alphabet=\"ipa\" ph=\"ɪ\">/i/</phoneme>.<break time=\"200ms\"/> Quick, tight sound.<break time=\"200ms\"/> Not \"eye\"—just <phoneme alphabet=\"ipa\" ph=\"ɪ\">/i/</phoneme> like \"it\".<break time=\"300ms\"/> Listen: <phoneme alphabet=\"ipa\" ph=\"ɪ\">/i/</phoneme>.<break time=\"200ms\"/> Say it: <phoneme alphabet=\"ipa\" ph=\"ɪ\">/i/</phoneme>.</speak>",
+            "visual": [
+              {
+                "word": "I",
+                "mouthCue": "Mouth slightly open, tongue high in the middle, short duration.",
+                "association": "Insect."
+              }
+            ],
+            "feedback": {
+              "exactMatch": {
+                "tts": "Perfect /i/.",
+                "tts_ssml": "<speak>Perfect /i/.</speak>",
+                "xp_earned": 5
+              },
+              "closeMatch": {
+                "tts": "Tighter. Make it quick: /i/.",
+                "tts_ssml": "<speak>Tighter.<break time=\"200ms\"/> Make it quick: /i/.</speak>",
+                "allow_retry": true
+              },
+              "wrongSound": {
+                "tts": "That's 'ee' or 'eye'. We need short /i/ like 'sit'.",
+                "tts_ssml": "<speak>That's \"ee\" or \"eye\".<break time=\"200ms\"/> We need short /i/ like \"sit\".</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_2_alphabet_6",
+            "task_type": "alphabet_practice",
+            "task_sequence": 6,
+            "letter": "N",
+            "expected_phoneme": "n",
+            "expected_ipa": "n",
+            "acceptable_variations": ["m"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "tts_instruction": "Letter N makes /nnn/. Tongue up, sound comes through your nose. Feel the buzz in your nose? That's it. Listen: /nnn/. Say it: /nnn/.",
+            "tts_instruction_ssml": "<speak>Letter <say-as interpret-as=\"characters\">N</say-as> makes <phoneme alphabet=\"ipa\" ph=\"n\">/nnn/</phoneme>.<break time=\"200ms\"/> Tongue up, sound comes through your nose.<break time=\"200ms\"/> Feel the buzz in your nose? That's it.<break time=\"300ms\"/> Listen: <phoneme alphabet=\"ipa\" ph=\"n\">/nnn/</phoneme>.<break time=\"200ms\"/> Say it: <phoneme alphabet=\"ipa\" ph=\"n\">/nnn/</phoneme>.</speak>",
+            "visual": [
+              {
+                "word": "N",
+                "mouthCue": "Tongue tip touches roof of mouth, air goes through nose (nasal airflow).",
+                "association": "Nose; feel the nasal buzz."
+              }
+            ],
+            "feedback": {
+              "exactMatch": {
+                "tts": "Solid. That's /nnn/.",
+                "tts_ssml": "<speak>Solid.<break time=\"200ms\"/> That's /nnn/.</speak>",
+                "xp_earned": 5
+              },
+              "closeMatch": {
+                "tts": "Not enough nose sound. Tongue up, push air through your nose.",
+                "tts_ssml": "<speak>Not enough nose sound.<break time=\"200ms\"/> Tongue up, push air through your nose.</speak>",
+                "allow_retry": true
+              },
+              "wrongSound": {
+                "tts": "That's /m/. N has your tongue up, M has lips closed.",
+                "tts_ssml": "<speak>That's /m/.<break time=\"200ms\"/> N has your tongue up, M has lips closed.</speak>",
+                "allow_retry": true
+              }
+            }
+          }
+        ],
+        "blending_practice": [
+          {
+            "task_id": "lesson_1_mission_2_blend_1",
+            "task_type": "blending_practice",
+            "task_sequence": 7,
+            "word": "sat",
+            "phonemes": ["s", "æ", "t"],
+            "expected_pronunciation": "sat",
+            "expected_ipa": "sæt",
+            "acceptable_variations": ["sət"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Person sitting on a chair",
+            "tts_instruction": "Now we put sounds together. Watch: /s/ /a/ /t/ → sat. Each sound connects smoothly. Your turn—blend it!",
+            "tts_instruction_ssml": "<speak>Now we put sounds together.<break time=\"300ms\"/> Watch:<break time=\"200ms\"/> <phoneme alphabet=\"ipa\" ph=\"s\">/s/</phoneme> <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme> <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme><break time=\"200ms\"/> <say-as interpret-as=\"characters\">s</say-as><break time=\"50ms\"/><say-as interpret-as=\"characters\">a</say-as><break time=\"50ms\"/><say-as interpret-as=\"characters\">t</say-as> → <emphasis>sat</emphasis>.<break time=\"300ms\"/> Each sound connects smoothly.<break time=\"200ms\"/> Your turn—blend it!</speak>",
+            "feedback": {
+              "correct": {
+                "tts": "Correct.",
+                "tts_ssml": "<speak>Correct.</speak>",
+                "xp_earned": 5
+              },
+              "incorrect": {
+                "tts": "Not quite. Sound it out: /s/... /a/... /t/. Blend them.",
+                "tts_ssml": "<speak>Not quite.<break time=\"200ms\"/> Sound it out: /s/... /a/... /t/. Blend them.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_2_blend_2",
+            "task_type": "blending_practice",
+            "task_sequence": 8,
+            "word": "tap",
+            "phonemes": ["t", "æ", "p"],
+            "expected_pronunciation": "tap",
+            "expected_ipa": "tæp",
+            "acceptable_variations": ["təp"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Finger tapping on surface",
+            "tts_instruction": "Blend: /t/ /a/ /p/ → tap.",
+            "tts_instruction_ssml": "<speak>Blend:<break time=\"200ms\"/> <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme> <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme> <phoneme alphabet=\"ipa\" ph=\"p\">/p/</phoneme> → <emphasis>tap</emphasis>.</speak>",
+            "feedback": {
+              "correct": {
+                "tts": "Got it.",
+                "tts_ssml": "<speak>Got it.</speak>",
+                "xp_earned": 5
+              },
+              "incorrect": {
+                "tts": "Try again. /t/... /a/... /p/.",
+                "tts_ssml": "<speak>Try again.<break time=\"200ms\"/> /t/... /a/... /p/.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_2_blend_3",
+            "task_type": "blending_practice",
+            "task_sequence": 9,
+            "word": "pin",
+            "phonemes": ["p", "ɪ", "n"],
+            "expected_pronunciation": "pin",
+            "expected_ipa": "pɪn",
+            "acceptable_variations": ["pin"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Safety pin",
+            "tts_instruction": "Blend: /p/ /i/ /n/ → pin.",
+            "tts_instruction_ssml": "<speak>Blend:<break time=\"200ms\"/> <phoneme alphabet=\"ipa\" ph=\"p\">/p/</phoneme> <phoneme alphabet=\"ipa\" ph=\"ɪ\">/i/</phoneme> <phoneme alphabet=\"ipa\" ph=\"n\">/n/</phoneme> → <emphasis>pin</emphasis>.</speak>",
+            "feedback": {
+              "correct": {
+                "tts": "Right.",
+                "tts_ssml": "<speak>Right.</speak>",
+                "xp_earned": 5
+              },
+              "incorrect": {
+                "tts": "Break it down: /p/... /i/... /n/.",
+                "tts_ssml": "<speak>Break it down:<break time=\"200ms\"/> /p/... /i/... /n/.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_2_blend_4",
+            "task_type": "blending_practice",
+            "task_sequence": 10,
+            "word": "nap",
+            "phonemes": ["n", "æ", "p"],
+            "expected_pronunciation": "nap",
+            "expected_ipa": "næp",
+            "acceptable_variations": ["nəp"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Person sleeping with 'ZZZ'",
+            "tts_instruction": "Blend: /n/ /a/ /p/ → nap.",
+            "tts_instruction_ssml": "<speak>Blend:<break time=\"200ms\"/> <phoneme alphabet=\"ipa\" ph=\"n\">/n/</phoneme> <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme> <phoneme alphabet=\"ipa\" ph=\"p\">/p/</phoneme> → <emphasis>nap</emphasis>.</speak>",
+            "feedback": {
+              "correct": {
+                "tts": "Correct.",
+                "tts_ssml": "<speak>Correct.</speak>",
+                "xp_earned": 5
+              },
+              "incorrect": {
+                "tts": "/n/... /a/... /p/. Blend it smooth.",
+                "tts_ssml": "<speak>/n/... /a/... /p/.<break time=\"200ms\"/> Blend it smooth.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_2_blend_5",
+            "task_type": "blending_practice",
+            "task_sequence": 11,
+            "word": "pit",
+            "phonemes": ["p", "ɪ", "t"],
+            "expected_pronunciation": "pit",
+            "expected_ipa": "pɪt",
+            "acceptable_variations": ["pit"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Hole/pit in the ground",
+            "tts_instruction": "Blend: /p/ /i/ /t/ → pit.",
+            "tts_instruction_ssml": "<speak>Blend:<break time=\"200ms\"/> <phoneme alphabet=\"ipa\" ph=\"p\">/p/</phoneme> <phoneme alphabet=\"ipa\" ph=\"ɪ\">/i/</phoneme> <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme> → <emphasis>pit</emphasis>.</speak>",
+            "feedback": {
+              "correct": {
+                "tts": "Yes.",
+                "tts_ssml": "<speak>Yes.</speak>",
+                "xp_earned": 5
+              },
+              "incorrect": {
+                "tts": "Sound it: /p/... /i/... /t/.",
+                "tts_ssml": "<speak>Sound it:<break time=\"200ms\"/> /p/... /i/... /t/.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_2_blend_6",
+            "task_type": "blending_practice",
+            "task_sequence": 12,
+            "word": "tip",
+            "phonemes": ["t", "ɪ", "p"],
+            "expected_pronunciation": "tip",
+            "expected_ipa": "tɪp",
+            "acceptable_variations": ["tip"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Arrow pointing to tip of pencil",
+            "tts_instruction": "Blend: /t/ /i/ /p/ → tip.",
+            "tts_instruction_ssml": "<speak>Blend:<break time=\"200ms\"/> <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme> <phoneme alphabet=\"ipa\" ph=\"ɪ\">/i/</phoneme> <phoneme alphabet=\"ipa\" ph=\"p\">/p/</phoneme> → <emphasis>tip</emphasis>.</speak>",
+            "feedback": {
+              "correct": {
+                "tts": "Good.",
+                "tts_ssml": "<speak>Good.</speak>",
+                "xp_earned": 5
+              },
+              "incorrect": {
+                "tts": "/t/... /i/... /p/. Keep going.",
+                "tts_ssml": "<speak>/t/... /i/... /p/.<break time=\"200ms\"/> Keep going.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_2_blend_7",
+            "task_type": "blending_practice",
+            "task_sequence": 13,
+            "word": "pan",
+            "phonemes": ["p", "æ", "n"],
+            "expected_pronunciation": "pan",
+            "expected_ipa": "pæn",
+            "acceptable_variations": ["pən"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Frying pan",
+            "tts_instruction": "Blend: /p/ /a/ /n/ → pan.",
+            "tts_instruction_ssml": "<speak>Blend:<break time=\"200ms\"/> <phoneme alphabet=\"ipa\" ph=\"p\">/p/</phoneme> <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme> <phoneme alphabet=\"ipa\" ph=\"n\">/n/</phoneme> → <emphasis>pan</emphasis>.</speak>",
+            "feedback": {
+              "correct": {
+                "tts": "Nice.",
+                "tts_ssml": "<speak>Nice.</speak>",
+                "xp_earned": 5
+              },
+              "incorrect": {
+                "tts": "Try: /p/... /a/... /n/.",
+                "tts_ssml": "<speak>Try:<break time=\"200ms\"/> /p/... /a/... /n/.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_2_blend_8",
+            "task_type": "blending_practice",
+            "task_sequence": 14,
+            "word": "sit",
+            "phonemes": ["s", "ɪ", "t"],
+            "expected_pronunciation": "sit",
+            "expected_ipa": "sɪt",
+            "acceptable_variations": ["sit"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Chair with 'sit' sign",
+            "tts_instruction": "Blend: /s/ /i/ /t/ → sit.",
+            "tts_instruction_ssml": "<speak>Blend:<break time=\"200ms\"/> <phoneme alphabet=\"ipa\" ph=\"s\">/s/</phoneme> <phoneme alphabet=\"ipa\" ph=\"ɪ\">/i/</phoneme> <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme> → <emphasis>sit</emphasis>.</speak>",
+            "feedback": {
+              "correct": {
+                "tts": "Correct.",
+                "tts_ssml": "<speak>Correct.</speak>",
+                "xp_earned": 5
+              },
+              "incorrect": {
+                "tts": "Break it down. /s/... /i/... /t/.",
+                "tts_ssml": "<speak>Break it down.<break time=\"200ms\"/> /s/... /i/... /t/.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_2_blend_9",
+            "task_type": "blending_practice",
+            "task_sequence": 15,
+            "word": "tan",
+            "phonemes": ["t", "æ", "n"],
+            "expected_pronunciation": "tan",
+            "expected_ipa": "tæn",
+            "acceptable_variations": ["tən"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Tan/brown color swatch",
+            "tts_instruction": "Blend: /t/ /a/ /n/ → tan.",
+            "tts_instruction_ssml": "<speak>Blend:<break time=\"200ms\"/> <phoneme alphabet=\"ipa\" ph=\"t\">/t/</phoneme> <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme> <phoneme alphabet=\"ipa\" ph=\"n\">/n/</phoneme> → <emphasis>tan</emphasis>.</speak>",
+            "feedback": {
+              "correct": {
+                "tts": "Right.",
+                "tts_ssml": "<speak>Right.</speak>",
+                "xp_earned": 5
+              },
+              "incorrect": {
+                "tts": "/t/... /a/... /n/. Connect them.",
+                "tts_ssml": "<speak>/t/... /a/... /n/.<break time=\"200ms\"/> Connect them.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_2_blend_10",
+            "task_type": "blending_practice",
+            "task_sequence": 16,
+            "word": "sap",
+            "phonemes": ["s", "æ", "p"],
+            "expected_pronunciation": "sap",
+            "expected_ipa": "sæp",
+            "acceptable_variations": ["səp"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Tree sap dripping",
+            "tts_instruction": "Blend: /s/ /a/ /p/ → sap.",
+            "tts_instruction_ssml": "<speak>Blend:<break time=\"200ms\"/> <phoneme alphabet=\"ipa\" ph=\"s\">/s/</phoneme> <phoneme alphabet=\"ipa\" ph=\"æ\">/a/</phoneme> <phoneme alphabet=\"ipa\" ph=\"p\">/p/</phoneme> → <emphasis>sap</emphasis>.</speak>",
+            "feedback": {
+              "correct": {
+                "tts": "Got it.",
+                "tts_ssml": "<speak>Got it.</speak>",
+                "xp_earned": 5
+              },
+              "incorrect": {
+                "tts": "One more time: /s/... /a/... /p/.",
+                "tts_ssml": "<speak>One more time:<break time=\"200ms\"/> /s/... /a/... /p/.</speak>",
+                "allow_retry": true
+              }
+            }
+          }
+        ],
+        "word_practice": [],
+        "sentence_practice": []
+      }
+    },
+    {
+      "mission_id": "lesson_1_mission_3",
+      "mission_sequence": 3,
+      "mission_type": "mastery_check",
+      "mission_name": "Assessment - Mastery Check",
+      "is_required": true,
+      "tasks": {
+        "introduction": {
+          "task_id": "lesson_1_mission_3_intro",
+          "task_type": "introduction",
+          "task_sequence": 0,
+          "requires_interaction": false,
+          "tts_instruction": "Now let's check what stuck. You'll read words built from S, A, T, P, I, N. Aim for at least eight out of ten to hit mastery.",
+          "tts_instruction_ssml": "<speak>Now let's check what stuck.<break time=\"200ms\"/> You'll read words built from <say-as interpret-as=\"characters\">S A T P I N</say-as>.<break time=\"300ms\"/> Aim for at least eight out of ten to hit mastery.</speak>",
+          "visual": []
+        },
+        "mastery_check": [
+          {
+            "task_id": "lesson_1_mission_3_mastery_1",
+            "task_type": "mastery_check",
+            "task_sequence": 1,
+            "word": "sat",
+            "phonemes": ["s", "æ", "t"],
+            "expected_pronunciation": "sat",
+            "expected_ipa": "sæt",
+            "acceptable_variations": ["sət"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Person sitting on a chair",
+            "tts_instruction": "Read this word: sat",
+            "tts_instruction_ssml": "<speak>Read this word: <emphasis>sat</emphasis>.</speak>",
+            "feedback": {
+              "positive": {
+                "tts": "You've got it. That's mastery starting to show.",
+                "tts_ssml": "<speak>You've got it.<break time=\"200ms\"/> That's mastery starting to show.</speak>",
+                "xp_earned": 5
+              },
+              "negative": {
+                "tts": "Sound it out: /s/... /a/... /t/.",
+                "tts_ssml": "<speak>Sound it out:<break time=\"200ms\"/> /s/... /a/... /t/.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_3_mastery_2",
+            "task_type": "mastery_check",
+            "task_sequence": 2,
+            "word": "tap",
+            "phonemes": ["t", "æ", "p"],
+            "expected_pronunciation": "tap",
+            "expected_ipa": "tæp",
+            "acceptable_variations": ["təp"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Finger tapping",
+            "tts_instruction": "Read this word: tap",
+            "tts_instruction_ssml": "<speak>Read this word: <emphasis>tap</emphasis>.</speak>",
+            "feedback": {
+              "positive": {
+                "tts": "Nice blend.",
+                "tts_ssml": "<speak>Nice blend.</speak>",
+                "xp_earned": 5
+              },
+              "negative": {
+                "tts": "Try again: /t/... /a/... /p/.",
+                "tts_ssml": "<speak>Try again:<break time=\"200ms\"/> /t/... /a/... /p/.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_3_mastery_3",
+            "task_type": "mastery_check",
+            "task_sequence": 3,
+            "word": "pin",
+            "phonemes": ["p", "ɪ", "n"],
+            "expected_pronunciation": "pin",
+            "expected_ipa": "pɪn",
+            "acceptable_variations": ["pin"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Safety pin",
+            "tts_instruction": "Read this word: pin",
+            "tts_instruction_ssml": "<speak>Read this word: <emphasis>pin</emphasis>.</speak>",
+            "feedback": {
+              "positive": {
+                "tts": "Right on.",
+                "tts_ssml": "<speak>Right on.</speak>",
+                "xp_earned": 5
+              },
+              "negative": {
+                "tts": "Break it down: /p/... /i/... /n/.",
+                "tts_ssml": "<speak>Break it down:<break time=\"200ms\"/> /p/... /i/... /n/.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_3_mastery_4",
+            "task_type": "mastery_check",
+            "task_sequence": 4,
+            "word": "nap",
+            "phonemes": ["n", "æ", "p"],
+            "expected_pronunciation": "nap",
+            "expected_ipa": "næp",
+            "acceptable_variations": ["nəp"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Person sleeping",
+            "tts_instruction": "Read this word: nap",
+            "tts_instruction_ssml": "<speak>Read this word: <emphasis>nap</emphasis>.</speak>",
+            "feedback": {
+              "positive": {
+                "tts": "Correct.",
+                "tts_ssml": "<speak>Correct.</speak>",
+                "xp_earned": 5
+              },
+              "negative": {
+                "tts": "/n/... /a/... /p/.",
+                "tts_ssml": "<speak>/n/... /a/... /p/.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_3_mastery_5",
+            "task_type": "mastery_check",
+            "task_sequence": 5,
+            "word": "pit",
+            "phonemes": ["p", "ɪ", "t"],
+            "expected_pronunciation": "pit",
+            "expected_ipa": "pɪt",
+            "acceptable_variations": ["pit"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Hole in the ground",
+            "tts_instruction": "Read this word: pit",
+            "tts_instruction_ssml": "<speak>Read this word: <emphasis>pit</emphasis>.</speak>",
+            "feedback": {
+              "positive": {
+                "tts": "Yes.",
+                "tts_ssml": "<speak>Yes.</speak>",
+                "xp_earned": 5
+              },
+              "negative": {
+                "tts": "/p/... /i/... /t/.",
+                "tts_ssml": "<speak>/p/... /i/... /t/.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_3_mastery_6",
+            "task_type": "mastery_check",
+            "task_sequence": 6,
+            "word": "tip",
+            "phonemes": ["t", "ɪ", "p"],
+            "expected_pronunciation": "tip",
+            "expected_ipa": "tɪp",
+            "acceptable_variations": ["tip"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Tip of a pencil",
+            "tts_instruction": "Read this word: tip",
+            "tts_instruction_ssml": "<speak>Read this word: <emphasis>tip</emphasis>.</speak>",
+            "feedback": {
+              "positive": {
+                "tts": "Good.",
+                "tts_ssml": "<speak>Good.</speak>",
+                "xp_earned": 5
+              },
+              "negative": {
+                "tts": "/t/... /i/... /p/.",
+                "tts_ssml": "<speak>/t/... /i/... /p/.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_3_mastery_7",
+            "task_type": "mastery_check",
+            "task_sequence": 7,
+            "word": "pan",
+            "phonemes": ["p", "æ", "n"],
+            "expected_pronunciation": "pan",
+            "expected_ipa": "pæn",
+            "acceptable_variations": ["pən"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Frying pan",
+            "tts_instruction": "Read this word: pan",
+            "tts_instruction_ssml": "<speak>Read this word: <emphasis>pan</emphasis>.</speak>",
+            "feedback": {
+              "positive": {
+                "tts": "Nice.",
+                "tts_ssml": "<speak>Nice.</speak>",
+                "xp_earned": 5
+              },
+              "negative": {
+                "tts": "/p/... /a/... /n/.",
+                "tts_ssml": "<speak>/p/... /a/... /n/.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_3_mastery_8",
+            "task_type": "mastery_check",
+            "task_sequence": 8,
+            "word": "sit",
+            "phonemes": ["s", "ɪ", "t"],
+            "expected_pronunciation": "sit",
+            "expected_ipa": "sɪt",
+            "acceptable_variations": ["sit"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Chair with 'sit' sign",
+            "tts_instruction": "Read this word: sit",
+            "tts_instruction_ssml": "<speak>Read this word: <emphasis>sit</emphasis>.</speak>",
+            "feedback": {
+              "positive": {
+                "tts": "Correct.",
+                "tts_ssml": "<speak>Correct.</speak>",
+                "xp_earned": 5
+              },
+              "negative": {
+                "tts": "/s/... /i/... /t/.",
+                "tts_ssml": "<speak>/s/... /i/... /t/.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_3_mastery_9",
+            "task_type": "mastery_check",
+            "task_sequence": 9,
+            "word": "tan",
+            "phonemes": ["t", "æ", "n"],
+            "expected_pronunciation": "tan",
+            "expected_ipa": "tæn",
+            "acceptable_variations": ["tən"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Tan color swatch",
+            "tts_instruction": "Read this word: tan",
+            "tts_instruction_ssml": "<speak>Read this word: <emphasis>tan</emphasis>.</speak>",
+            "feedback": {
+              "positive": {
+                "tts": "Right.",
+                "tts_ssml": "<speak>Right.</speak>",
+                "xp_earned": 5
+              },
+              "negative": {
+                "tts": "/t/... /a/... /n/.",
+                "tts_ssml": "<speak>/t/... /a/... /n/.</speak>",
+                "allow_retry": true
+              }
+            }
+          },
+          {
+            "task_id": "lesson_1_mission_3_mastery_10",
+            "task_type": "mastery_check",
+            "task_sequence": 10,
+            "word": "sap",
+            "phonemes": ["s", "æ", "p"],
+            "expected_pronunciation": "sap",
+            "expected_ipa": "sæp",
+            "acceptable_variations": ["səp"],
+            "min_score_to_pass": 80,
+            "max_attempts": 3,
+            "image": "Tree sap",
+            "tts_instruction": "Read this word: sap",
+            "tts_instruction_ssml": "<speak>Read this word: <emphasis>sap</emphasis>.</speak>",
+            "feedback": {
+              "positive": {
+                "tts": "Got it.",
+                "tts_ssml": "<speak>Got it.</speak>",
+                "xp_earned": 5
+              },
+              "negative": {
+                "tts": "/s/... /a/... /p/.",
+                "tts_ssml": "<speak>/s/... /a/... /p/.</speak>",
+                "allow_retry": true
+              }
+            }
+          }
+        ],
+        "results": {
+          "mastery_threshold": 80,
+          "min_correct_for_mastery": 8,
+          "feedback": {
+            "tts_8_10_correct": "You've got it. That's mastery—8 out of 10 or better. Moving forward.",
+            "tts_8_10_correct_ssml": "<speak>You've got it.<break time=\"200ms\"/> That's mastery—eight out of ten or better.<break time=\"200ms\"/> Moving forward.</speak>",
+            "tts_5_7_correct": "You're close—got {obtained_correct}/10. Let's drill the ones you missed, then retry.",
+            "tts_5_7_correct_ssml": "<speak>You're close—got {obtained_correct} out of ten.<break time=\"200ms\"/> Let's drill the ones you missed, then retry.</speak>",
+            "tts_1_5_correct": "Not quite there yet. We're going to break this down more. Sound-by-sound practice coming up.",
+            "tts_1_5_correct_ssml": "<speak>Not quite there yet.<break time=\"200ms\"/> We're going to break this down more.<break time=\"200ms\"/> Sound-by-sound practice coming up.</speak>"
+          }
+        }
+      }
+    },
+    {
+      "mission_id": "lesson_1_mission_4",
+      "mission_sequence": 4,
+      "mission_type": "wrap",
+      "mission_name": "Lesson Wrap",
+      "is_required": true,
+      "tasks": {
+        "summary": {
+          "task_id": "lesson_1_mission_4_summary",
+          "task_type": "summary",
+          "task_sequence": 0,
+          "requires_interaction": false,
+          "tts_instruction": "Done. You learned six sounds: S, A, T, P, I, N. With just these six, you can read actual English words. That's not kids' stuff—that's functional literacy building. Next session, we add four more sounds, and your word count explodes. English has about 44 sounds total. You just learned 6. By the end of next lesson, you'll have 10. That's almost 25% of English phonics in two sessions. Stay sharp.",
+          "tts_instruction_ssml": "<speak>Done.<break time=\"200ms\"/> You learned six sounds: <say-as interpret-as=\"characters\">S, A, T, P, I, N</say-as>.<break time=\"300ms\"/> With just these six, you can read actual English words.<break time=\"200ms\"/> That's not kids' stuff—that's functional literacy building.<break time=\"400ms\"/> Next session, we add four more sounds, and your word count explodes.<break time=\"300ms\"/> English has about forty-four sounds total.<break time=\"200ms\"/> You just learned six.<break time=\"300ms\"/> By the end of next lesson, you'll have ten.<break time=\"200ms\"/> That's almost twenty-five percent of English phonics in two sessions.<break time=\"300ms\"/> Stay sharp.</speak>",
+          "visual": [
+            {
+              "progressBar": "6/44 sounds learned",
+              "sessionStats": {
+                "soundsMastered": 6,
+                "totalSounds": 6,
+                "wordsRead": 10,
+                "masteryThreshold": 80,
+                "xpEarned": 110
+              },
+              "nextUnlock": "MDGO sounds"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

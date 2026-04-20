@@ -1,0 +1,707 @@
+{
+    "success": true,
+    "data": {
+        "id": "561c9e3c-6645-402c-9e58-912ac5bc1633",
+        "title": "MDGO Power-Up",
+        "skillFocus": [
+            "M",
+            "D",
+            "G",
+            "O"
+        ],
+        "preview": null,
+        "lessonType": null,
+        "status": "available",
+        "badge": null,
+        "estimatedTime": null,
+        "xpReward": 120,
+        "prerequisiteLessons": null,
+        "resources": null,
+        "hints": null,
+        "lessonOrder": 2,
+        "content": {
+            "missions": [
+                {
+                    "tasks": {
+                        "word_practice": [],
+                        "alphabet_practice": [
+                            {
+                                "xp": 5,
+                                "letter": "S",
+                                "visual": [
+                                    {
+                                        "image": "Mouth animation with air only",
+                                        "prompt": "System Check - S",
+                                        "mouthCue": "Air only, teeth nearly together.",
+                                        "association": "Clean air signal for /sss/."
+                                    }
+                                ],
+                                "task_id": "1",
+                                "tts_ss1": "Say the sound for S. No letter name. Just the sound: /sss/.",
+                                "feedback": {
+                                    "tts_closeMatch": "That's not it. Just air: /sss/. Try again.",
+                                    "tts_exactMatch": "Signal clear.",
+                                    "tts_wrongSound": "That's not it. Just air: /sss/. Try again.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">That's not it.<break time=\"180ms\"/> Just air: <phoneme alphabet=\"ipa\" ph=\"s\">sss</phoneme>.<break time=\"180ms\"/> Try again.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Signal clear.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">That's not it.<break time=\"180ms\"/> Just air: <phoneme alphabet=\"ipa\" ph=\"s\">sss</phoneme>.<break time=\"180ms\"/> Try again.</voice></speak>"
+                                },
+                                "tts_ss1_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say the sound for <say-as interpret-as=\"characters\">S</say-as>.<break time=\"180ms\"/> No letter name.<break time=\"180ms\"/> Just the sound: <phoneme alphabet=\"ipa\" ph=\"s\">sss</phoneme>.</voice></speak>"
+                            },
+                            {
+                                "xp": 5,
+                                "letter": "A",
+                                "visual": [
+                                    {
+                                        "image": "Short vowel jaw drop",
+                                        "prompt": "System Check - A",
+                                        "mouthCue": "Short vowel with a quick jaw drop.",
+                                        "association": "Fast short vowel sound."
+                                    }
+                                ],
+                                "task_id": "2",
+                                "tts_ss1": "Say the sound for A. Keep it short: /a/.",
+                                "feedback": {
+                                    "tts_closeMatch": "That was too long. Keep it quick: /a/.",
+                                    "tts_exactMatch": "Short and sharp. Good.",
+                                    "tts_wrongSound": "That was too long. Keep it quick: /a/.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">That was too long.<break time=\"180ms\"/> Keep it quick: <phoneme alphabet=\"ipa\" ph=\"æ\">a</phoneme>.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Short and sharp. Good.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">That was too long.<break time=\"180ms\"/> Keep it quick: <phoneme alphabet=\"ipa\" ph=\"æ\">a</phoneme>.</voice></speak>"
+                                },
+                                "tts_ss1_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say the sound for <say-as interpret-as=\"characters\">A</say-as>.<break time=\"180ms\"/> Keep it short: <phoneme alphabet=\"ipa\" ph=\"æ\">a</phoneme>.</voice></speak>"
+                            },
+                            {
+                                "xp": 5,
+                                "letter": "T",
+                                "visual": [
+                                    {
+                                        "image": "Tongue tap",
+                                        "prompt": "System Check - T",
+                                        "mouthCue": "Quick tongue tap behind the teeth.",
+                                        "association": "Fast tap with no added vowel."
+                                    }
+                                ],
+                                "task_id": "3",
+                                "tts_ss1": "Say the sound for T. Stop clean: /t/.",
+                                "feedback": {
+                                    "tts_closeMatch": "Stop before the vowel. Just /t/.",
+                                    "tts_exactMatch": "Clean tap.",
+                                    "tts_wrongSound": "Stop before the vowel. Just /t/.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Stop before the vowel.<break time=\"180ms\"/> Just <phoneme alphabet=\"ipa\" ph=\"t\">t</phoneme>.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Clean tap.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Stop before the vowel.<break time=\"180ms\"/> Just <phoneme alphabet=\"ipa\" ph=\"t\">t</phoneme>.</voice></speak>"
+                                },
+                                "tts_ss1_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say the sound for <say-as interpret-as=\"characters\">T</say-as>.<break time=\"180ms\"/> Stop clean: <phoneme alphabet=\"ipa\" ph=\"t\">t</phoneme>.</voice></speak>"
+                            },
+                            {
+                                "xp": 5,
+                                "letter": "P",
+                                "visual": [
+                                    {
+                                        "image": "Lip pop",
+                                        "prompt": "System Check - P",
+                                        "mouthCue": "Lips pop open with air only.",
+                                        "association": "Unvoiced lip pop."
+                                    }
+                                ],
+                                "task_id": "4",
+                                "tts_ss1": "Say the sound for P. Air pop only: /p/.",
+                                "feedback": {
+                                    "tts_closeMatch": "That was voiced. Try again: no voice.",
+                                    "tts_exactMatch": "Air pop confirmed.",
+                                    "tts_wrongSound": "That was voiced. Try again: no voice.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">That was voiced.<break time=\"180ms\"/> Try again: no voice.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Air pop confirmed.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">That was voiced.<break time=\"180ms\"/> Try again: no voice.</voice></speak>"
+                                },
+                                "tts_ss1_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say the sound for <say-as interpret-as=\"characters\">P</say-as>.<break time=\"180ms\"/> Air pop only: <phoneme alphabet=\"ipa\" ph=\"p\">p</phoneme>.</voice></speak>"
+                            },
+                            {
+                                "xp": 5,
+                                "letter": "I",
+                                "visual": [
+                                    {
+                                        "image": "Tight short vowel",
+                                        "prompt": "System Check - I",
+                                        "mouthCue": "Tight short vowel, quick release.",
+                                        "association": "Short vowel like sit."
+                                    }
+                                ],
+                                "task_id": "5",
+                                "tts_ss1": "Say the sound for I. Keep it short: /i/ like sit.",
+                                "feedback": {
+                                    "tts_closeMatch": "Too long. Short /i/ like sit.",
+                                    "tts_exactMatch": "Correct.",
+                                    "tts_wrongSound": "Too long. Short /i/ like sit.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Too long.<break time=\"180ms\"/> Short <phoneme alphabet=\"ipa\" ph=\"ɪ\">i</phoneme> like <emphasis>sit</emphasis>.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Too long.<break time=\"180ms\"/> Short <phoneme alphabet=\"ipa\" ph=\"ɪ\">i</phoneme> like <emphasis>sit</emphasis>.</voice></speak>"
+                                },
+                                "tts_ss1_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say the sound for <say-as interpret-as=\"characters\">I</say-as>.<break time=\"180ms\"/> Keep it short: <phoneme alphabet=\"ipa\" ph=\"ɪ\">i</phoneme> like <emphasis>sit</emphasis>.</voice></speak>"
+                            },
+                            {
+                                "xp": 5,
+                                "letter": "N",
+                                "visual": [
+                                    {
+                                        "image": "Nasal airflow",
+                                        "prompt": "System Check - N",
+                                        "mouthCue": "Tongue up with nasal airflow.",
+                                        "association": "Nasal signal through the nose."
+                                    }
+                                ],
+                                "task_id": "6",
+                                "tts_ss1": "Say the sound for N. Use your nose: /n/.",
+                                "feedback": {
+                                    "tts_closeMatch": "Use your nose. Tongue up.",
+                                    "tts_exactMatch": "Nasal signal detected.",
+                                    "tts_wrongSound": "Use your nose. Tongue up.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Use your nose.<break time=\"180ms\"/> Tongue up.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Nasal signal detected.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Use your nose.<break time=\"180ms\"/> Tongue up.</voice></speak>"
+                                },
+                                "tts_ss1_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say the sound for <say-as interpret-as=\"characters\">N</say-as>.<break time=\"180ms\"/> Use your nose: <phoneme alphabet=\"ipa\" ph=\"n\">n</phoneme>.</voice></speak>"
+                            }
+                        ],
+                        "blending_practice": [
+                            {
+                                "xp": 5,
+                                "word": "sat",
+                                "image": "Person sitting on a chair",
+                                "task_id": "7",
+                                "feedback": {
+                                    "tts_closeMatch": "Break it down. Sound by sound. Then blend.",
+                                    "tts_exactMatch": "Decoded.",
+                                    "tts_wrongSound": "Break it down. Sound by sound. Then blend.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Break it down.<break time=\"180ms\"/> Sound by sound.<break time=\"180ms\"/> Then blend.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Decoded.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Break it down.<break time=\"180ms\"/> Sound by sound.<break time=\"180ms\"/> Then blend.</voice></speak>"
+                                },
+                                "tts_instruction": "Decode the word: sat.",
+                                "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Decode the word: <emphasis>sat</emphasis>.</voice></speak>"
+                            },
+                            {
+                                "xp": 5,
+                                "word": "pin",
+                                "image": "A push pin",
+                                "task_id": "8",
+                                "feedback": {
+                                    "tts_closeMatch": "Break it down. Sound by sound. Then blend.",
+                                    "tts_exactMatch": "Decoded.",
+                                    "tts_wrongSound": "Break it down. Sound by sound. Then blend.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Break it down.<break time=\"180ms\"/> Sound by sound.<break time=\"180ms\"/> Then blend.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Decoded.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Break it down.<break time=\"180ms\"/> Sound by sound.<break time=\"180ms\"/> Then blend.</voice></speak>"
+                                },
+                                "tts_instruction": "Decode the word: pin.",
+                                "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Decode the word: <emphasis>pin</emphasis>.</voice></speak>"
+                            },
+                            {
+                                "xp": 5,
+                                "word": "tap",
+                                "image": "Finger tapping on a surface",
+                                "task_id": "9",
+                                "feedback": {
+                                    "tts_closeMatch": "Break it down. Sound by sound. Then blend.",
+                                    "tts_exactMatch": "Decoded.",
+                                    "tts_wrongSound": "Break it down. Sound by sound. Then blend.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Break it down.<break time=\"180ms\"/> Sound by sound.<break time=\"180ms\"/> Then blend.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Decoded.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Break it down.<break time=\"180ms\"/> Sound by sound.<break time=\"180ms\"/> Then blend.</voice></speak>"
+                                },
+                                "tts_instruction": "Decode the word: tap.",
+                                "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Decode the word: <emphasis>tap</emphasis>.</voice></speak>"
+                            }
+                        ],
+                        "sentence_practice": []
+                    },
+                    "mission_id": "lesson_2_mission_1",
+                    "is_required": true,
+                    "introduction": {
+                        "visual": [
+                            {
+                                "sfx": "low system hum with soft pulse tones across S-A-T-P-I-N",
+                                "scene": "Command center reactivates. The SATPIN grid appears on screen and each letter pulses softly."
+                            }
+                        ],
+                        "tts_missionControlVoice": "Welcome back, operative. Before we add new power, we need to check your core system. Six sounds. No guessing. Clean signals only. Let's run a SATPIN diagnostic.",
+                        "tts_missionControlVoice_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\"><prosody rate=\"medium\">Welcome back, operative.<break time=\"250ms\"/> Before we add new power, we need to check your core system.<break time=\"250ms\"/> Six sounds.<break time=\"150ms\"/> No guessing.<break time=\"150ms\"/> Clean signals only.<break time=\"250ms\"/> Let's run a <emphasis>SATPIN diagnostic</emphasis>.</prosody></voice></speak>"
+                    },
+                    "mission_name": "Mission Mode - SATPIN System Check",
+                    "mission_type": "mission_mode",
+                    "mission_sequence": 1
+                },
+                {
+                    "tasks": {
+                        "word_practice": [
+                            {
+                                "xp": 5,
+                                "word": "map",
+                                "image": "A map",
+                                "task_id": "7",
+                                "feedback": {
+                                    "tts_closeMatch": "Say each sound. Then blend.",
+                                    "tts_exactMatch": "Correct.",
+                                    "tts_wrongSound": "Say each sound. Then blend.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound.<break time=\"180ms\"/> Then blend.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound.<break time=\"180ms\"/> Then blend.</voice></speak>"
+                                },
+                                "tts_instruction": "Read it.",
+                                "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Read it.</voice></speak>"
+                            },
+                            {
+                                "xp": 5,
+                                "word": "dam",
+                                "image": "A dam holding back water",
+                                "task_id": "8",
+                                "feedback": {
+                                    "tts_closeMatch": "Say each sound. Then blend.",
+                                    "tts_exactMatch": "Correct.",
+                                    "tts_wrongSound": "Say each sound. Then blend.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound.<break time=\"180ms\"/> Then blend.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound.<break time=\"180ms\"/> Then blend.</voice></speak>"
+                                },
+                                "tts_instruction": "Read it.",
+                                "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Read it.</voice></speak>"
+                            },
+                            {
+                                "xp": 5,
+                                "word": "got",
+                                "image": "A got-it gesture",
+                                "task_id": "9",
+                                "feedback": {
+                                    "tts_closeMatch": "Say each sound. Then blend.",
+                                    "tts_exactMatch": "Correct.",
+                                    "tts_wrongSound": "Say each sound. Then blend.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound.<break time=\"180ms\"/> Then blend.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound.<break time=\"180ms\"/> Then blend.</voice></speak>"
+                                },
+                                "tts_instruction": "Read it.",
+                                "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Read it.</voice></speak>"
+                            },
+                            {
+                                "xp": 5,
+                                "word": "dip",
+                                "image": "A chip dipping into sauce",
+                                "task_id": "10",
+                                "feedback": {
+                                    "tts_closeMatch": "Say each sound. Then blend.",
+                                    "tts_exactMatch": "Correct.",
+                                    "tts_wrongSound": "Say each sound. Then blend.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound.<break time=\"180ms\"/> Then blend.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound.<break time=\"180ms\"/> Then blend.</voice></speak>"
+                                },
+                                "tts_instruction": "Read it.",
+                                "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Read it.</voice></speak>"
+                            },
+                            {
+                                "xp": 5,
+                                "word": "mop",
+                                "image": "A mop",
+                                "task_id": "11",
+                                "feedback": {
+                                    "tts_closeMatch": "Say each sound. Then blend.",
+                                    "tts_exactMatch": "Correct.",
+                                    "tts_wrongSound": "Say each sound. Then blend.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound.<break time=\"180ms\"/> Then blend.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound.<break time=\"180ms\"/> Then blend.</voice></speak>"
+                                },
+                                "tts_instruction": "Read it.",
+                                "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Read it.</voice></speak>"
+                            },
+                            {
+                                "xp": 5,
+                                "word": "god",
+                                "image": "A glowing word card for god",
+                                "task_id": "12",
+                                "feedback": {
+                                    "tts_closeMatch": "Say each sound. Then blend.",
+                                    "tts_exactMatch": "Correct.",
+                                    "tts_wrongSound": "Say each sound. Then blend.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound.<break time=\"180ms\"/> Then blend.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound.<break time=\"180ms\"/> Then blend.</voice></speak>"
+                                },
+                                "tts_instruction": "Read it.",
+                                "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Read it.</voice></speak>"
+                            }
+                        ],
+                        "alphabet_practice": [
+                            {
+                                "letter": "M",
+                                "visual": [
+                                    {
+                                        "word": "M",
+                                        "mouthCue": "Lips closed with a humming voice.",
+                                        "association": "Mmm, like something tastes good."
+                                    }
+                                ],
+                                "task_id": "1",
+                                "feedback": {
+                                    "tts_closeMatch": "Lips together. Keep the sound going.",
+                                    "tts_exactMatch": "Yes. Feel the hum. That's /mmm/.",
+                                    "tts_wrongSound": "That was /n/. Close your lips.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Lips together.<break time=\"180ms\"/> Keep the sound going.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Yes.<break time=\"180ms\"/> Feel the hum.<break time=\"180ms\"/> That's <phoneme alphabet=\"ipa\" ph=\"m\">mmm</phoneme>.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">That was <phoneme alphabet=\"ipa\" ph=\"n\">n</phoneme>.<break time=\"180ms\"/> Close your lips.</voice></speak>"
+                                },
+                                "tts_coach": "Letter M makes /mmm/. Lips together. Voice on. You can hold this sound. Listen: /mmm/. Say it: /mmm/.",
+                                "tts_coach_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Letter <say-as interpret-as=\"characters\">M</say-as> makes <phoneme alphabet=\"ipa\" ph=\"m\">mmm</phoneme>.<break time=\"180ms\"/> Lips together.<break time=\"120ms\"/> Voice on.<break time=\"180ms\"/> You can hold this sound.<break time=\"220ms\"/> Listen: <phoneme alphabet=\"ipa\" ph=\"m\">mmm</phoneme>.<break time=\"180ms\"/> Say it: <phoneme alphabet=\"ipa\" ph=\"m\">mmm</phoneme>.</voice></speak>"
+                            },
+                            {
+                                "letter": "D",
+                                "visual": [
+                                    {
+                                        "word": "D",
+                                        "mouthCue": "Tongue taps behind teeth with quick release.",
+                                        "association": "Down. /d/."
+                                    }
+                                ],
+                                "task_id": "2",
+                                "feedback": {
+                                    "tts_closeMatch": "You added a vowel. Stop sooner.",
+                                    "tts_exactMatch": "Sharp and clean.",
+                                    "tts_wrongSound": "Tongue needs to tap the roof.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">You added a vowel.<break time=\"180ms\"/> Stop sooner.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Sharp and clean.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Tongue needs to tap the roof.</voice></speak>"
+                                },
+                                "tts_coach": "Letter D makes /d/. Tongue taps, then stops. No 'duh'. Just /d/. Listen: /d/. Say it: /d/.",
+                                "tts_coach_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Letter <say-as interpret-as=\"characters\">D</say-as> makes <phoneme alphabet=\"ipa\" ph=\"d\">d</phoneme>.<break time=\"180ms\"/> Tongue taps, then stops.<break time=\"180ms\"/> No <say-as interpret-as=\"characters\">d u h</say-as>.<break time=\"180ms\"/> Just <phoneme alphabet=\"ipa\" ph=\"d\">d</phoneme>.<break time=\"220ms\"/> Listen: <phoneme alphabet=\"ipa\" ph=\"d\">d</phoneme>.<break time=\"180ms\"/> Say it: <phoneme alphabet=\"ipa\" ph=\"d\">d</phoneme>.</voice></speak>"
+                            },
+                            {
+                                "letter": "G",
+                                "visual": [
+                                    {
+                                        "word": "G",
+                                        "mouthCue": "Back of tongue lifts toward the throat.",
+                                        "association": "Gate. /g/."
+                                    }
+                                ],
+                                "task_id": "3",
+                                "feedback": {
+                                    "tts_closeMatch": "That was /d/. Move the sound back.",
+                                    "tts_exactMatch": "Good. Strong sound.",
+                                    "tts_wrongSound": "Stop the sound. Don't add a vowel.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">That was <phoneme alphabet=\"ipa\" ph=\"d\">d</phoneme>.<break time=\"180ms\"/> Move the sound back.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Good.<break time=\"120ms\"/> Strong sound.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Stop the sound.<break time=\"180ms\"/> Don't add a vowel.</voice></speak>"
+                                },
+                                "tts_coach": "Letter G makes /g/. Back of your mouth. Strong stop. Listen: /g/. Say it: /g/.",
+                                "tts_coach_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Letter <say-as interpret-as=\"characters\">G</say-as> makes <phoneme alphabet=\"ipa\" ph=\"g\">g</phoneme>.<break time=\"180ms\"/> Back of your mouth.<break time=\"180ms\"/> Strong stop.<break time=\"220ms\"/> Listen: <phoneme alphabet=\"ipa\" ph=\"g\">g</phoneme>.<break time=\"180ms\"/> Say it: <phoneme alphabet=\"ipa\" ph=\"g\">g</phoneme>.</voice></speak>"
+                            },
+                            {
+                                "letter": "O",
+                                "visual": [
+                                    {
+                                        "word": "O",
+                                        "mouthCue": "Mouth open with relaxed lips.",
+                                        "association": "Dog. /o/."
+                                    }
+                                ],
+                                "task_id": "4",
+                                "feedback": {
+                                    "tts_closeMatch": "Too long. Make it quick.",
+                                    "tts_exactMatch": "Short and correct.",
+                                    "tts_wrongSound": "That was 'oh'. Try again.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Too long.<break time=\"180ms\"/> Make it quick.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Short and correct.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">That was <say-as interpret-as=\"characters\">o h</say-as>.<break time=\"180ms\"/> Try again.</voice></speak>"
+                                },
+                                "tts_coach": "Letter O makes /o/. Short sound, like dog. Not 'oh'. Listen: /o/. Say it: /o/.",
+                                "tts_coach_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Letter <say-as interpret-as=\"characters\">O</say-as> makes <phoneme alphabet=\"ipa\" ph=\"ɒ\">o</phoneme>.<break time=\"180ms\"/> Short sound, like <emphasis>dog</emphasis>.<break time=\"180ms\"/> Not <say-as interpret-as=\"characters\">o h</say-as>.<break time=\"220ms\"/> Listen: <phoneme alphabet=\"ipa\" ph=\"ɒ\">o</phoneme>.<break time=\"180ms\"/> Say it: <phoneme alphabet=\"ipa\" ph=\"ɒ\">o</phoneme>.</voice></speak>"
+                            }
+                        ],
+                        "blending_practice": [
+                            {
+                                "xp": 5,
+                                "word": "mat",
+                                "image": "A floor mat",
+                                "task_id": "5",
+                                "feedback": {
+                                    "tts_closeMatch": "Say each sound. Then blend.",
+                                    "tts_exactMatch": "Correct.",
+                                    "tts_wrongSound": "Say each sound. Then blend.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound.<break time=\"180ms\"/> Then blend.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound.<break time=\"180ms\"/> Then blend.</voice></speak>"
+                                },
+                                "tts_instruction": "Now we blend. Old sounds. New sounds. Same process every time. Read: mat.",
+                                "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Now we blend.<break time=\"200ms\"/> Old sounds.<break time=\"120ms\"/> New sounds.<break time=\"120ms\"/> Same process every time.<break time=\"250ms\"/> Read: <emphasis>mat</emphasis>.</voice></speak>"
+                            },
+                            {
+                                "xp": 5,
+                                "word": "dog",
+                                "image": "A dog",
+                                "task_id": "6",
+                                "feedback": {
+                                    "tts_closeMatch": "Say each sound. Then blend.",
+                                    "tts_exactMatch": "Correct.",
+                                    "tts_wrongSound": "Say each sound. Then blend.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound.<break time=\"180ms\"/> Then blend.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound.<break time=\"180ms\"/> Then blend.</voice></speak>"
+                                },
+                                "tts_instruction": "Read: dog.",
+                                "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Read: <emphasis>dog</emphasis>.</voice></speak>"
+                            }
+                        ],
+                        "sentence_practice": [
+                            {
+                                "xp": 5,
+                                "word": "Sit down.",
+                                "image": "A student sitting down",
+                                "task_id": "13",
+                                "feedback": {
+                                    "tts_closeMatch": "Go word by word. Decode.",
+                                    "tts_exactMatch": "Good reading.",
+                                    "tts_wrongSound": "Go word by word. Decode.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word.<break time=\"180ms\"/> Decode.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Good reading.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word.<break time=\"180ms\"/> Decode.</voice></speak>"
+                                },
+                                "tts_instruction": "These are real instructions. Read it like you would see it in school.",
+                                "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">These are real instructions.<break time=\"200ms\"/> Read it like you would see it in school.</voice></speak>"
+                            },
+                            {
+                                "xp": 5,
+                                "word": "Get a map.",
+                                "image": "A hand holding a map",
+                                "task_id": "14",
+                                "feedback": {
+                                    "tts_closeMatch": "Go word by word. Decode.",
+                                    "tts_exactMatch": "Good reading.",
+                                    "tts_wrongSound": "Go word by word. Decode.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word.<break time=\"180ms\"/> Decode.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Good reading.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word.<break time=\"180ms\"/> Decode.</voice></speak>"
+                                },
+                                "tts_instruction": "Read it.",
+                                "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Read it.</voice></speak>"
+                            },
+                            {
+                                "xp": 5,
+                                "word": "Tap the dot.",
+                                "image": "A finger tapping a dot on a screen",
+                                "task_id": "15",
+                                "feedback": {
+                                    "tts_closeMatch": "Go word by word. Decode.",
+                                    "tts_exactMatch": "Good reading.",
+                                    "tts_wrongSound": "Go word by word. Decode.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word.<break time=\"180ms\"/> Decode.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Good reading.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word.<break time=\"180ms\"/> Decode.</voice></speak>"
+                                },
+                                "tts_instruction": "Read it.",
+                                "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Read it.</voice></speak>"
+                            }
+                        ]
+                    },
+                    "mission_id": "lesson_2_mission_2",
+                    "is_required": true,
+                    "introduction": {
+                        "visual": [],
+                        "tts_coach": "Good. Your base is solid. Today we add four more sounds. These will multiply the number of words you can read. Focus on the sound, not the letter name.",
+                        "tts_coach_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Good.<break time=\"180ms\"/> Your base is solid.<break time=\"250ms\"/> Today we add four more sounds.<break time=\"250ms\"/> These will multiply the number of words you can read.<break time=\"250ms\"/> Focus on the sound, not the letter name.</voice></speak>"
+                    },
+                    "mission_name": "Direct Instruction - MDGO Sounds",
+                    "mission_type": "direct_instruction",
+                    "mission_sequence": 2
+                },
+                {
+                    "tasks": {
+                        "results": {
+                            "tts_0-1_correct": "Strong work. You're ready to move on.",
+                            "tts_1-5_correct": "We're slowing down and fixing the sounds.",
+                            "tts_5-7_correct": "Almost there. We'll practice the tricky ones.",
+                            "tts_0-1_correct_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Strong work.<break time=\"180ms\"/> You're ready to move on.</voice></speak>",
+                            "tts_1-5_correct_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">We're slowing down and fixing the sounds.</voice></speak>",
+                            "tts_5-7_correct_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Almost there.<break time=\"180ms\"/> We'll practice the tricky ones.</voice></speak>"
+                        },
+                        "word_practice": [
+                            {
+                                "xp": 5,
+                                "word": "mat",
+                                "image": "A floor mat",
+                                "task_id": "1",
+                                "feedback": {
+                                    "tts_closeMatch": "Go word by word. Decode.",
+                                    "tts_exactMatch": "Correct.",
+                                    "tts_wrongSound": "Go word by word. Decode.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word.<break time=\"180ms\"/> Decode.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word.<break time=\"180ms\"/> Decode.</voice></speak>"
+                                },
+                                "retryLimit": 3
+                            },
+                            {
+                                "xp": 5,
+                                "word": "dog",
+                                "image": "A dog",
+                                "task_id": "2",
+                                "feedback": {
+                                    "tts_closeMatch": "Go word by word. Decode.",
+                                    "tts_exactMatch": "Correct.",
+                                    "tts_wrongSound": "Go word by word. Decode.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word.<break time=\"180ms\"/> Decode.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word.<break time=\"180ms\"/> Decode.</voice></speak>"
+                                },
+                                "retryLimit": 3
+                            },
+                            {
+                                "xp": 5,
+                                "word": "map",
+                                "image": "A map",
+                                "task_id": "3",
+                                "feedback": {
+                                    "tts_closeMatch": "Go word by word. Decode.",
+                                    "tts_exactMatch": "Correct.",
+                                    "tts_wrongSound": "Go word by word. Decode.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word.<break time=\"180ms\"/> Decode.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word.<break time=\"180ms\"/> Decode.</voice></speak>"
+                                },
+                                "retryLimit": 3
+                            },
+                            {
+                                "xp": 5,
+                                "word": "dam",
+                                "image": "A dam holding back water",
+                                "task_id": "4",
+                                "feedback": {
+                                    "tts_closeMatch": "Go word by word. Decode.",
+                                    "tts_exactMatch": "Correct.",
+                                    "tts_wrongSound": "Go word by word. Decode.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word.<break time=\"180ms\"/> Decode.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word.<break time=\"180ms\"/> Decode.</voice></speak>"
+                                },
+                                "retryLimit": 3
+                            },
+                            {
+                                "xp": 5,
+                                "word": "got",
+                                "image": "A got-it gesture",
+                                "task_id": "5",
+                                "feedback": {
+                                    "tts_closeMatch": "Go word by word. Decode.",
+                                    "tts_exactMatch": "Correct.",
+                                    "tts_wrongSound": "Go word by word. Decode.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word.<break time=\"180ms\"/> Decode.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word.<break time=\"180ms\"/> Decode.</voice></speak>"
+                                },
+                                "retryLimit": 3
+                            },
+                            {
+                                "xp": 5,
+                                "word": "dip",
+                                "image": "A chip dipping into sauce",
+                                "task_id": "6",
+                                "feedback": {
+                                    "tts_closeMatch": "Go word by word. Decode.",
+                                    "tts_exactMatch": "Correct.",
+                                    "tts_wrongSound": "Go word by word. Decode.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word.<break time=\"180ms\"/> Decode.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word.<break time=\"180ms\"/> Decode.</voice></speak>"
+                                },
+                                "retryLimit": 3
+                            },
+                            {
+                                "xp": 5,
+                                "word": "mop",
+                                "image": "A mop",
+                                "task_id": "7",
+                                "feedback": {
+                                    "tts_closeMatch": "Go word by word. Decode.",
+                                    "tts_exactMatch": "Correct.",
+                                    "tts_wrongSound": "Go word by word. Decode.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word.<break time=\"180ms\"/> Decode.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word.<break time=\"180ms\"/> Decode.</voice></speak>"
+                                },
+                                "retryLimit": 3
+                            },
+                            {
+                                "xp": 5,
+                                "word": "Tap the dot.",
+                                "image": "A finger tapping a dot on a screen",
+                                "task_id": "8",
+                                "feedback": {
+                                    "tts_closeMatch": "Go word by word. Decode.",
+                                    "tts_exactMatch": "Correct.",
+                                    "tts_wrongSound": "Go word by word. Decode.",
+                                    "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word.<break time=\"180ms\"/> Decode.</voice></speak>",
+                                    "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>",
+                                    "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word.<break time=\"180ms\"/> Decode.</voice></speak>"
+                                },
+                                "retryLimit": 3
+                            }
+                        ]
+                    },
+                    "target": "0-1",
+                    "mission_id": "lesson_2_mission_3",
+                    "is_required": true,
+                    "introduction": {
+                        "visual": [],
+                        "tts_coach": "Time to check mastery. You'll read mixed words and one sentence using SATPIN and MDGO. Aim for at least eight out of ten to move on.",
+                        "tts_coach_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Time to check mastery.<break time=\"200ms\"/> You'll read mixed words and one sentence using <say-as interpret-as=\"characters\">S A T P I N</say-as> and <say-as interpret-as=\"characters\">M D G O</say-as>.<break time=\"250ms\"/> Aim for at least eight out of ten to move on.</voice></speak>"
+                    },
+                    "mission_name": "Assessment - Mastery Check",
+                    "mission_type": "mastery_check",
+                    "mission_sequence": 3
+                },
+                {
+                    "tasks": {
+                        "summary": {
+                            "visual": [
+                                {
+                                    "nextUnlock": "C, K, E, R, U, H glowing",
+                                    "progressBar": "10/44 sounds learned",
+                                    "sessionStats": {
+                                        "xpEarned": 155,
+                                        "wordsRead": 14,
+                                        "totalSounds": 10,
+                                        "soundsMastered": 10,
+                                        "masteryThreshold": 80
+                                    }
+                                }
+                            ],
+                            "tts_coach": "You now know ten sounds: S, A, T, P, I, N, M, D, G, O. That's a big jump in reading power. Next lesson, we finish the basic code. You're building something real.",
+                            "tts_coach_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">You now know ten sounds: <say-as interpret-as=\"characters\">S, A, T, P, I, N, M, D, G, O</say-as>.<break time=\"250ms\"/> That's a big jump in reading power.<break time=\"250ms\"/> Next lesson, we finish the basic code.<break time=\"250ms\"/> You're building something real.</voice></speak>"
+                        }
+                    },
+                    "mission_id": "lesson_2_mission_4",
+                    "is_required": true,
+                    "mission_name": "Lesson Wrap",
+                    "mission_type": "wrap",
+                    "mission_sequence": 4
+                }
+            ],
+            "lesson_id": "lesson_2",
+            "lesson_title": "MDGO Power-Up",
+            "lesson_sequence": 2,
+            "learning_objectives": [
+                "M",
+                "D",
+                "G",
+                "O"
+            ]
+        },
+        "createdBy": null,
+        "creatorFirstName": null,
+        "creatorLastName": null,
+        "creatorEmail": null,
+        "createdAt": "2026-04-02T07:38:04.337Z",
+        "updatedAt": "2026-04-02T08:54:09.788Z",
+        "creatorName": null
+    }
+}
