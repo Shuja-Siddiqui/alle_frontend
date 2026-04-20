@@ -59,7 +59,7 @@ export function LessonObjective({
           {tags.map((tag, index) => (
             <div
               key={index}
-              className="flex items-center justify-center px-[12px] py-[12px] rounded-[60px] shrink-0"
+              className="flex items-center justify-center min-w-[120px] px-[12px] py-[12px] rounded-[60px] shrink-0"
               style={{
                 backgroundColor: "#434b93",
               }}

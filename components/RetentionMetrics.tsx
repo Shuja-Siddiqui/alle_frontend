@@ -13,6 +13,8 @@ type RetentionMetricsProps = {
   className?: string;
   /** Optional inline styles */
   style?: React.CSSProperties;
+  /** Use analytics page specific layout/style */
+  analyticsStyle?: boolean;
 };
 
 export function RetentionMetrics({
@@ -20,7 +22,12 @@ export function RetentionMetrics({
   changePercentage = 4,
   className,
   style,
+  analyticsStyle = false,
 }: RetentionMetricsProps) {
+  const roundedChange = Math.round(changePercentage);
+  const changeLabel = `${roundedChange >= 0 ? "+" : ""}${roundedChange}%`;
+  const changeColor = roundedChange >= 0 ? "#38ffa2" : "#ff6b8a";
+
   // Animated percentage state - always start at 0
   const [animatedPercentage, setAnimatedPercentage] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -109,10 +116,28 @@ export function RetentionMetrics({
         Retention metrics
       </p>
 
-      {/* Chart and Info Container - Side by side */}
-      <div className="absolute flex gap-[16px] items-center" style={{ left: "24px", top: "70px" }}>
-        {/* Circular Progress Chart - 140px */}
-        <div className="relative shrink-0" style={{ width: "140px", height: "140px" }}>
+      {/* Chart and Info Container */}
+      <div
+        className={
+          analyticsStyle
+            ? "absolute left-1/2 flex flex-col items-center"
+            : "absolute flex gap-[16px] items-center"
+        }
+        style={
+          analyticsStyle
+            ? { top: "100px", transform: "translateX(-50%)" }
+            : { left: "24px", top: "70px" }
+        }
+      >
+        {/* Circular Progress Chart */}
+        <div
+          className="relative shrink-0"
+          style={
+            analyticsStyle
+              ? { width: "267.724px", height: "279.731px" }
+              : { width: "140px", height: "140px" }
+          }
+        >
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <defs>
@@ -141,8 +166,8 @@ export function RetentionMetrics({
                 data={data}
                 cx="50%"
                 cy="50%"
-                innerRadius={50}
-                outerRadius={70}
+                innerRadius={analyticsStyle ? 92 : 50}
+                outerRadius={analyticsStyle ? 130 : 70}
                 startAngle={90}
                 endAngle={-270}
                 dataKey="value"
@@ -161,18 +186,19 @@ export function RetentionMetrics({
           <div
             className="absolute flex items-center justify-center"
             style={{
-              top: "40%",
-              left: "27%",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
             }}
           >
             <p
               style={{
                 color: "#ff00ca",
                 fontFamily: "var(--font-orbitron), system-ui, sans-serif",
-                fontSize: "24px",
+                fontSize: analyticsStyle ? "40px" : "24px",
                 fontStyle: "normal",
                 fontWeight: 500,
-                lineHeight: "32px",
+                lineHeight: analyticsStyle ? "48px" : "32px",
                 letterSpacing: "-0.264px",
                 textAlign: "center",
               }}
@@ -183,7 +209,13 @@ export function RetentionMetrics({
         </div>
 
         {/* Info Text */}
-        <div className="flex flex-col gap-[12px] items-start justify-center">
+        <div
+          className={
+            analyticsStyle
+              ? "mt-[20px] flex flex-col gap-[12px] items-center justify-center text-center"
+              : "flex flex-col gap-[12px] items-start justify-center"
+          }
+        >
           {/* Change Percentage */}
           <p
             style={{
@@ -197,7 +229,7 @@ export function RetentionMetrics({
               whiteSpace: "pre-wrap",
             }}
           >
-            <span style={{ color: "#38ffa2" }}>+{changePercentage}% </span>
+            <span style={{ color: changeColor }}>{changeLabel} </span>
             <span>vs last week</span>
           </p>
           {/* Description */}
@@ -210,7 +242,9 @@ export function RetentionMetrics({
               fontWeight: 500,
               lineHeight: "22px",
               letterSpacing: "-0.176px",
-              width: "152px",
+              textAlign: analyticsStyle ? "center" : undefined,
+              whiteSpace: analyticsStyle ? "nowrap" : "pre-wrap",
+              width: analyticsStyle ? undefined : "152px",
             }}
           >
             Students engagement rate

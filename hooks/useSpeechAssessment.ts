@@ -5,6 +5,9 @@
 
 import { useState, useCallback, useRef } from "react";
 import { api } from "../lib/api-client";
+import { getTaskStartTimeIso } from "../lib/attempt-timing";
+import { resolvePhonemeCode } from "../lib/phonemeCatalog";
+import { recommendVoicePaceForPhoneme } from "../lib/voicePace";
 
 interface AssessmentResult {
   success: boolean;
@@ -143,14 +146,18 @@ export function useSpeechAssessment() {
 
       try {
         const formData = new FormData();
+        const normalizedPhoneme = resolvePhonemeCode(phoneme);
+        const paceRecommendation = await recommendVoicePaceForPhoneme(audioBlob);
         formData.append("audio", audioBlob, "phoneme.webm");
-        formData.append("phoneme", phoneme);
+        formData.append("phoneme", normalizedPhoneme || phoneme);
         if (letter) {
           formData.append("letter", letter);
         }
         formData.append("dictType", options.dictType || "CMU");
         formData.append("ageGroup", String(options.ageGroup || 1));
-        formData.append("slack", String(options.slack || 0.5));
+        formData.append("slack", String(options.slack || paceRecommendation.slack));
+        formData.append("enhanceAtempo", String(paceRecommendation.atempo));
+        formData.append("enhanceGainDb", String(paceRecommendation.gainDb));
 
         const API_BASE_URL =
           process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:4000/api";
@@ -225,7 +232,8 @@ export function useSpeechAssessment() {
       lessonId: string,
       missionSequence: number,
       taskId: string,
-      expectedText: string
+      expectedText: string,
+      taskStartTime?: string
     ): Promise<AssessmentResult> => {
       // MOCK MODE: Skip API call, return mock result
       const mockMode = localStorage.getItem('MOCK_MODE') === 'true';
@@ -269,7 +277,7 @@ export function useSpeechAssessment() {
           taskId,
           audioData: base64Audio,
           mimeType: "audio/webm",
-          taskStartTime: new Date().toISOString(),
+          taskStartTime: taskStartTime || getTaskStartTimeIso(null),
         });
 
         const result = response.data || response;

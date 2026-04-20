@@ -23,7 +23,7 @@ export function StarRing({
     onCircleClick,
     syncWithVolume = true 
 }: StarRingProps) {
-    const containerSize = 409;
+    const containerSize = 424.667;
     const radius = containerSize / 2; // 204.5px
     const centerX = radius;
     const centerY = radius;
@@ -32,6 +32,7 @@ export function StarRing({
     
     // Volume control hook
     const { volume, setVolume, saveVolume } = useVolumeControl();
+    const [showVolumePrompt, setShowVolumePrompt] = useState(false);
     
     // Convert volume (0-100) to circle count (0-45)
     const volumeToCircles = (vol: number) => Math.round((vol / 100) * numCircles);
@@ -50,6 +51,16 @@ export function StarRing({
             setInternalSelectedCircle(volumeToCircles(volume));
         }
     }, [volume, syncWithVolume, externalSelectedCircle]);
+
+    // Show a friendly prompt when sound is muted (0%)
+    useEffect(() => {
+        if (!syncWithVolume) return;
+        if (volume === 0) {
+            setShowVolumePrompt(true);
+        } else {
+            setShowVolumePrompt(false);
+        }
+    }, [volume, syncWithVolume]);
 
     // Use external selected circle if provided, otherwise use internal state
     const selectedCircle = externalSelectedCircle ?? internalSelectedCircle;
@@ -78,6 +89,9 @@ export function StarRing({
             
             // Update volume locally for instant feedback
             setVolume(newVolume);
+            if (newVolume > 0) {
+                setShowVolumePrompt(false);
+            }
             
             // Save to backend (async, doesn't block UI)
             try {
@@ -107,6 +121,66 @@ export function StarRing({
             data-name="Star Ring"
             data-node-id="2133:338"
         >
+            {showVolumePrompt && (
+                <div
+                    className="absolute z-20"
+                    style={{
+                        top: "-76px",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        width: "310px",
+                        padding: "12px 14px",
+                        borderRadius: "16px",
+                        border: "2px solid #E451FE",
+                        background: "linear-gradient(168.78deg, #0B0F37 12.01%, #1B1F4E 94.63%)",
+                        color: "#FFFFFF",
+                        textAlign: "center",
+                        boxShadow: "0 0 16px rgba(255, 0, 200, 0.35)",
+                        animation: "softPulse 1.6s ease-in-out infinite",
+                    }}
+                >
+                    <p
+                        style={{
+                            fontFamily: "var(--font-orbitron), system-ui, sans-serif",
+                            fontSize: "12px",
+                            lineHeight: "16px",
+                            margin: 0,
+                        }}
+                    >
+                        Sound is muted. Increase volume to hear lesson audio.
+                    </p>
+                    <button
+                        type="button"
+                        onClick={() => setShowVolumePrompt(false)}
+                        style={{
+                            marginTop: "8px",
+                            border: "1px solid #E451FE",
+                            borderRadius: "10px",
+                            padding: "4px 10px",
+                            color: "#75FF1A",
+                            background: "transparent",
+                            fontSize: "11px",
+                            cursor: "pointer",
+                        }}
+                    >
+                        Got it
+                    </button>
+                    <style jsx>{`
+                        @keyframes softPulse {
+                            0%,
+                            100% {
+                                transform: translateX(-50%) scale(1);
+                                box-shadow: 0 0 10px rgba(255, 0, 200, 0.2);
+                            }
+                            50% {
+                                transform: translateX(-50%) scale(1.02);
+                                box-shadow: 0 0 20px rgba(117, 255, 26, 0.35);
+                            }
+                        }
+                    `}</style>
+                </div>
+            )}
+
             {/* Small circles around the perimeter */}
             {circlePositions.map((pos, index) => {
                 const circleNumber = index + 1; // 1-based numbering

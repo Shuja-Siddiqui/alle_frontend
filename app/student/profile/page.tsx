@@ -7,6 +7,7 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { SettingsDialog } from "./components/SettingsDialog";
 import { MascotDisplay } from "@/components/MascotDisplay";
 import { AllBadgesOverlay } from "@/components/AllBadgesOverlay";
+import { PrimaryButton } from "@/components/PrimaryButton";
 import { api } from "../../../lib/api-client";
 
 const DEFAULT_AVATAR = "/assets/icons/others/profile_avatar_large.png";
@@ -122,6 +123,10 @@ export default function ProfileSettingsPage() {
 
     setAllBadges(fullBadgeList);
     setIsBadgesOverlayOpen(true);
+  };
+
+  const handleStartDemo = () => {
+    router.push("/student/demo");
   };
 
   return (
@@ -477,6 +482,20 @@ export default function ProfileSettingsPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      <div style={{ marginTop: "28px" }}>
+        <PrimaryButton
+          text="Demo flow"
+          iconSrc="/assets/icons/others/play.png"
+          iconAlt="Start demo flow"
+          size="default"
+          variant="filled"
+          onClick={handleStartDemo}
+          style={{
+            width: "380px",
+          }}
+        />
       </div>
 
       {/* Settings Dialog */}

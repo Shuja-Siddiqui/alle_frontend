@@ -44,7 +44,12 @@ export default function AnalyticsPage() {
         const start = new Date(today);
         start.setDate(today.getDate() - 6); // Last 7 days including today
 
-        const toIsoDate = (d: Date) => d.toISOString().slice(0, 10);
+        const toIsoDate = (d: Date) => {
+          const year = d.getFullYear();
+          const month = String(d.getMonth() + 1).padStart(2, "0");
+          const day = String(d.getDate()).padStart(2, "0");
+          return `${year}-${month}-${day}`;
+        };
         const startDate = toIsoDate(start);
         const endDate = toIsoDate(today);
 
@@ -233,10 +238,38 @@ export default function AnalyticsPage() {
     setShowDownloadReportDialog(true);
   }
 
-  function handleDownloadReport(data: DownloadReportFormData) {
-    // TODO: Implement download report API call
-    console.log("Downloading report:", data);
-    setShowDownloadReportDialog(false);
+  async function handleDownloadReport(data: DownloadReportFormData) {
+    if (!data.dateRange) return;
+    try {
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+      const baseUrl =
+        process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:4000/api";
+      const url = `${baseUrl}/reports/download-analytics-excel?dateRange=${encodeURIComponent(
+        data.dateRange
+      )}`;
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to download CSV (${response.status})`);
+      }
+
+      const blob = await response.blob();
+      const objectUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = objectUrl;
+      link.download = `analytics-report-${data.dateRange}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(objectUrl);
+      setShowDownloadReportDialog(false);
+    } catch (error) {
+      console.error("Failed to download analytics Excel report:", error);
+    }
   }
 
   function handleResetReport() {
@@ -317,7 +350,11 @@ export default function AnalyticsPage() {
       {/* Charts Row */}
       <div className="flex gap-[24px] items-start">
         {/* Left: Retention Metrics Chart */}
-        <RetentionMetrics percentage={engagementRate} changePercentage={engagementChange} />
+        <RetentionMetrics
+          percentage={engagementRate}
+          changePercentage={engagementChange}
+          analyticsStyle={true}
+        />
 
         {/* Right: Students Activity Chart and Struggle Sliders stacked */}
         <div className="flex flex-col gap-[24px] items-start">
