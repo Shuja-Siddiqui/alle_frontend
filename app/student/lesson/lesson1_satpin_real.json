@@ -1,4 +1,4 @@
-{
+﻿{
   "lesson_id": "lesson_1",
   "lesson_sequence": 1,
   "lesson_title": "Core Sounds - SATPIN",
@@ -39,10 +39,10 @@
             "feedback": {
               "tts_exactMatch": "Perfect. That's exactly /sss/. Locked in.",
               "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Perfect. That's exactly /sss/. Locked in.</voice></speak>",
-              "tts_closeMatch": "Almost—you're adding voice. It's just air: /sss/, not /zzz/. Watch the animation again.",
-              "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Almost—you're adding voice. It's just air: /sss/, not /zzz/. Watch the animation again.</voice></speak>",
-              "tts_wrongSound": "That's not /sss/. Check the screen—teeth together, air only. Try again.",
-              "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">That's not /sss/. Check the screen—teeth together, air only. Try again.</voice></speak>"
+              "tts_closeMatch": "Almostâ€”you're adding voice. It's just air: /sss/, not /zzz/. Watch the animation again.",
+              "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Almostâ€”you're adding voice. It's just air: /sss/, not /zzz/. Watch the animation again.</voice></speak>",
+              "tts_wrongSound": "That's not /sss/. Check the screenâ€”teeth together, air only. Try again.",
+              "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">That's not /sss/. Check the screenâ€”teeth together, air only. Try again.</voice></speak>"
             }
           },
           {
@@ -87,8 +87,8 @@
               "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Clean. That's /t/.</voice></speak>",
               "tts_closeMatch": "Stop before the vowel. Just /t/.",
               "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Stop before the vowel. Just /t/.</voice></speak>",
-              "tts_wrongSound": "You're saying 'tuh'. Stop before the vowel—just /t/.",
-              "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">You're saying 'tuh'. Stop before the vowel—just /t/.</voice></speak>"
+              "tts_wrongSound": "You're saying 'tuh'. Stop before the vowelâ€”just /t/.",
+              "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">You're saying 'tuh'. Stop before the vowelâ€”just /t/.</voice></speak>"
             }
           },
           {
@@ -108,10 +108,10 @@
             "feedback": {
               "tts_exactMatch": "Exact. /p/ locked.",
               "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Exact. /p/ locked.</voice></speak>",
-              "tts_closeMatch": "Just /p/—don't add 'puh'. Lips pop and stop.",
-              "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Just /p/—don't add 'puh'. Lips pop and stop.</voice></speak>",
-              "tts_wrongSound": "That's /b/. P has no voice—just air. Try again.",
-              "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">That's /b/. P has no voice—just air. Try again.</voice></speak>"
+              "tts_closeMatch": "Just /p/â€”don't add 'puh'. Lips pop and stop.",
+              "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Just /p/â€”don't add 'puh'. Lips pop and stop.</voice></speak>",
+              "tts_wrongSound": "That's /b/. P has no voiceâ€”just air. Try again.",
+              "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">That's /b/. P has no voiceâ€”just air. Try again.</voice></speak>"
             }
           },
           {
@@ -334,8 +334,8 @@
       "mission_name": "Direct Instruction - SATPIN Sounds",
       "is_required": true,
       "introduction": {
-        "tts_coach": "Alright, let's get straight to it. Six sounds today. These unlock actual English words you'll see everywhere—texts, signs, homework, all of it. No fluff. Let's go.",
-        "tts_coach_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Alright, let's get straight to it. Six sounds today. These unlock actual English words you'll see everywhere—texts, signs, homework, all of it. No fluff. Let's go.</voice></speak>",
+        "tts_coach": "Alright, let's get straight to it. Six sounds today. These unlock actual English words you'll see everywhereâ€”texts, signs, homework, all of it. No fluff. Let's go.",
+        "tts_coach_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Alright, let's get straight to it. Six sounds today. These unlock actual English words you'll see everywhereâ€”texts, signs, homework, all of it. No fluff. Let's go.</voice></speak>",
         "visual": []
       },
       "tasks": {
@@ -343,7 +343,7 @@
           {
             "task_id": "1",
             "letter": "S",
-            "tts_coach": "Letter S makes /sss/. It's all air, no voice. Watch the screen—teeth almost together, tongue stays behind. Listen: /sss/. Say it: /sss/.",
+            "tts_coach": "Letter S makes /sss/. It's all air, no voice. Watch the screenâ€”teeth almost together, tongue stays behind. Listen: /sss/. Say it: /sss/.",
             "tts_coach_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Letter S makes /sss/. It's all air, no voice. Listen: /sss/. Say it: /sss/.</voice></speak>",
             "visual": [
               {
@@ -356,16 +356,16 @@
             "feedback": {
               "tts_exactMatch": "Perfect. That's exactly /sss/. Locked in.",
               "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Perfect. That's exactly /sss/. Locked in.</voice></speak>",
-              "tts_closeMatch": "Almost—you're adding voice. It's just air: /sss/, not /zzz/. Watch the animation again.",
-              "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Almost—you're adding voice. It's just air: /sss/, not /zzz/. Watch the animation again.</voice></speak>",
-              "tts_wrongSound": "That's not /sss/. Check the screen—teeth together, air only. Try again.",
-              "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">That's not /sss/. Check the screen—teeth together, air only. Try again.</voice></speak>"
+              "tts_closeMatch": "Almostâ€”you're adding voice. It's just air: /sss/, not /zzz/. Watch the animation again.",
+              "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Almostâ€”you're adding voice. It's just air: /sss/, not /zzz/. Watch the animation again.</voice></speak>",
+              "tts_wrongSound": "That's not /sss/. Check the screenâ€”teeth together, air only. Try again.",
+              "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">That's not /sss/. Check the screenâ€”teeth together, air only. Try again.</voice></speak>"
             }
           },
           {
             "task_id": "2",
             "letter": "A",
-            "tts_coach": "Letter A makes /a/. Short and sharp. Not 'ay'—just /a/. Listen: /a/. Your turn: /a/.",
+            "tts_coach": "Letter A makes /a/. Short and sharp. Not 'ay'â€”just /a/. Listen: /a/. Your turn: /a/.",
             "tts_coach_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Letter A makes /a/. Short and sharp. Not 'ay'. Listen: /a/. Your turn: /a/.</voice></speak>",
             "visual": [
               {
@@ -387,7 +387,7 @@
           {
             "task_id": "3",
             "letter": "T",
-            "tts_coach": "Letter T makes /t/. It's a quick tap—tongue up, then release. No 'tuh'. Just /t/.",
+            "tts_coach": "Letter T makes /t/. It's a quick tapâ€”tongue up, then release. No 'tuh'. Just /t/.",
             "tts_coach_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Letter T makes /t/. It's a quick tap. Just /t/.</voice></speak>",
             "visual": [
               {
@@ -400,10 +400,10 @@
             "feedback": {
               "tts_exactMatch": "Clean. That's /t/.",
               "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Clean. That's /t/.</voice></speak>",
-              "tts_closeMatch": "You're adding a vowel. Stop before it—just /t/.",
-              "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">You're adding a vowel. Stop before it—just /t/.</voice></speak>",
-              "tts_wrongSound": "You're saying 'tuh'. Stop before the vowel—just /t/.",
-              "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">You're saying 'tuh'. Stop before the vowel—just /t/.</voice></speak>"
+              "tts_closeMatch": "You're adding a vowel. Stop before itâ€”just /t/.",
+              "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">You're adding a vowel. Stop before itâ€”just /t/.</voice></speak>",
+              "tts_wrongSound": "You're saying 'tuh'. Stop before the vowelâ€”just /t/.",
+              "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">You're saying 'tuh'. Stop before the vowelâ€”just /t/.</voice></speak>"
             }
           },
           {
@@ -422,16 +422,16 @@
             "feedback": {
               "tts_exactMatch": "Exact. /p/ locked.",
               "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Exact. /p/ locked.</voice></speak>",
-              "tts_closeMatch": "Just /p/—don't add 'puh'. Lips pop and stop.",
-              "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Just /p/—don't add 'puh'. Lips pop and stop.</voice></speak>",
-              "tts_wrongSound": "That's /b/. P has no voice—just air. Try again.",
-              "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">That's /b/. P has no voice—just air. Try again.</voice></speak>"
+              "tts_closeMatch": "Just /p/â€”don't add 'puh'. Lips pop and stop.",
+              "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Just /p/â€”don't add 'puh'. Lips pop and stop.</voice></speak>",
+              "tts_wrongSound": "That's /b/. P has no voiceâ€”just air. Try again.",
+              "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">That's /b/. P has no voiceâ€”just air. Try again.</voice></speak>"
             }
           },
           {
             "task_id": "5",
             "letter": "I",
-            "tts_coach": "Letter I makes /i/. Quick, tight sound. Not 'eye'—just /i/ like 'it'.",
+            "tts_coach": "Letter I makes /i/. Quick, tight sound. Not 'eye'â€”just /i/ like 'it'.",
             "tts_coach_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Letter I makes /i/. Quick, tight sound. Not 'eye'.</voice></speak>",
             "visual": [
               {
@@ -474,16 +474,16 @@
           }
         ],
         "blending_practice": [
-          { "task_id": "7", "word": "sat", "image": "Person sitting on a chair", "tts_instruction": "Read: sat.", "tts_instruction_ssml": "<speak><voice name=\"en-US-JennyNeural\">Read: sat.</voice></speak>", "feedback": { "tts_exactMatch": "Correct.", "tts_exactMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>", "tts_closeMatch": "Say each sound. Then blend.", "tts_closeMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>", "tts_wrongSound": "Say each sound. Then blend.", "tts_wrongSound_ssml": "<speak><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>" }, "xp": 5 },
-          { "task_id": "8", "word": "pin", "image": "Safety pin", "tts_instruction": "Read: pin.", "tts_instruction_ssml": "<speak><voice name=\"en-US-JennyNeural\">Read: pin.</voice></speak>", "feedback": { "tts_exactMatch": "Right.", "tts_exactMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Right.</voice></speak>", "tts_closeMatch": "Say each sound. Then blend.", "tts_closeMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>", "tts_wrongSound": "Say each sound. Then blend.", "tts_wrongSound_ssml": "<speak><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>" }, "xp": 5 },
-          { "task_id": "9", "word": "tap", "image": "Finger tapping on surface", "tts_instruction": "Read: tap.", "tts_instruction_ssml": "<speak><voice name=\"en-US-JennyNeural\">Read: tap.</voice></speak>", "feedback": { "tts_exactMatch": "Got it.", "tts_exactMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Got it.</voice></speak>", "tts_closeMatch": "Say each sound. Then blend.", "tts_closeMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>", "tts_wrongSound": "Say each sound. Then blend.", "tts_wrongSound_ssml": "<speak><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>" }, "xp": 5 },
-          { "task_id": "10", "word": "nap", "image": "Person sleeping with 'ZZZ'", "tts_instruction": "Read: nap.", "tts_instruction_ssml": "<speak><voice name=\"en-US-JennyNeural\">Read: nap.</voice></speak>", "feedback": { "tts_exactMatch": "Correct.", "tts_exactMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>", "tts_closeMatch": "Say each sound. Then blend.", "tts_closeMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>", "tts_wrongSound": "Say each sound. Then blend.", "tts_wrongSound_ssml": "<speak><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>" }, "xp": 5 },
-          { "task_id": "11", "word": "pit", "image": "Hole/pit in the ground", "tts_instruction": "Read: pit.", "tts_instruction_ssml": "<speak><voice name=\"en-US-JennyNeural\">Read: pit.</voice></speak>", "feedback": { "tts_exactMatch": "Yes.", "tts_exactMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Yes.</voice></speak>", "tts_closeMatch": "Say each sound. Then blend.", "tts_closeMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>", "tts_wrongSound": "Say each sound. Then blend.", "tts_wrongSound_ssml": "<speak><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>" }, "xp": 5 },
-          { "task_id": "12", "word": "tip", "image": "Arrow pointing to tip of pencil", "tts_instruction": "Read: tip.", "tts_instruction_ssml": "<speak><voice name=\"en-US-JennyNeural\">Read: tip.</voice></speak>", "feedback": { "tts_exactMatch": "Good.", "tts_exactMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Good.</voice></speak>", "tts_closeMatch": "Say each sound. Then blend.", "tts_closeMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>", "tts_wrongSound": "Say each sound. Then blend.", "tts_wrongSound_ssml": "<speak><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>" }, "xp": 5 },
-          { "task_id": "13", "word": "pan", "image": "Frying pan", "tts_instruction": "Read: pan.", "tts_instruction_ssml": "<speak><voice name=\"en-US-JennyNeural\">Read: pan.</voice></speak>", "feedback": { "tts_exactMatch": "Nice.", "tts_exactMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Nice.</voice></speak>", "tts_closeMatch": "Say each sound. Then blend.", "tts_closeMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>", "tts_wrongSound": "Say each sound. Then blend.", "tts_wrongSound_ssml": "<speak><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>" }, "xp": 5 },
-          { "task_id": "14", "word": "sit", "image": "Chair with sit instruction sign", "tts_instruction": "Read: sit.", "tts_instruction_ssml": "<speak><voice name=\"en-US-JennyNeural\">Read: sit.</voice></speak>", "feedback": { "tts_exactMatch": "Correct.", "tts_exactMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>", "tts_closeMatch": "Say each sound. Then blend.", "tts_closeMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>", "tts_wrongSound": "Say each sound. Then blend.", "tts_wrongSound_ssml": "<speak><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>" }, "xp": 5 },
-          { "task_id": "15", "word": "tan", "image": "Tan/brown color swatch", "tts_instruction": "Read: tan.", "tts_instruction_ssml": "<speak><voice name=\"en-US-JennyNeural\">Read: tan.</voice></speak>", "feedback": { "tts_exactMatch": "Right.", "tts_exactMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Right.</voice></speak>", "tts_closeMatch": "Say each sound. Then blend.", "tts_closeMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>", "tts_wrongSound": "Say each sound. Then blend.", "tts_wrongSound_ssml": "<speak><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>" }, "xp": 5 },
-          { "task_id": "16", "word": "sap", "image": "Tree sap dripping", "tts_instruction": "Read: sap.", "tts_instruction_ssml": "<speak><voice name=\"en-US-JennyNeural\">Read: sap.</voice></speak>", "feedback": { "tts_exactMatch": "Got it.", "tts_exactMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Got it.</voice></speak>", "tts_closeMatch": "Say each sound. Then blend.", "tts_closeMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>", "tts_wrongSound": "Say each sound. Then blend.", "tts_wrongSound_ssml": "<speak><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>" }, "xp": 5 }
+          { "task_id": "7", "word": "sat", "image": "Person sitting on a chair", "tts_instruction": "Read: sat.", "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Read: sat.</voice></speak>", "feedback": { "tts_exactMatch": "Correct.", "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>", "tts_closeMatch": "Say each sound. Then blend.", "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>", "tts_wrongSound": "Say each sound. Then blend.", "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>" }, "xp": 5 },
+          { "task_id": "8", "word": "pin", "image": "Safety pin", "tts_instruction": "Read: pin.", "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Read: pin.</voice></speak>", "feedback": { "tts_exactMatch": "Right.", "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Right.</voice></speak>", "tts_closeMatch": "Say each sound. Then blend.", "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>", "tts_wrongSound": "Say each sound. Then blend.", "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>" }, "xp": 5 },
+          { "task_id": "9", "word": "tap", "image": "Finger tapping on surface", "tts_instruction": "Read: tap.", "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Read: tap.</voice></speak>", "feedback": { "tts_exactMatch": "Got it.", "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Got it.</voice></speak>", "tts_closeMatch": "Say each sound. Then blend.", "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>", "tts_wrongSound": "Say each sound. Then blend.", "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>" }, "xp": 5 },
+          { "task_id": "10", "word": "nap", "image": "Person sleeping with 'ZZZ'", "tts_instruction": "Read: nap.", "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Read: nap.</voice></speak>", "feedback": { "tts_exactMatch": "Correct.", "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>", "tts_closeMatch": "Say each sound. Then blend.", "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>", "tts_wrongSound": "Say each sound. Then blend.", "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>" }, "xp": 5 },
+          { "task_id": "11", "word": "pit", "image": "Hole/pit in the ground", "tts_instruction": "Read: pit.", "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Read: pit.</voice></speak>", "feedback": { "tts_exactMatch": "Yes.", "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Yes.</voice></speak>", "tts_closeMatch": "Say each sound. Then blend.", "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>", "tts_wrongSound": "Say each sound. Then blend.", "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>" }, "xp": 5 },
+          { "task_id": "12", "word": "tip", "image": "Arrow pointing to tip of pencil", "tts_instruction": "Read: tip.", "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Read: tip.</voice></speak>", "feedback": { "tts_exactMatch": "Good.", "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Good.</voice></speak>", "tts_closeMatch": "Say each sound. Then blend.", "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>", "tts_wrongSound": "Say each sound. Then blend.", "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>" }, "xp": 5 },
+          { "task_id": "13", "word": "pan", "image": "Frying pan", "tts_instruction": "Read: pan.", "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Read: pan.</voice></speak>", "feedback": { "tts_exactMatch": "Nice.", "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Nice.</voice></speak>", "tts_closeMatch": "Say each sound. Then blend.", "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>", "tts_wrongSound": "Say each sound. Then blend.", "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>" }, "xp": 5 },
+          { "task_id": "14", "word": "sit", "image": "Chair with sit instruction sign", "tts_instruction": "Read: sit.", "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Read: sit.</voice></speak>", "feedback": { "tts_exactMatch": "Correct.", "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>", "tts_closeMatch": "Say each sound. Then blend.", "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>", "tts_wrongSound": "Say each sound. Then blend.", "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>" }, "xp": 5 },
+          { "task_id": "15", "word": "tan", "image": "Tan/brown color swatch", "tts_instruction": "Read: tan.", "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Read: tan.</voice></speak>", "feedback": { "tts_exactMatch": "Right.", "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Right.</voice></speak>", "tts_closeMatch": "Say each sound. Then blend.", "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>", "tts_wrongSound": "Say each sound. Then blend.", "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>" }, "xp": 5 },
+          { "task_id": "16", "word": "sap", "image": "Tree sap dripping", "tts_instruction": "Read: sap.", "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Read: sap.</voice></speak>", "feedback": { "tts_exactMatch": "Got it.", "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Got it.</voice></speak>", "tts_closeMatch": "Say each sound. Then blend.", "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>", "tts_wrongSound": "Say each sound. Then blend.", "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Say each sound. Then blend.</voice></speak>" }, "xp": 5 }
         ],
         "word_practice": [],
         "sentence_practice": [
@@ -492,14 +492,14 @@
             "word": "Sit down.",
             "image": "A student sitting down",
             "tts_instruction": "Read it.",
-            "tts_instruction_ssml": "<speak><voice name=\"en-US-JennyNeural\">Read it.</voice></speak>",
+            "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Read it.</voice></speak>",
             "feedback": {
               "tts_exactMatch": "Good reading.",
-              "tts_exactMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Good reading.</voice></speak>",
+              "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Good reading.</voice></speak>",
               "tts_closeMatch": "Go word by word. Decode.",
-              "tts_closeMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Go word by word. Decode.</voice></speak>",
+              "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word. Decode.</voice></speak>",
               "tts_wrongSound": "Go word by word. Decode.",
-              "tts_wrongSound_ssml": "<speak><voice name=\"en-US-JennyNeural\">Go word by word. Decode.</voice></speak>"
+              "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word. Decode.</voice></speak>"
             },
             "xp": 5
           },
@@ -508,14 +508,14 @@
             "word": "Get a map.",
             "image": "A hand holding a map",
             "tts_instruction": "Read it.",
-            "tts_instruction_ssml": "<speak><voice name=\"en-US-JennyNeural\">Read it.</voice></speak>",
+            "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Read it.</voice></speak>",
             "feedback": {
               "tts_exactMatch": "Good reading.",
-              "tts_exactMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Good reading.</voice></speak>",
+              "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Good reading.</voice></speak>",
               "tts_closeMatch": "Go word by word. Decode.",
-              "tts_closeMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Go word by word. Decode.</voice></speak>",
+              "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word. Decode.</voice></speak>",
               "tts_wrongSound": "Go word by word. Decode.",
-              "tts_wrongSound_ssml": "<speak><voice name=\"en-US-JennyNeural\">Go word by word. Decode.</voice></speak>"
+              "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word. Decode.</voice></speak>"
             },
             "xp": 5
           },
@@ -524,14 +524,14 @@
             "word": "Tap the dot.",
             "image": "A finger tapping a dot on a screen",
             "tts_instruction": "Read it.",
-            "tts_instruction_ssml": "<speak><voice name=\"en-US-JennyNeural\">Read it.</voice></speak>",
+            "tts_instruction_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Read it.</voice></speak>",
             "feedback": {
               "tts_exactMatch": "Good reading.",
-              "tts_exactMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Good reading.</voice></speak>",
+              "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Good reading.</voice></speak>",
               "tts_closeMatch": "Go word by word. Decode.",
-              "tts_closeMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Go word by word. Decode.</voice></speak>",
+              "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word. Decode.</voice></speak>",
               "tts_wrongSound": "Go word by word. Decode.",
-              "tts_wrongSound_ssml": "<speak><voice name=\"en-US-JennyNeural\">Go word by word. Decode.</voice></speak>"
+              "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Go word by word. Decode.</voice></speak>"
             },
             "xp": 5
           }
@@ -547,29 +547,29 @@
       "target": "0-1",
       "introduction": {
         "tts_coach": "Now let's check what stuck. You'll read words built from S, A, T, P, I, N. Aim for at least eight out of ten to hit mastery.",
-        "tts_coach_ssml": "<speak><voice name=\"en-US-JennyNeural\">Now let's check what stuck. You'll read words built from S, A, T, P, I, N. Aim for at least eight out of ten to hit mastery.</voice></speak>",
+        "tts_coach_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Now let's check what stuck. You'll read words built from S, A, T, P, I, N. Aim for at least eight out of ten to hit mastery.</voice></speak>",
         "visual": []
       },
       "tasks": {
         "word_practice": [
-          { "task_id": "1", "word": "sat", "image": "Person sitting on a chair", "retryLimit": 3, "feedback": { "tts_exactMatch": "Correct.", "tts_exactMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>", "tts_closeMatch": "Not quite. Sound it out. Then blend.", "tts_closeMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>", "tts_wrongSound": "Not quite. Sound it out. Then blend.", "tts_wrongSound_ssml": "<speak><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>" }, "xp": 5 },
-          { "task_id": "2", "word": "tap", "image": "Finger tapping on surface", "retryLimit": 3, "feedback": { "tts_exactMatch": "Correct.", "tts_exactMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>", "tts_closeMatch": "Not quite. Sound it out. Then blend.", "tts_closeMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>", "tts_wrongSound": "Not quite. Sound it out. Then blend.", "tts_wrongSound_ssml": "<speak><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>" }, "xp": 5 },
-          { "task_id": "3", "word": "pin", "image": "Safety pin", "retryLimit": 3, "feedback": { "tts_exactMatch": "Correct.", "tts_exactMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>", "tts_closeMatch": "Not quite. Sound it out. Then blend.", "tts_closeMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>", "tts_wrongSound": "Not quite. Sound it out. Then blend.", "tts_wrongSound_ssml": "<speak><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>" }, "xp": 5 },
-          { "task_id": "4", "word": "nap", "image": "Person sleeping with 'ZZZ'", "retryLimit": 3, "feedback": { "tts_exactMatch": "Correct.", "tts_exactMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>", "tts_closeMatch": "Not quite. Sound it out. Then blend.", "tts_closeMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>", "tts_wrongSound": "Not quite. Sound it out. Then blend.", "tts_wrongSound_ssml": "<speak><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>" }, "xp": 5 },
-          { "task_id": "5", "word": "pit", "image": "Hole/pit in the ground", "retryLimit": 3, "feedback": { "tts_exactMatch": "Correct.", "tts_exactMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>", "tts_closeMatch": "Not quite. Sound it out. Then blend.", "tts_closeMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>", "tts_wrongSound": "Not quite. Sound it out. Then blend.", "tts_wrongSound_ssml": "<speak><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>" }, "xp": 5 },
-          { "task_id": "6", "word": "tip", "image": "Arrow pointing to tip of pencil", "retryLimit": 3, "feedback": { "tts_exactMatch": "Correct.", "tts_exactMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>", "tts_closeMatch": "Not quite. Sound it out. Then blend.", "tts_closeMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>", "tts_wrongSound": "Not quite. Sound it out. Then blend.", "tts_wrongSound_ssml": "<speak><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>" }, "xp": 5 },
-          { "task_id": "7", "word": "pan", "image": "Frying pan", "retryLimit": 3, "feedback": { "tts_exactMatch": "Correct.", "tts_exactMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>", "tts_closeMatch": "Not quite. Sound it out. Then blend.", "tts_closeMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>", "tts_wrongSound": "Not quite. Sound it out. Then blend.", "tts_wrongSound_ssml": "<speak><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>" }, "xp": 5 },
-          { "task_id": "8", "word": "sit", "image": "Chair with sit instruction sign", "retryLimit": 3, "feedback": { "tts_exactMatch": "Correct.", "tts_exactMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>", "tts_closeMatch": "Not quite. Sound it out. Then blend.", "tts_closeMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>", "tts_wrongSound": "Not quite. Sound it out. Then blend.", "tts_wrongSound_ssml": "<speak><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>" }, "xp": 5 },
-          { "task_id": "9", "word": "tan", "image": "Tan/brown color swatch", "retryLimit": 3, "feedback": { "tts_exactMatch": "Correct.", "tts_exactMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>", "tts_closeMatch": "Not quite. Sound it out. Then blend.", "tts_closeMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>", "tts_wrongSound": "Not quite. Sound it out. Then blend.", "tts_wrongSound_ssml": "<speak><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>" }, "xp": 5 },
-          { "task_id": "10", "word": "sap", "image": "Tree sap dripping", "retryLimit": 3, "feedback": { "tts_exactMatch": "Correct.", "tts_exactMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>", "tts_closeMatch": "Not quite. Sound it out. Then blend.", "tts_closeMatch_ssml": "<speak><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>", "tts_wrongSound": "Not quite. Sound it out. Then blend.", "tts_wrongSound_ssml": "<speak><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>" }, "xp": 5 }
+          { "task_id": "1", "word": "sat", "image": "Person sitting on a chair", "retryLimit": 3, "feedback": { "tts_exactMatch": "Correct.", "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>", "tts_closeMatch": "Not quite. Sound it out. Then blend.", "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>", "tts_wrongSound": "Not quite. Sound it out. Then blend.", "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>" }, "xp": 5 },
+          { "task_id": "2", "word": "tap", "image": "Finger tapping on surface", "retryLimit": 3, "feedback": { "tts_exactMatch": "Correct.", "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>", "tts_closeMatch": "Not quite. Sound it out. Then blend.", "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>", "tts_wrongSound": "Not quite. Sound it out. Then blend.", "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>" }, "xp": 5 },
+          { "task_id": "3", "word": "pin", "image": "Safety pin", "retryLimit": 3, "feedback": { "tts_exactMatch": "Correct.", "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>", "tts_closeMatch": "Not quite. Sound it out. Then blend.", "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>", "tts_wrongSound": "Not quite. Sound it out. Then blend.", "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>" }, "xp": 5 },
+          { "task_id": "4", "word": "nap", "image": "Person sleeping with 'ZZZ'", "retryLimit": 3, "feedback": { "tts_exactMatch": "Correct.", "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>", "tts_closeMatch": "Not quite. Sound it out. Then blend.", "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>", "tts_wrongSound": "Not quite. Sound it out. Then blend.", "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>" }, "xp": 5 },
+          { "task_id": "5", "word": "pit", "image": "Hole/pit in the ground", "retryLimit": 3, "feedback": { "tts_exactMatch": "Correct.", "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>", "tts_closeMatch": "Not quite. Sound it out. Then blend.", "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>", "tts_wrongSound": "Not quite. Sound it out. Then blend.", "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>" }, "xp": 5 },
+          { "task_id": "6", "word": "tip", "image": "Arrow pointing to tip of pencil", "retryLimit": 3, "feedback": { "tts_exactMatch": "Correct.", "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>", "tts_closeMatch": "Not quite. Sound it out. Then blend.", "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>", "tts_wrongSound": "Not quite. Sound it out. Then blend.", "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>" }, "xp": 5 },
+          { "task_id": "7", "word": "pan", "image": "Frying pan", "retryLimit": 3, "feedback": { "tts_exactMatch": "Correct.", "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>", "tts_closeMatch": "Not quite. Sound it out. Then blend.", "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>", "tts_wrongSound": "Not quite. Sound it out. Then blend.", "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>" }, "xp": 5 },
+          { "task_id": "8", "word": "sit", "image": "Chair with sit instruction sign", "retryLimit": 3, "feedback": { "tts_exactMatch": "Correct.", "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>", "tts_closeMatch": "Not quite. Sound it out. Then blend.", "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>", "tts_wrongSound": "Not quite. Sound it out. Then blend.", "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>" }, "xp": 5 },
+          { "task_id": "9", "word": "tan", "image": "Tan/brown color swatch", "retryLimit": 3, "feedback": { "tts_exactMatch": "Correct.", "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>", "tts_closeMatch": "Not quite. Sound it out. Then blend.", "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>", "tts_wrongSound": "Not quite. Sound it out. Then blend.", "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>" }, "xp": 5 },
+          { "task_id": "10", "word": "sap", "image": "Tree sap dripping", "retryLimit": 3, "feedback": { "tts_exactMatch": "Correct.", "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Correct.</voice></speak>", "tts_closeMatch": "Not quite. Sound it out. Then blend.", "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>", "tts_wrongSound": "Not quite. Sound it out. Then blend.", "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Not quite. Sound it out. Then blend.</voice></speak>" }, "xp": 5 }
         ],
         "results": {
-          "tts_0-1_correct": "You've got it. That's mastery—8 out of 10 or better. Moving forward.",
-          "tts_0-1_correct_ssml": "<speak><voice name=\"en-US-JennyNeural\">You've got it. That's mastery—8 out of 10 or better. Moving forward.</voice></speak>",
-          "tts_5-7_correct": "You're close—got {obtained_correct}/10. Let's drill the ones you missed, then retry.",
-          "tts_5-7_correct_ssml": "<speak><voice name=\"en-US-JennyNeural\">You're close—got {obtained_correct}/10. Let's drill the ones you missed, then retry.</voice></speak>",
+          "tts_0-1_correct": "You've got it. That's masteryâ€”8 out of 10 or better. Moving forward.",
+          "tts_0-1_correct_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">You've got it. That's masteryâ€”8 out of 10 or better. Moving forward.</voice></speak>",
+          "tts_5-7_correct": "You're closeâ€”got {obtained_correct}/10. Let's drill the ones you missed, then retry.",
+          "tts_5-7_correct_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">You're closeâ€”got {obtained_correct}/10. Let's drill the ones you missed, then retry.</voice></speak>",
           "tts_1-5_correct": "We're slowing down and fixing the sounds. Sound-by-sound practice coming up.",
-          "tts_1-5_correct_ssml": "<speak><voice name=\"en-US-JennyNeural\">We're slowing down and fixing the sounds. Sound-by-sound practice coming up.</voice></speak>"
+          "tts_1-5_correct_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">We're slowing down and fixing the sounds. Sound-by-sound practice coming up.</voice></speak>"
         }
       }
     },
@@ -581,8 +581,8 @@
       "is_required": true,
       "tasks": {
         "summary": {
-          "tts_coach": "Done. You learned six sounds: S, A, T, P, I, N. With just these six, you can read actual English words. That's not kids' stuff—that's functional literacy building. Next session, we add four more sounds, and your word count explodes. English has about 44 sounds total. You just learned 6. By the end of next lesson, you'll have 10. That's almost 25% of English phonics in two sessions. Stay sharp.",
-          "tts_coach_ssml": "<speak><voice name=\"en-US-JennyNeural\">Done. You learned six sounds: S, A, T, P, I, N. Next session, we add four more sounds. English has about 44 sounds total. You just learned 6. By end of next lesson, you'll have 10. Stay sharp.</voice></speak>",
+          "tts_coach": "Done. You learned six sounds: S, A, T, P, I, N. With just these six, you can read actual English words. That's not kids' stuffâ€”that's functional literacy building. Next session, we add four more sounds, and your word count explodes. English has about 44 sounds total. You just learned 6. By the end of next lesson, you'll have 10. That's almost 25% of English phonics in two sessions. Stay sharp.",
+          "tts_coach_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Done. You learned six sounds: S, A, T, P, I, N. Next session, we add four more sounds. English has about 44 sounds total. You just learned 6. By end of next lesson, you'll have 10. Stay sharp.</voice></speak>",
           "visual": [
             {
               "progressBar": "6/44 sounds learned",
@@ -601,3 +601,4 @@
     }
   ]
 }
+

@@ -411,6 +411,7 @@ export default function MissionPage() {
         variant="filled"
         onClick={handleContinue}
         disabled={isContinueDisabled}
+        className="flow-btn-attention"
       />
 
       {/* Mascot Avatar - Left Bottom */}

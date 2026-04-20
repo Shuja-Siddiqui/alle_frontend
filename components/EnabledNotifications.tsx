@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Toggle } from "./Toggle";
 
 type NotificationSetting = {
@@ -29,6 +29,11 @@ export function EnabledNotifications({
   onNotificationChange,
 }: EnabledNotificationsProps) {
   const [notificationStates, setNotificationStates] = useState<NotificationSetting[]>(notifications);
+
+  // Keep local state synced if parent passes new notification values from API.
+  useEffect(() => {
+    setNotificationStates(notifications);
+  }, [notifications]);
 
   function handleToggle(id: string, checked: boolean) {
     setNotificationStates((prev) =>

@@ -76,6 +76,12 @@ export function LevelMap({
     const root = containerRef.current;
     const svg = root.querySelector("svg");
     if (!svg) return;
+    svg.setAttribute("width", "846");
+    svg.setAttribute("height", "619");
+    svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+    (svg as SVGSVGElement).style.width = "846px";
+    (svg as SVGSVGElement).style.height = "619px";
+    (svg as SVGSVGElement).style.display = "block";
 
     const states: LessonMapState[] = ["active", "closed", "completed"];
 
@@ -148,11 +154,9 @@ export function LevelMap({
     return (
       <div
         style={{
-          position: "absolute",
-          width: 886,
+          position: "relative",
+          width: 846,
           height: 619,
-          top: -60,
-          left: -30,
           background: "rgba(0,0,0,0.1)",
           borderRadius: 8,
         }}
@@ -165,11 +169,9 @@ export function LevelMap({
     <div
       ref={containerRef}
       style={{
-        position: "absolute",
-        width: 886,
+        position: "relative",
+        width: 846,
         height: 619,
-        top: -60,
-        left: -30,
         opacity: 1,
         transform: "rotate(0deg)",
       }}

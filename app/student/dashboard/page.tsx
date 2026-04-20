@@ -251,7 +251,7 @@ export default function StudentDashboardPage() {
       className="flex flex-col font-sans"
       style={{
         width: "1440px",
-        padding: "0 32px 32px 32px", // No top padding, 32px on other sides
+        padding: "0 32px 32px 0px", // No top padding, 32px on other sides
       }}
     >
         {/* Heading */}
@@ -268,15 +268,19 @@ export default function StudentDashboardPage() {
             letterSpacing: "-0.66px",
             textTransform: "uppercase",
             margin: "62px 0px 0px 0px",
+            paddingLeft: "32px",
           }}
         >
           Your galaxy progress
         </h1>
 
         {/* Main Content */}
-        <main className="flex flex-1 flex-row items-start justify-between" style={{ marginTop: "51px", width: "100%" }}>
+        <main
+          className="flex flex-1 flex-row items-start justify-start"
+          style={{ marginTop: "51px", width: "100%" }}
+        >
           {/* Level Map Container - Left Side */}
-          <div className="relative w-full h-full">
+          <div className="shrink-0" style={{ width: "846px", height: "619px" }}>
             <LevelMap
               totalLevels={totalLevels}
               xpPerLevel={xpPerLevel}
@@ -294,7 +298,7 @@ export default function StudentDashboardPage() {
           </div>
 
           {/* Star Ring - Right Side */}
-          <div className="relative flex flex-col items-center justify-center">
+          <div className="relative flex flex-col items-center justify-center shrink-0" style={{ width: "454px" }}>
             <StarRing />
 
             {/* Box below Star Ring - full unit (button + box) gets drop shadow on hover */}

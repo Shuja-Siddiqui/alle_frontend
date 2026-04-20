@@ -113,8 +113,13 @@ export default function StudentDetailsPage() {
 
     const fetchStudent = async () => {
       try {
-        const response = await api.get<any>(`/users/${studentId}/student-details`);
-        const payload = response?.data ?? response;
+        const [detailsResponse, weekOverWeekResponse] = await Promise.all([
+          api.get<any>(`/users/${studentId}/student-details`),
+          api.get<any>(`/reports/week-over-week?studentId=${studentId}`),
+        ]);
+        const payload = detailsResponse?.data ?? detailsResponse;
+        const weekPayload = weekOverWeekResponse?.data ?? weekOverWeekResponse;
+        const weekData = weekPayload?.data ?? weekPayload ?? {};
 
         if (!isMounted || !payload) return;
 
@@ -183,6 +188,20 @@ export default function StudentDetailsPage() {
             ? `${totalHours}h ${remainingMinutes}m`
             : `${remainingMinutes}m`;
 
+        const thisWeekDaysActive =
+          typeof weekData?.thisWeek?.daysActive === "number"
+            ? weekData.thisWeek.daysActive
+            : 0;
+        const lastWeekDaysActive =
+          typeof weekData?.lastWeek?.daysActive === "number"
+            ? weekData.lastWeek.daysActive
+            : 0;
+        const engagementRate = Math.round((Math.min(7, Math.max(0, thisWeekDaysActive)) / 7) * 100);
+        const engagementRateLastWeek = Math.round(
+          (Math.min(7, Math.max(0, lastWeekDaysActive)) / 7) * 100
+        );
+        const engagementChange = engagementRate - engagementRateLastWeek;
+
         setStudentData((prev) => ({
           ...prev,
           id: user.id ?? prev.id,
@@ -211,6 +230,8 @@ export default function StudentDetailsPage() {
             total: totalTimeLabel,
             daily: learningDailyData,
           },
+          engagementRate,
+          engagementChange,
         }));
         setLoading(false);
       } catch (error) {

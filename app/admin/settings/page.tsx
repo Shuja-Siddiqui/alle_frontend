@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ContactDetails } from "../../../components/ContactDetails";
@@ -8,6 +8,23 @@ import { EnabledNotifications } from "../../../components/EnabledNotifications";
 import { CustomerSupport } from "../../../components/CustomerSupport";
 import { EditContactDetailsDialog, ContactDetailsFormData } from "../../../components/EditContactDetailsDialog";
 import { useAuth } from "../../../contexts/AuthContext";
+import { api } from "../../../lib/api-client";
+
+type NotificationSetting = {
+  id: string;
+  label: string;
+  enabled: boolean;
+};
+
+const defaultNotificationSettings: NotificationSetting[] = [
+  { id: "email", label: "Email notifications", enabled: false },
+  { id: "sms", label: "SMS notifications", enabled: false },
+  { id: "inApp", label: "In app alerts", enabled: false },
+  { id: "fastProgress", label: "Student progressing faster than expected", enabled: false },
+  { id: "weeklySummary", label: "Weekly summary reports", enabled: false },
+  { id: "lowActivity", label: "Low students activity progress", enabled: false },
+  { id: "inactive", label: "Inactive students", enabled: false },
+];
 
 const defaultLanguages = [
   { value: "english", label: "English" },
@@ -28,6 +45,9 @@ export default function AdminSettingsPage() {
   const { logout } = useAuth();
 
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [notificationSettings, setNotificationSettings] = useState<NotificationSetting[]>(
+    defaultNotificationSettings
+  );
   const [contactData, setContactData] = useState<ContactDetailsFormData>({
     firstName: "James",
     lastName: "Dembele",
@@ -48,10 +68,53 @@ export default function AdminSettingsPage() {
     console.log("Saving contact details:", data);
   }
 
-  function handleNotificationChange(id: string, enabled: boolean) {
-    // TODO: Implement API call to update notification settings
-    console.log(`Notification ${id} changed to ${enabled}`);
+  async function handleNotificationChange(id: string, enabled: boolean) {
+    // Optimistic update
+    setNotificationSettings((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, enabled } : item))
+    );
+
+    try {
+      const response = await api.patch<any>("/users/me/notification-settings", {
+        id,
+        enabled,
+      });
+      const payload = response?.data ?? response ?? {};
+      const map = payload.notifications ?? {};
+      setNotificationSettings((prev) =>
+        prev.map((item) => ({ ...item, enabled: Boolean(map[item.id]) }))
+      );
+    } catch (error) {
+      console.error("Failed to save notification setting:", error);
+      // Revert on failure
+      setNotificationSettings((prev) =>
+        prev.map((item) => (item.id === id ? { ...item, enabled: !enabled } : item))
+      );
+    }
   }
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchNotificationSettings = async () => {
+      try {
+        const response = await api.get<any>("/users/me/notification-settings");
+        const payload = response?.data ?? response ?? {};
+        const map = payload.notifications ?? {};
+        if (!isMounted) return;
+        setNotificationSettings((prev) =>
+          prev.map((item) => ({ ...item, enabled: Boolean(map[item.id]) }))
+        );
+      } catch (error) {
+        console.error("Failed to load notification settings:", error);
+      }
+    };
+
+    fetchNotificationSettings();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   function handleContactSupport() {
     setShowEditDialog(true);
@@ -138,7 +201,10 @@ export default function AdminSettingsPage() {
 
             {/* Enabled Notifications */}
             <div className="flex-1" style={{ maxWidth: "558px" }}>
-              <EnabledNotifications onNotificationChange={handleNotificationChange} />
+              <EnabledNotifications
+                notifications={notificationSettings}
+                onNotificationChange={handleNotificationChange}
+              />
             </div>
           </div>
 

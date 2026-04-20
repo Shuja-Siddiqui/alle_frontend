@@ -3,12 +3,10 @@
 import { useState } from "react";
 import { BackButton } from "./BackButton";
 import { PrimaryButton } from "./PrimaryButton";
-import { RadioButton } from "./RadioButton";
 import { SelectField } from "./SelectField";
 
 export type DownloadReportFormData = {
   dateRange: string | null;
-  format: "PDF" | "CSV" | null;
 };
 
 type DownloadReportDialogProps = {
@@ -29,17 +27,15 @@ export function DownloadReportDialog({
   onReset,
 }: DownloadReportDialogProps) {
   const [dateRange, setDateRange] = useState<string | null>(null);
-  const [format, setFormat] = useState<"PDF" | "CSV" | null>(null);
 
   function handleReset() {
     setDateRange(null);
-    setFormat(null);
     onReset?.();
   }
 
   function handleDownload() {
-    if (dateRange && format) {
-      onDownload({ dateRange, format });
+    if (dateRange) {
+      onDownload({ dateRange });
     }
   }
 
@@ -102,44 +98,6 @@ export function DownloadReportDialog({
               onChange={(value) => setDateRange(value)}
               className="w-full!"
             />
-          </div>
-
-          {/* Format Section */}
-          <div className="flex flex-col items-start relative w-full">
-            <div className="flex flex-col gap-[12px] items-start justify-center relative w-full">
-              <p
-                style={{
-                  color: "#FFFFFF",
-                  fontFamily: "var(--font-orbitron), system-ui, sans-serif",
-                  fontSize: "16px",
-                  fontStyle: "normal",
-                  fontWeight: 500,
-                  lineHeight: "1.5",
-                  letterSpacing: "-0.176px",
-                }}
-              >
-                Format
-              </p>
-              <div className="flex gap-[36px] items-start relative w-full">
-                {/* PDF Option */}
-                <RadioButton
-                  checked={format === "PDF"}
-                  onChange={() => setFormat("PDF")}
-                  name="format"
-                  value="PDF"
-                  label="PDF"
-                />
-
-                {/* CSV Option */}
-                <RadioButton
-                  checked={format === "CSV"}
-                  onChange={() => setFormat("CSV")}
-                  name="format"
-                  value="CSV"
-                  label="CSV"
-                />
-              </div>
-            </div>
           </div>
 
           {/* Buttons */}

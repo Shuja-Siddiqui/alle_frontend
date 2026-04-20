@@ -1,7 +1,6 @@
 "use client";
 
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-import Image from "next/image";
 
 type StudentEngagementCardProps = {
   /** Engagement percentage (0-100) */
@@ -17,6 +16,10 @@ export function StudentEngagementCard({
   changePercentage = 4,
   className,
 }: StudentEngagementCardProps) {
+  const roundedChange = Math.round(changePercentage);
+  const changeLabel = `${roundedChange >= 0 ? "+" : ""}${roundedChange}%`;
+  const changeColor = roundedChange >= 0 ? "#38ffa2" : "#ff6b8a";
+
   // Data for the donut chart
   const data = [
     { name: "Engaged", value: percentage },
@@ -67,25 +70,6 @@ export function StudentEngagementCard({
               </Pie>
             </PieChart>
           </ResponsiveContainer>
-
-          {/* Icon in center - using analytics icon as placeholder */}
-          <div
-            className="absolute flex items-center justify-center"
-            style={{
-              top: "77.27px",
-              left: "1.56px",
-              width: "22.634px",
-              height: "22.634px",
-            }}
-          >
-            <Image
-              src="/assets/icons/admin/analytics.svg"
-              alt="Engagement"
-              width={23}
-              height={23}
-              className="block max-w-none"
-            />
-          </div>
 
           {/* Center Percentage Text */}
           <div
@@ -141,7 +125,7 @@ export function StudentEngagementCard({
               letterSpacing: "-0.132px",
             }}
           >
-            <span style={{ color: "#38ffa2" }}>+{changePercentage}% </span>
+            <span style={{ color: changeColor }}>{changeLabel} </span>
             <span>vs last week</span>
           </p>
         </div>

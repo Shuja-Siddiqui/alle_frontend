@@ -56,24 +56,24 @@
                         {
                             "task_id": "2",
                             "letter": "A",
-                            "tts_ss1": "Next: A. Short and sharp. /a/. Say it: /a/. Keep it quick.",
-                            "tts_ss1_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Next: A. Short and sharp. /a/. Say it: /a/. Keep it quick.</voice></speak>",
+                            "tts_ss1": "Next: A. Short and sharp. /ae/. Say it: /ae/. Keep it quick.",
+                            "tts_ss1_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Next: A. Short and sharp. /ae/. Say it: /ae/. Keep it quick.</voice></speak>",
                             "xp": 10,
                             "visual": [
                                 {
                                     "prompt": "Sound Station 2 - A",
                                     "mouthCue": "Medium-open mouth, quick jaw drop, tongue stays low and flat.",
-                                    "association": "Apple and ant. /a/.",
+                                    "association": "Apple and ant. /ae/.",
                                     "image": "Apple"
                                 }
                             ],
                             "feedback": {
-                                "tts_exactMatch": "That's it. Perfect /a/. Locked in.",
-                                "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">That's it. Perfect /a/. Locked in.</voice></speak>",
+                                "tts_exactMatch": "That's it. Perfect /ae/. Locked in.",
+                                "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">That's it. Perfect /ae/. Locked in.</voice></speak>",
                                 "tts_closeMatch": "You're holding it too long. Make it quick: /a/.",
                                 "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">You're holding it too long. Make it quick: /a/.</voice></speak>",
-                                "tts_wrongSound": "That's 'ay' like the letter name. We need the short sound: /a/ like 'ant'.",
-                                "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">That's 'ay' like the letter name. We need the short sound: /a/ like 'ant'.</voice></speak>"
+                                "tts_wrongSound": "That's 'ay' like the letter name. We need the short sound: /ae/ like 'ant'.",
+                                "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">That's 'ay' like the letter name. We need the short sound: /ae/ like 'ant'.</voice></speak>"
                             }
                         },
                         {
@@ -373,8 +373,8 @@
                         {
                             "task_id": "2",
                             "letter": "A",
-                            "tts_coach": "Letter A makes /a/. Short and sharp. Not 'ay'—just /a/. Listen: /a/. Your turn: /a/.",
-                            "tts_coach_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Letter A makes /a/. Short and sharp. Not 'ay'. Listen: /a/. Your turn: /a/.</voice></speak>",
+                            "tts_coach": "Letter A makes /ae/. Short and sharp. Not 'ay'—just /ae/. Listen: /ae/. Your turn: /ae/.",
+                            "tts_coach_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">Letter A makes /ae/. Short and sharp. Not 'ay'. Listen: /ae/. Your turn: /ae/.</voice></speak>",
                             "visual": [
                                 {
                                     "word": "A",
@@ -384,12 +384,12 @@
                                 }
                             ],
                             "feedback": {
-                                "tts_exactMatch": "That's it. Perfect /a/.",
-                                "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">That's it. Perfect /a/.</voice></speak>",
+                                "tts_exactMatch": "That's it. Perfect /ae/.",
+                                "tts_exactMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">That's it. Perfect /ae/.</voice></speak>",
                                 "tts_closeMatch": "You're holding it too long. Make it quick: /a/.",
                                 "tts_closeMatch_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">You're holding it too long. Make it quick: /a/.</voice></speak>",
-                                "tts_wrongSound": "That's 'ay' like the letter name. We need the short sound: /a/ like 'ant'.",
-                                "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">That's 'ay' like the letter name. We need the short sound: /a/ like 'ant'.</voice></speak>"
+                                "tts_wrongSound": "That's 'ay' like the letter name. We need the short sound: /ae/ like 'ant'.",
+                                "tts_wrongSound_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice name=\"en-US-JennyNeural\">That's 'ay' like the letter name. We need the short sound: /ae/ like 'ant'.</voice></speak>"
                             }
                         },
                         {

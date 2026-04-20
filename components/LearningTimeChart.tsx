@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 type DailyData = {
   day: string;
   minutes: number;
@@ -32,6 +34,7 @@ export function LearningTimeChart({
   totalTime = "2h 23m",
   className,
 }: LearningTimeChartProps) {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   // Calculate bar heights as percentages
   const maxValue = Math.max(...dailyData.map((d) => d.minutes), MAX_MINUTES);
 
@@ -142,6 +145,38 @@ export function LearningTimeChart({
 
         {/* Bars and X-axis labels */}
         <div className="flex flex-[1_0_0] flex-col gap-[12px] h-[188px] items-start min-w-0 relative">
+          {/* Hover tooltip */}
+          {hoveredIndex !== null && (
+            <div
+              className="absolute z-20 pointer-events-none px-[12px] py-[8px] rounded-[16px]"
+              style={{
+                top: "-10px",
+                left: `${(hoveredIndex / Math.max(dailyData.length - 1, 1)) * 100}%`,
+                transform:
+                  hoveredIndex === 0
+                    ? "translateX(0)"
+                    : hoveredIndex === dailyData.length - 1
+                    ? "translateX(-100%)"
+                    : "translateX(-50%)",
+                backgroundColor: "#1b1f4e",
+                border: "1px solid #e451fe",
+                whiteSpace: "nowrap",
+              }}
+            >
+              <p
+                style={{
+                  color: "#FFFFFF",
+                  fontFamily: "var(--font-orbitron), system-ui, sans-serif",
+                  fontSize: "12px",
+                  fontWeight: 500,
+                  lineHeight: "18px",
+                }}
+              >
+                {dailyData[hoveredIndex]?.minutes ?? 0}m on {dailyData[hoveredIndex]?.day}
+              </p>
+            </div>
+          )}
+
           {/* Bars */}
           <div className="flex flex-[1_0_0] items-end justify-between min-w-0 relative w-full">
             {dailyData.map((data, index) => {
@@ -153,7 +188,9 @@ export function LearningTimeChart({
               return (
                 <div
                   key={index}
-                  className="bg-[#434b93] rounded-[12px] shrink-0"
+                  className="bg-[#434b93] rounded-[12px] shrink-0 cursor-pointer"
+                  onMouseEnter={() => setHoveredIndex(index)}
+                  onMouseLeave={() => setHoveredIndex(null)}
                   style={{
                     height: `${barHeight}px`,
                     width: "40px",

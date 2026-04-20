@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { InputHTMLAttributes } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type InputFieldProps = InputHTMLAttributes<HTMLInputElement> & {
   label?: string;
@@ -23,8 +24,34 @@ export function InputField({
   onEndIconClick,
   ...props
 }: InputFieldProps) {
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const inputId =
     id ?? (label ? label.replace(/\s+/g, "-").toLowerCase() : undefined);
+  const isPasswordField = props.type === "password" || props.type === "text";
+  const canTogglePassword =
+    !!endIconSrc &&
+    (props.type === "password" || (props.type === "text" && !!onEndIconClick));
+
+  // When type changes away from text/password, reset visibility state.
+  useEffect(() => {
+    if (!isPasswordField) {
+      setIsPasswordVisible(false);
+    }
+  }, [isPasswordField]);
+
+  const resolvedType = useMemo(() => {
+    if (!canTogglePassword) return props.type;
+    if (props.type === "password" && isPasswordVisible) return "text";
+    if (props.type === "text" && !isPasswordVisible) return "password";
+    return props.type;
+  }, [canTogglePassword, props.type, isPasswordVisible]);
+
+  const handleEndIconClick = () => {
+    if (canTogglePassword) {
+      setIsPasswordVisible((prev) => !prev);
+    }
+    onEndIconClick?.();
+  };
 
   return (
     <div>
@@ -66,11 +93,13 @@ export function InputField({
             letterSpacing: "-0.198px",
           }}
           {...props}
+          type={resolvedType}
         />
         {endIconSrc && (
           <button
             type="button"
-            onClick={onEndIconClick}
+            onClick={handleEndIconClick}
+            aria-pressed={canTogglePassword ? isPasswordVisible : undefined}
             style={{
               background: "transparent",
               border: "none",
@@ -86,6 +115,14 @@ export function InputField({
               alt={endIconAlt}
               width={endIconWidth}
               height={endIconHeight}
+              style={
+                canTogglePassword && isPasswordVisible
+                  ? {
+                      filter:
+                        "brightness(0) saturate(100%) invert(31%) sepia(99%) saturate(2714%) hue-rotate(291deg) brightness(103%) contrast(101%)",
+                    }
+                  : undefined
+              }
             />
           </button>
         )}

@@ -19,7 +19,15 @@ type BlendingBoxesProps = {
   letterGap?: number;
   /** Custom className */
   className?: string;
+  /** Optional score shown above each letter (e.g., Azure) */
+  topScores?: Array<number | null | undefined>;
+  /** Optional score shown below each letter (e.g., SpeechSuper) */
+  bottomScores?: Array<number | null | undefined>;
 };
+
+function formatScore(score?: number | null) {
+  return typeof score === "number" && Number.isFinite(score) ? `${Math.round(score)}%` : "--";
+}
 
 /** Returns the correct chain image element for a given variant */
 function ChainConnector({ variant }: { variant: StatusVariant }) {
@@ -67,6 +75,8 @@ export function BlendingBoxes({
   letterHeight = 134.92,
   letterGap = 6,
   className,
+  topScores,
+  bottomScores,
 }: BlendingBoxesProps) {
   // Only apply rotations for error variant, otherwise keep boxes straight
   const defaultRotations = letters.map((_, index) => {
@@ -102,23 +112,68 @@ export function BlendingBoxes({
         <React.Fragment key={index}>
           {/* Letter Box */}
           <div
+            className="flex flex-col items-center"
             style={{
-              position: "relative",
               zIndex: 0,
-              transform:
-                verticalOffsets[index] !== 0
-                  ? `translateY(${verticalOffsets[index]}px)`
-                  : undefined,
+              position: "relative",
+              paddingTop: "24px",
+              paddingBottom: "24px",
             }}
           >
-            <BlendingStatusBox
-              letter={letter}
-              variant={variant}
-              rotation={finalRotations[index]}
-              letterWidth={letterWidth}
-              letterHeight={letterHeight}
-              letterGap={letterGap}
-            />
+            <div
+              style={{
+                position: "absolute",
+                top: "0",
+                left: "50%",
+                transform: "translateX(-50%)",
+                minHeight: "20px",
+                color: "#7DD3FC",
+                fontSize: "14px",
+                fontWeight: 700,
+                letterSpacing: "0.02em",
+                zIndex: 300,
+                whiteSpace: "nowrap",
+                pointerEvents: "none",
+              }}
+            >
+              {topScores ? formatScore(topScores[index]) : ""}
+            </div>
+            <div
+              style={{
+                position: "relative",
+                transform:
+                  verticalOffsets[index] !== 0
+                    ? `translateY(${verticalOffsets[index]}px)`
+                    : undefined,
+              }}
+            >
+              <BlendingStatusBox
+                letter={letter}
+                variant={variant}
+                rotation={finalRotations[index]}
+                letterWidth={letterWidth}
+                letterHeight={letterHeight}
+                letterGap={letterGap}
+              />
+            </div>
+            <div
+              style={{
+                position: "absolute",
+                bottom: "0",
+                left: "50%",
+                transform: "translateX(-50%)",
+                minHeight: "20px",
+                color: "#F9A8D4",
+                fontSize: "14px",
+                fontWeight: 700,
+                letterSpacing: "0.02em",
+                zIndex: 300,
+                whiteSpace: "nowrap",
+                pointerEvents: "none",
+              }}
+            >
+              {bottomScores ? formatScore(bottomScores[index]) : ""}
+            </div>
           </div>
 
           {/* Chain connector placed inline between boxes */}

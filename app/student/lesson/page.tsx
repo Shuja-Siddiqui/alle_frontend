@@ -18,7 +18,19 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { useLesson } from "../../../contexts/LessonContext";
 import { useUI } from "../../../contexts/UIContext";
 import { api } from "../../../lib/api-client";
-import { getNextLessonStep, resolveTaskIndex } from "../../../lib/lesson-navigation";
+import { resolvePhonemeCode } from "../../../lib/phonemeCatalog";
+import { getNextLessonStep, PAGE_BY_TASK_TYPE, resolveTaskIndex } from "../../../lib/lesson-navigation";
+import {
+  getAttemptDurationSeconds,
+  getTaskStartTimeIso,
+  markAttemptEnd,
+  markAttemptStart,
+} from "../../../lib/attempt-timing";
+import {
+  clearTaskOutcomeState,
+  loadTaskOutcomeState,
+  saveTaskOutcomeState,
+} from "../../../lib/taskOutcomeState";
 import Image from "next/image";
 
 type StatusVariant = "initial" | "default" | "success" | "error";
@@ -74,6 +86,11 @@ export default function LessonPage() {
   const [showingFeedback, setShowingFeedback] = useState(false);
   const [feedbackData, setFeedbackData] = useState<any>(null);
   const [isPlayingTTS, setIsPlayingTTS] = useState(false);
+  const [pendingReset, setPendingReset] = useState<{
+    missionSequence: number;
+    taskId: string;
+    taskType: string;
+  } | null>(null);
   const [currentTaskIndex, setCurrentTaskIndex] = useState(0); // Index in alphabet_practice array
 
   // Get data from URL params
@@ -97,6 +114,8 @@ export default function LessonPage() {
   const processedRef = useRef(false);
   const batchStartCalledRef = useRef(false);
   const taskStartTimeRef = useRef<number | null>(null);
+  const assessmentEndTimeRef = useRef<number | null>(null);
+  const taskStateKeyPage = "lesson";
 
   // Helper: play TTS (instructions or feedback) and manage isPlayingTTS flag
   const playTTSManaged = useCallback(
@@ -157,6 +176,23 @@ export default function LessonPage() {
   useEffect(() => {
     setCurrentTaskIndex(effectiveTaskIndex);
   }, [effectiveTaskIndex]);
+
+  useEffect(() => {
+    const stored = loadTaskOutcomeState<any>(
+      taskStateKeyPage,
+      lessonId,
+      missionSequence,
+      taskId
+    );
+    if (!stored) return;
+    setStatusVariant(stored.statusVariant);
+    setFeedbackData(stored.feedbackData ?? null);
+    setCurrentRetry(stored.currentRetry ?? 0);
+    setPendingReset(stored.pendingReset ?? null);
+    setIsMicActive(false);
+    setIsProcessing(false);
+    setShowingFeedback(false);
+  }, [lessonId, missionSequence, taskId]);
 
   // Register batch start when user lands on first task (creates activity in backend)
   useEffect(() => {
@@ -225,7 +261,8 @@ export default function LessonPage() {
       setFeedbackData(null);
       setIsMicActive(false);
       setIsProcessing(false);
-      taskStartTimeRef.current = Date.now();
+      taskStartTimeRef.current = null;
+      assessmentEndTimeRef.current = null;
 
       return;
     }
@@ -247,7 +284,8 @@ export default function LessonPage() {
         const data = response.data;
         setTaskData(data);
         setCurrentRetry(data.currentRetries || 0);
-        taskStartTimeRef.current = Date.now();
+        taskStartTimeRef.current = null;
+        assessmentEndTimeRef.current = null;
 
         // Auto-play instruction TTS after a brief delay (disable mic while playing)
         if (data.tts && (data.tts.text || data.tts.ssml)) {
@@ -303,6 +341,8 @@ export default function LessonPage() {
       // Start recording
       try {
         await startRecording();
+        taskStartTimeRef.current = markAttemptStart();
+        assessmentEndTimeRef.current = null;
       } catch (error) {
         console.error("Failed to start recording:", error);
         setIsMicActive(false);
@@ -324,6 +364,22 @@ export default function LessonPage() {
         if (isAlphabetPractice) {
           // Use backend lesson response endpoint wired to SuperSpeech phoneme API
           const audioBase64 = await blobToBase64(audioBlob);
+          const resolvedLetter =
+            (currentTask as any)?.letter ??
+            letterFromContext ??
+            taskData?.letter ??
+            taskData?.expectedResponse?.value ??
+            "";
+          // Prefer explicit phoneme from payload/task data; fallback to letter-derived phoneme.
+          const payloadPhoneme =
+            (currentTask as any)?.expected_phoneme ??
+            ((taskData?.expectedResponse?.type === "phoneme"
+              ? taskData?.expectedResponse?.value
+              : "") as string) ??
+            taskData?.expectedResponse?.ipa ??
+            "";
+          const phonemeToSendRaw = String(payloadPhoneme || resolvedLetter || "").trim();
+          const normalizedPhoneme = resolvePhonemeCode(phonemeToSendRaw);
           const response = await api.post<any>(
             `/lessons/${lessonId}/progress/phoneme`,
             {
@@ -331,12 +387,20 @@ export default function LessonPage() {
               taskId,
               audioData: audioBase64,
               mimeType: "audio/webm",
+              letter: resolvedLetter || undefined,
+              phoneme: phonemeToSendRaw || normalizedPhoneme || undefined,
+              taskStartTime: getTaskStartTimeIso(taskStartTimeRef.current),
             }
           );
           result = response.data;
         } else {
           // Use Azure for word/sentence-level assessment via backend
           const audioBase64 = await blobToBase64(audioBlob);
+          const expectedResponse: any = (taskData as any)?.expectedResponse || {};
+          const phonemeFromPayload =
+            expectedResponse?.ipa ||
+            (Array.isArray(expectedResponse?.phonemes) ? expectedResponse.phonemes.join(" ") : "") ||
+            "";
           const response = await api.post<any>(
             `/lessons/${lessonId}/progress/response`,
             {
@@ -344,14 +408,66 @@ export default function LessonPage() {
               taskId,
               audioData: audioBase64,
               mimeType: "audio/webm",
+              phoneme: phonemeFromPayload || undefined,
+              taskStartTime: getTaskStartTimeIso(taskStartTimeRef.current),
             }
           );
           result = response.data;
         }
 
         if (result) {
+          assessmentEndTimeRef.current = markAttemptEnd();
           console.log("result", result);
           setFeedbackData(result);
+          saveTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId, {
+            statusVariant: result.feedbackType === "exactMatch" ? "success" : "error",
+            feedbackData: result,
+            currentRetry: result.feedbackType === "wrongSound" ? currentRetry + 1 : currentRetry,
+            pendingReset: null,
+          });
+
+          if (result.lessonResetToStart) {
+            const restartMission = Number(result?.restartAt?.missionSequence ?? 1);
+            const restartTaskId = String(result?.restartAt?.taskId ?? "1");
+            const restartTaskType = String(result?.restartAt?.taskType ?? "alphabet_practice");
+            const currentMission = currentLesson?.missions?.find(
+              (m: any) => (m.mission_sequence ?? m.missionSequence) === parseInt(missionSequence || "0", 10)
+            );
+            const isMasteryMission =
+              ((currentMission as any)?.mission_type ?? (currentMission as any)?.missionType) === "mastery_check";
+            const resetMessage = isMasteryMission
+              ? "Great effort! Mastery check is not complete yet. Let us practice the lesson again and come back even stronger. Tap Try again!"
+              : "Great effort! Let us restart this quest from the beginning so you can get even stronger. Tap Try again!";
+            setPendingReset({
+              missionSequence: restartMission,
+              taskId: restartTaskId,
+              taskType: restartTaskType,
+            });
+            setStatusVariant("error");
+            setShowingFeedback(false);
+            setCurrentRetry(0);
+            setIsMicActive(false);
+            saveTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId, {
+              statusVariant: "error",
+              feedbackData: result,
+              currentRetry: 0,
+              pendingReset: {
+                missionSequence: restartMission,
+                taskId: restartTaskId,
+                taskType: restartTaskType,
+              },
+            });
+
+            // Speak reset instruction; user taps "Try again" afterwards.
+            if (result?.feedback?.text || result?.feedback?.ssml) {
+              await playTTSManaged(result.feedback.text || "", result.feedback.ssml);
+            }
+            await playTTSManaged(
+              resetMessage,
+              undefined
+            );
+            return;
+          }
 
           // Play feedback TTS using ONLY lesson SSML
           if (result.feedbackType === "exactMatch") {
@@ -360,6 +476,12 @@ export default function LessonPage() {
             const successSSML = (taskData?.feedback as any)?.tts_exactMatch_ssml;
 
             await playTTSManaged(successSSML || "", successSSML);
+            saveTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId, {
+              statusVariant: "success",
+              feedbackData: result,
+              currentRetry,
+              pendingReset: null,
+            });
 
             // Don't auto-advance - wait for continue button click
             // Don't save checkpoint here - wait for continue button
@@ -383,6 +505,12 @@ export default function LessonPage() {
               improvementSSML || "",
               improvementSSML
             );
+            saveTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId, {
+              statusVariant: "error",
+              feedbackData: result,
+              currentRetry,
+              pendingReset: null,
+            });
           } else {
             // wrongSound: mark as error, play feedback, and let user retry via refresh/mic
             setStatusVariant("error");
@@ -403,13 +531,21 @@ export default function LessonPage() {
 
             // Check retry logic
             if (taskData && currentRetry + 1 >= (taskData.retryLimit || 3)) {
-              // Max retries reached - auto-advance
-              setTimeout(() => {
-                handleContinue();
-              }, 2000);
+              saveTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId, {
+                statusVariant: "error",
+                feedbackData: result,
+                currentRetry: currentRetry + 1,
+                pendingReset: null,
+              });
             } else {
               // Increment retry counter; user can tap refresh/mic for a new try
               setCurrentRetry(currentRetry + 1);
+              saveTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId, {
+                statusVariant: "error",
+                feedbackData: result,
+                currentRetry: currentRetry + 1,
+                pendingReset: null,
+              });
             }
           }
         }
@@ -441,8 +577,11 @@ export default function LessonPage() {
       payload.retryCount = currentRetry + 1;
       payload.letter = (currentTask as any)?.letter ?? letterFromContext;
       if (taskStartTimeRef.current) {
-        payload.duration = Math.max(0, Math.floor((Date.now() - taskStartTimeRef.current) / 1000));
-        payload.taskStartTime = new Date(taskStartTimeRef.current).toISOString();
+        payload.duration = getAttemptDurationSeconds(
+          taskStartTimeRef.current,
+          assessmentEndTimeRef.current
+        );
+        payload.taskStartTime = getTaskStartTimeIso(taskStartTimeRef.current);
       }
     }
 
@@ -455,12 +594,16 @@ export default function LessonPage() {
 
   // Handle refresh (reset same letter)
   const handleRefresh = () => {
+    clearTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId);
     setStatusVariant("initial");
     setShowingFeedback(false);
     setFeedbackData(null);
+    setPendingReset(null);
     setCurrentRetry(0);
     setIsMicActive(false);
     setIsProcessing(false);
+    taskStartTimeRef.current = null;
+    assessmentEndTimeRef.current = null;
 
     // Replay instruction TTS (disable mic while playing)
     if (taskData?.tts) {
@@ -470,12 +613,24 @@ export default function LessonPage() {
     }
   };
 
+  const handleTryAgain = () => {
+    if (!pendingReset) return;
+    clearTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId);
+    const { missionSequence: ms, taskId: tid, taskType: ttype } = pendingReset;
+    const page = PAGE_BY_TASK_TYPE[ttype] ?? "lesson";
+    setPendingReset(null);
+    router.push(
+      `/student/${page}?lessonId=${lessonId}&missionSequence=${ms}&taskId=${tid}&taskIndex=0`
+    );
+  };
+
   // Handle continue (move to next letter)
   const handleContinue = async () => {
     if (!lessonId || !missionSequence || !currentLesson || isProcessing) return;
     setIsProcessing(true);
 
     try {
+      clearTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId);
       // Save checkpoint
       await saveCheckpoint();
 
@@ -609,18 +764,23 @@ export default function LessonPage() {
             }}
             disabled={isPlayingTTS}
             style={{
-              padding: "8px 16px",
+              width: "48px",
+              height: "48px",
               backgroundColor: isPlayingTTS ? "#666" : "#4A90E2",
               color: "#FFF",
               border: "none",
-              borderRadius: "6px",
+              borderRadius: "999px",
               cursor: isPlayingTTS ? "not-allowed" : "pointer",
-              fontSize: "14px",
+              fontSize: "22px",
               fontWeight: 600,
               opacity: isPlayingTTS ? 0.6 : 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
+            aria-label={isPlayingTTS ? "Playing TTS" : "Play TTS"}
           >
-            {isPlayingTTS ? "🔊 Playing..." : "▶ Play TTS"}
+            {isPlayingTTS ? "🔊" : "▶"}
           </button>
         )}
 
@@ -659,12 +819,24 @@ export default function LessonPage() {
 
         {/* Mic / Refresh / Continue */}
         <div style={{ marginTop: "69px" }}>
-          {isSuccess ? (
+          {pendingReset ? (
+            <div className="flex items-center gap-8 justify-center">
+              <PrimaryButton
+                text="Try again"
+                size="medium"
+                variant="filled"
+                onClick={handleTryAgain}
+                disabled={isProcessing || isPlayingTTS}
+                className="flow-btn-attention"
+              />
+            </div>
+          ) : isSuccess ? (
             <div className="flex items-center gap-8">
               {/* Refresh Button */}
               <button
                 type="button"
                 onClick={handleRefresh}
+                className="flow-icon-btn-attention"
                 style={{
                   display: "flex",
                   width: "70px",
@@ -694,6 +866,7 @@ export default function LessonPage() {
                 variant="filled"
                 onClick={handleContinue}
                 disabled={isProcessing}
+                className="flow-btn-attention"
               />
             </div>
           ) : (
@@ -703,6 +876,7 @@ export default function LessonPage() {
                 <button
                   type="button"
                   onClick={handleRefresh}
+                  className="flow-icon-btn-attention"
                   style={{
                     display: "flex",
                     width: "70px",
@@ -731,6 +905,7 @@ export default function LessonPage() {
                 size={100}
                 onClick={handleMicClick}
                 disabled={isProcessing || isPlayingTTS}
+                className="flow-mic-btn-attention"
               />
             </div>
           )}

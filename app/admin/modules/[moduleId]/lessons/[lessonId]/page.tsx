@@ -35,8 +35,29 @@ type StudentApiData = {
   grade?: string;
   languagePreference?: string;
   avatarUrl?: string;
+  successRate?: number;
   status: string;
   progress: number;
+};
+
+type PerformanceMarkersApiData = {
+  averageAccuracy: number;
+  totalErrors: number;
+  topError: string;
+  correctAnswers: number;
+  incorrectAnswers: number;
+  partialMastery: number;
+  criticalErrors: number;
+};
+
+const DEFAULT_PERFORMANCE_MARKERS: PerformanceMarkersApiData = {
+  averageAccuracy: 0,
+  totalErrors: 0,
+  topError: "—",
+  correctAnswers: 0,
+  incorrectAnswers: 0,
+  partialMastery: 0,
+  criticalErrors: 0,
 };
 
 export default function LessonDetailsPage({
@@ -51,6 +72,9 @@ export default function LessonDetailsPage({
   const [showAddStudentDialog, setShowAddStudentDialog] = useState(false);
   const [lessonData, setLessonData] = useState<LessonApiData | null>(null);
   const [lessonStudents, setLessonStudents] = useState<StudentRowData[]>([]);
+  const [performanceMarkers, setPerformanceMarkers] = useState<PerformanceMarkersApiData>(
+    DEFAULT_PERFORMANCE_MARKERS
+  );
   const [loadingLesson, setLoadingLesson] = useState(true);
   const [loadingStudents, setLoadingStudents] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -89,6 +113,32 @@ export default function LessonDetailsPage({
   useEffect(() => {
     let isMounted = true;
 
+    const fetchMarkers = async () => {
+      try {
+        const res = await api.get<{ success?: boolean; data?: PerformanceMarkersApiData }>(
+          `/lessons/${lessonId}/performance-markers`
+        );
+        const payload = (res as any)?.data ?? res;
+        const data = (payload as any)?.data ?? payload;
+        if (isMounted && data) {
+          setPerformanceMarkers({
+            ...DEFAULT_PERFORMANCE_MARKERS,
+            ...data,
+          });
+        }
+      } catch (error) {
+        console.error("❌ Failed to load lesson performance markers:", error);
+        if (isMounted) setPerformanceMarkers(DEFAULT_PERFORMANCE_MARKERS);
+      }
+    };
+
+    fetchMarkers();
+    return () => { isMounted = false; };
+  }, [lessonId, refreshTrigger]);
+
+  useEffect(() => {
+    let isMounted = true;
+
     const fetchStudents = async () => {
       try {
         const response = await api.get<{ data?: StudentApiData[] }>(`/lessons/${lessonId}/students`);
@@ -105,7 +155,7 @@ export default function LessonDetailsPage({
               grade: s.grade || "-",
               language: langCode as "en" | "es" | "fr" | "hi" | "ar",
               languageName: LANGUAGE_NAMES[langCode] || "English",
-              successRate: s.progress ?? 0,
+              successRate: typeof s.successRate === "number" ? s.successRate : 0,
               progress: s.status === "completed" ? "Completed" : s.status === "in_progress" ? "In Progress" : s.status,
               progressHasWarning: (s.progress ?? 0) < 50,
               status: s.status === "completed" ? "Completed" : "Active",
@@ -309,15 +359,15 @@ export default function LessonDetailsPage({
                 className="w-[364px] shrink-0"
               />
 
-              {/* Right: Performance Markers (derived from student progress) */}
+              {/* Right: Performance markers (lesson_difficulty_daily + lesson_outcome_snapshot; see API) */}
               <PerformanceMarkers
-                averageAccuracy={avgProgress}
-                totalErrors={0}
-                topError="—"
-                correctAnswers={0}
-                incorrectAnswers={0}
-                partialMastery={0}
-                criticalErrors={0}
+                averageAccuracy={performanceMarkers.averageAccuracy}
+                totalErrors={performanceMarkers.totalErrors}
+                topError={performanceMarkers.topError}
+                correctAnswers={performanceMarkers.correctAnswers}
+                incorrectAnswers={performanceMarkers.incorrectAnswers}
+                partialMastery={performanceMarkers.partialMastery}
+                criticalErrors={performanceMarkers.criticalErrors}
                 className="flex-1"
               />
             </div>
