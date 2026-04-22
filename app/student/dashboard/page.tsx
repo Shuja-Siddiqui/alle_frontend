@@ -26,6 +26,12 @@ interface ResumePoint {
   completedLessonOrders?: number[];
 }
 
+interface StudentSoundsResponse {
+  studentId: string;
+  totalMastered: number;
+  phonemes: string[];
+}
+
 export default function StudentDashboardPage() {
   const router = useRouter();
   const { user, allBadges: badgeCatalog } = useAuth();
@@ -39,6 +45,9 @@ export default function StudentDashboardPage() {
   const hasFetchedRef = useRef(false);
   const [allLessonsCompleted, setAllLessonsCompleted] = useState(false);
   const [completedLessonMapIds, setCompletedLessonMapIds] = useState<string[]>([]);
+  const [masteredSoundsCount, setMasteredSoundsCount] = useState(0);
+  const [masteredSoundLabels, setMasteredSoundLabels] = useState<string[]>([]);
+  const totalSoundRingSlots = 45;
   
   const handleLevelClick = (level: number) => {
     // TODO: Navigate to level or show level details
@@ -199,6 +208,40 @@ export default function StudentDashboardPage() {
     };
   }, [user?.id, currentLesson, checkpoint]); // depend on context so we can prefer it when available
 
+  useEffect(() => {
+    if (!user || user.role !== "student") return;
+    let isMounted = true;
+
+    const fetchStudentSounds = async () => {
+      try {
+        const response = await api.get<{ success: boolean; data: StudentSoundsResponse }>("/student-sounds/me");
+        const payload = (response as any)?.data?.data ?? (response as any)?.data ?? response;
+        const totalMastered = Number(payload?.totalMastered ?? 0);
+        const phonemes = Array.isArray(payload?.phonemes) ? payload.phonemes : [];
+        if (isMounted) {
+          setMasteredSoundsCount(Math.max(0, Math.min(totalSoundRingSlots, totalMastered)));
+          setMasteredSoundLabels(
+            phonemes
+              .map((p: any) => String(p ?? "").trim().toUpperCase())
+              .filter(Boolean)
+              .slice(0, totalSoundRingSlots)
+          );
+        }
+      } catch (error) {
+        console.error("[Dashboard] Error fetching student sounds", error);
+        if (isMounted) {
+          setMasteredSoundsCount(0);
+          setMasteredSoundLabels([]);
+        }
+      }
+    };
+
+    fetchStudentSounds();
+    return () => {
+      isMounted = false;
+    };
+  }, [user?.id]);
+
   const handleContinueMission = async () => {
     if (!resumePoint) {
       showError('No lesson available. Please try refreshing the page.');
@@ -299,7 +342,12 @@ export default function StudentDashboardPage() {
 
           {/* Star Ring - Right Side */}
           <div className="relative flex flex-col items-center justify-center shrink-0" style={{ width: "454px" }}>
-            <StarRing />
+            <StarRing
+              selectedCircle={masteredSoundsCount}
+              initialValue={masteredSoundsCount}
+              progressLabel={`${masteredSoundsCount}/${totalSoundRingSlots}`}
+              soundLabels={masteredSoundLabels}
+            />
 
             {/* Box below Star Ring - full unit (button + box) gets drop shadow on hover */}
             <div className="group/continue relative w-[454px]" style={{ marginTop: "63.67px" }}>

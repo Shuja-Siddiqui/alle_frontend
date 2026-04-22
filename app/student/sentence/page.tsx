@@ -41,6 +41,7 @@ export default function SentencePage() {
   const missionSequence = searchParams.get("missionSequence") || "1";
   const taskId = searchParams.get("taskId") || "1";
   const taskIndexParam = searchParams.get("taskIndex");
+  const taskStateId = `${taskId}:${taskIndexParam || "0"}`;
 
   // Keep platform background in sync with current mission's mission_type (mission_mode → mission_mode.png)
   useEffect(() => {
@@ -78,7 +79,7 @@ export default function SentencePage() {
   }, [stopTTS]);
 
   const isSuccess = statusVariant === "success";
-  const sentence = taskData?.word || taskData?.expectedResponse?.value || "";
+  const sentence = taskData?.sentence || taskData?.word || taskData?.expectedResponse?.value || "";
 
   // Helper: Convert blob to base64
   const blobToBase64 = (blob: Blob): Promise<string> => {
@@ -125,11 +126,19 @@ export default function SentencePage() {
   }, [lessonId, missionSequence, taskId, playTTSWithSSML]);
 
   useEffect(() => {
+    // Reset UI state when moving to another sentence task
+    setStatusVariant("initial");
+    setShowingFeedback(false);
+    setFeedbackData(null);
+    setIsMicActive(false);
+    setIsProcessing(false);
+    setPendingReset(null);
+
     const stored = loadTaskOutcomeState<any>(
       taskStateKeyPage,
       lessonId,
       missionSequence,
-      taskId
+      taskStateId
     );
     if (!stored) return;
     setStatusVariant(stored.statusVariant);
@@ -139,7 +148,7 @@ export default function SentencePage() {
     setIsMicActive(false);
     setIsProcessing(false);
     setShowingFeedback(false);
-  }, [lessonId, missionSequence, taskId]);
+  }, [lessonId, missionSequence, taskId, taskIndexParam, taskStateId]);
 
   // Handle mic click: record, assess, show feedback
   const handleMicClick = async () => {
@@ -233,7 +242,7 @@ export default function SentencePage() {
             setStatusVariant("error");
             setCurrentRetry(0);
             setIsMicActive(false);
-            saveTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId, {
+            saveTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskStateId, {
               statusVariant: "error",
               feedbackData: assessment,
               currentRetry: 0,
@@ -271,7 +280,7 @@ export default function SentencePage() {
               assessment?.feedback?.text || "",
               assessment?.feedback?.ssml
             );
-            saveTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId, {
+            saveTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskStateId, {
               statusVariant: "success",
               feedbackData: assessment,
               currentRetry,
@@ -299,7 +308,7 @@ export default function SentencePage() {
               assessment?.feedback?.text || "",
               assessment?.feedback?.ssml
             );
-            saveTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId, {
+            saveTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskStateId, {
               statusVariant: "error",
               feedbackData: assessment,
               currentRetry: isMaxRetry ? 0 : currentRetry + 1,
@@ -326,7 +335,7 @@ export default function SentencePage() {
   const handleContinue = async () => {
     if (!lessonId || !missionSequence || !taskId) return;
     try {
-      clearTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId);
+      clearTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskStateId);
       setIsProcessing(true);
       await api.post(`/lessons/${lessonId}/progress/task/complete`, {
         missionSequence: parseInt(missionSequence),
@@ -385,7 +394,7 @@ export default function SentencePage() {
 
   // Handle refresh to retry
   const handleRefresh = () => {
-    clearTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId);
+    clearTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskStateId);
     setStatusVariant("initial");
     setShowingFeedback(false);
     setFeedbackData(null);
@@ -396,7 +405,7 @@ export default function SentencePage() {
 
   const handleTryAgain = () => {
     if (!pendingReset) return;
-    clearTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId);
+    clearTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskStateId);
     const { missionSequence: ms, taskId: tid, taskType: ttype } = pendingReset;
     const page = PAGE_BY_TASK_TYPE[ttype] ?? "lesson";
     setPendingReset(null);
