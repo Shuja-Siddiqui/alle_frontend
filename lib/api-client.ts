@@ -33,6 +33,24 @@ export class ApiError extends Error {
   }
 }
 
+function handleExpiredTokenRedirect(responseData: any, statusCode: number) {
+  if (typeof window === 'undefined') return;
+  if (statusCode !== 401) return;
+
+  const message = String(responseData?.message || responseData?.error || '').toLowerCase();
+  const isExpiredToken =
+    message.includes('invalid or expired token') ||
+    message.includes('expired token') ||
+    message.includes('jwt expired') ||
+    message.includes('invalid token');
+
+  if (!isExpiredToken) return;
+
+  localStorage.removeItem('auth_token');
+  localStorage.removeItem('user_data');
+  window.location.href = '/';
+}
+
 /**
  * Get auth token from localStorage
  */
@@ -109,6 +127,7 @@ export async function apiClient<T = any>(
     // Handle non-2xx responses
     if (!response.ok) {
       const errorMessage = data?.message || data?.error || `Request failed with status ${response.status}`;
+      handleExpiredTokenRedirect(data, response.status);
       console.error(`❌ API Error: ${config.method} ${url}`, {
         status: response.status,
         statusText: response.statusText,

@@ -214,10 +214,22 @@ export default function WordPage() {
           (taskData as any)?.expectedResponse?.value ||
           "";
         const expectedResponse: any = (taskData as any)?.expectedResponse || {};
+        const taskAny: any = taskData as any;
+        const phonemeCandidates = [
+          expectedResponse?.ipa,
+          Array.isArray(expectedResponse?.phonemes) ? expectedResponse.phonemes.join(" ") : null,
+          typeof expectedResponse?.phonemes === "string" ? expectedResponse.phonemes : null,
+          taskAny?.phoneme,
+          taskAny?.ipa,
+          Array.isArray(taskAny?.phonemes) ? taskAny.phonemes.join(" ") : null,
+          typeof taskAny?.phonemes === "string" ? taskAny.phonemes : null,
+          Array.isArray(taskAny?.word_phonemes) ? taskAny.word_phonemes.join(" ") : null,
+          typeof taskAny?.word_phonemes === "string" ? taskAny.word_phonemes : null,
+          Array.isArray(taskAny?.expected_phonemes) ? taskAny.expected_phonemes.join(" ") : null,
+          typeof taskAny?.expected_phonemes === "string" ? taskAny.expected_phonemes : null,
+        ];
         const phonemeFromPayload =
-          expectedResponse?.ipa ||
-          (Array.isArray(expectedResponse?.phonemes) ? expectedResponse.phonemes.join(" ") : "") ||
-          "";
+          phonemeCandidates.find((v) => typeof v === "string" && v.trim().length > 0)?.trim() || "";
         if (taskData && wordToAssess) {
           // Use the backend processStudentResponse endpoint for word assessment
           const formData = new FormData();
@@ -387,13 +399,12 @@ export default function WordPage() {
       const results = masteryMission.tasks?.results || {};
       const targetStr: string = masteryMission.target || "";
 
-      // Parse target like "0-1" or "6-8" into [min,max]
+      // Parse target like "1-3" and treat it as minimum threshold to pass.
+      // Rule: correctCount >= targetMin => pass, below targetMin => fail.
       let targetMin = 0;
-      let targetMax = Number.POSITIVE_INFINITY;
       if (targetStr) {
         const parts = targetStr.split("-").map((p: string) => parseInt(p, 10));
         if (!Number.isNaN(parts[0])) targetMin = parts[0];
-        if (!Number.isNaN(parts[1])) targetMax = parts[1];
       }
 
       // Collect mastery words for this mission
@@ -418,18 +429,6 @@ export default function WordPage() {
 
       // Decide band from results keys, e.g. tts_0-1_correct, tts_5-7_correct, tts_1-5_correct
       const total = masteryWords.length || 10; // fallback denominator for messaging only
-
-      // Pass/fail threshold can be overridden via env.
-      // When provided, we ignore mission.target for the pass/fail decision.
-      const envMinCorrect = Number(
-        process.env.NEXT_PUBLIC_LESSON_MASTERY_MIN_CORRECT
-      );
-      const envMaxCorrect = Number(
-        process.env.NEXT_PUBLIC_LESSON_MASTERY_MAX_CORRECT
-      );
-      if (!Number.isNaN(envMinCorrect)) targetMin = envMinCorrect;
-      if (!Number.isNaN(envMaxCorrect)) targetMax = envMaxCorrect;
-      else if (!Number.isNaN(envMinCorrect)) targetMax = total;
 
       let bandKey: string | null = null;
 
@@ -475,11 +474,10 @@ export default function WordPage() {
       });
       await playTTSWithSSML(text, ssml);
 
-      const passed = correctCount >= targetMin && correctCount <= targetMax;
+      const passed = correctCount >= targetMin;
       console.log("[Mastery] Pass/fail decision", {
         correctCount,
         targetMin,
-        targetMax,
         passed,
       });
 
@@ -642,6 +640,7 @@ export default function WordPage() {
     "";
   const wordImage = taskData.visual?.[0]?.image;
   const isSuccess = statusVariant === "success";
+  const canContinue = isSuccess || feedbackData?.taskComplete === true;
 
   // Helper to convert blob to base64
   const blobToBase64 = (blob: Blob): Promise<string> => {
@@ -729,7 +728,7 @@ export default function WordPage() {
                 className="flow-btn-attention"
               />
             </div>
-          ) : isSuccess ? (
+          ) : canContinue ? (
             <div className="flex items-center gap-8">
               {/* Refresh Button */}
               <button
