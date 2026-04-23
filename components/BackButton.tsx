@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import type { ButtonHTMLAttributes } from "react";
+import { motion } from "framer-motion";
 
 type BackButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   text?: string;
@@ -20,7 +21,13 @@ export function BackButton({
       className={`flex items-center gap-[16px] self-stretch cursor-pointer ${className ?? ""}`}
       {...props}
     >
-      <Image src={iconSrc} alt="Back" width={36} height={36} />
+      <motion.div
+        animate={{ x: [0, -6, 0] }}
+        transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+        style={{ width: "36px", height: "36px", display: "flex" }}
+      >
+        <Image src={iconSrc} alt="Back" width={36} height={36} />
+      </motion.div>
       {text && (
         <span
           style={{

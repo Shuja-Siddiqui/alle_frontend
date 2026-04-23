@@ -1,12 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { MASCOT_COLORS } from "../app/mascotColors";
 import { BackButton } from "./BackButton";
 import { PrimaryButton } from "./PrimaryButton";
 import { ConfirmCancelDialog } from "./ConfirmCancelDialog";
 import { MascotDisplay } from "./MascotDisplay";
+import { AnimatePresence, motion } from "framer-motion";
 
 type MascotParts = {
   head: string;
@@ -93,6 +94,8 @@ export function MascotCreation({
   onBack,
 }: MascotCreationProps) {
   const [currentStep, setCurrentStep] = useState<Step>("head");
+  const previewRef = useRef<HTMLDivElement | null>(null);
+  const optionsGridRef = useRef<HTMLDivElement | null>(null);
   const [selectedParts, setSelectedParts] = useState<MascotParts>({
     head: initialParts?.head ?? initialParts?.face ?? "head1",
     hair: initialParts?.hair || "hair1",
@@ -101,6 +104,17 @@ export function MascotCreation({
     hairColor: initialParts?.hairColor || "#E451FE",
   });
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [flyAnimation, setFlyAnimation] = useState<{
+    src: string;
+    fromX: number;
+    fromY: number;
+    toX: number;
+    toY: number;
+  } | null>(null);
+  const [hairColorTransition, setHairColorTransition] = useState<{
+    from: string;
+    to: string;
+  } | null>(null);
 
    // When initialParts change (e.g. loaded from backend or updated after save),
    // sync them into local state so reloads and profile edits reflect the saved mascot.
@@ -129,7 +143,29 @@ export function MascotCreation({
   const currentOptions = CATEGORY_OPTIONS[currentStep];
   const currentSelected = selectedParts[currentStep];
 
-  const handlePartClick = (partId: string) => {
+  const triggerFlyToPreview = (partId: string, sourceEl?: HTMLElement | null) => {
+    if (!sourceEl || !previewRef.current) return;
+
+    const sourceRect = sourceEl.getBoundingClientRect();
+    const previewRect = previewRef.current.getBoundingClientRect();
+
+    const fromX = sourceRect.left + sourceRect.width / 2;
+    const fromY = sourceRect.top + sourceRect.height / 2;
+    const targetYFactor = currentStep === "hair" ? 0.3 : currentStep === "head" ? 0.38 : 0.7;
+    const toX = previewRect.left + previewRect.width / 2;
+    const toY = previewRect.top + previewRect.height * targetYFactor;
+
+    setFlyAnimation({
+      src: `${CATEGORY_PATHS[currentStep]}/${partId}.svg`,
+      fromX,
+      fromY,
+      toX,
+      toY,
+    });
+  };
+
+  const handlePartClick = (partId: string, sourceEl?: HTMLElement | null) => {
+    triggerFlyToPreview(partId, sourceEl);
     const newBody = currentStep === "body" ? partId : selectedParts.body;
     const newCollar = currentStep === "body" ? getCollarFromBody(partId) : selectedParts.collar;
     const newParts: MascotParts = {
@@ -144,6 +180,14 @@ export function MascotCreation({
   };
 
   const handleHairColorClick = (color: string) => {
+    const currentColor = selectedParts.hairColor ?? "#E451FE";
+    if (currentColor === color) return;
+
+    setHairColorTransition({
+      from: currentColor,
+      to: color,
+    });
+
     const newParts = { ...selectedParts, hairColor: color };
     setSelectedParts(newParts);
     onPartSelect?.(newParts);
@@ -161,14 +205,22 @@ export function MascotCreation({
     const currentIndex = currentOptions.indexOf(currentSelected);
     const previousIndex =
       currentIndex <= 0 ? currentOptions.length - 1 : currentIndex - 1;
-    handlePartClick(currentOptions[previousIndex]);
+    const nextOptionId = currentOptions[previousIndex];
+    const sourceEl = optionsGridRef.current?.querySelector(
+      `[data-option-id="${nextOptionId}"]`
+    ) as HTMLElement | null;
+    handlePartClick(nextOptionId, sourceEl);
   };
 
   const handleOptionRight = () => {
     const currentIndex = currentOptions.indexOf(currentSelected);
     const nextIndex =
       currentIndex >= currentOptions.length - 1 ? 0 : currentIndex + 1;
-    handlePartClick(currentOptions[nextIndex]);
+    const nextOptionId = currentOptions[nextIndex];
+    const sourceEl = optionsGridRef.current?.querySelector(
+      `[data-option-id="${nextOptionId}"]`
+    ) as HTMLElement | null;
+    handlePartClick(nextOptionId, sourceEl);
   };
 
   const handleSave = () => {
@@ -245,6 +297,7 @@ export function MascotCreation({
       <div className="mt-[54px] flex flex-1 items-start justify-center gap-[24px]">
         {/* Left panel - Mascot preview */}
         <div
+          ref={previewRef}
           className="relative flex h-[559px] w-[668px] flex-col items-center rounded-[51.22px] border-2 border-[#E451FE] px-[44px] pt-[44px]"
           style={{
             borderRadius: "51.22px",
@@ -259,13 +312,37 @@ export function MascotCreation({
             hairId={selectedParts.hair}
             bodyId={selectedParts.body}
             collarId={getCollarFromBody(selectedParts.body)}
-            hairColor={selectedParts.hairColor}
+            hairColor={hairColorTransition?.from ?? selectedParts.hairColor}
             className="absolute bottom-0 left-1/2 -translate-x-1/2"
             style={{
               width: "100%",
               height: "100%",
             }}
           />
+
+          {/* Hair color fill animation: new color wipes from left to right */}
+          {hairColorTransition && (
+            <motion.div
+              className="absolute inset-0 overflow-hidden"
+              initial={{ clipPath: "inset(0 100% 0 0)" }}
+              animate={{ clipPath: "inset(0 0% 0 0)" }}
+              transition={{ duration: 1.1, ease: "easeInOut" }}
+              onAnimationComplete={() => setHairColorTransition(null)}
+            >
+              <MascotDisplay
+                headId={selectedParts.head}
+                hairId={selectedParts.hair}
+                bodyId={selectedParts.body}
+                collarId={getCollarFromBody(selectedParts.body)}
+                hairColor={hairColorTransition.to}
+                className="absolute bottom-0 left-1/2 -translate-x-1/2"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                }}
+              />
+            </motion.div>
+          )}
         </div>
 
         {/* Right panel - Category selector */}
@@ -299,7 +376,7 @@ export function MascotCreation({
             <button
               type="button"
               onClick={handleOptionLeft}
-              className="flex h-[44px] w-[44px] items-center justify-center"
+              className="flex h-[44px] w-[44px] items-center justify-center cursor-pointer"
             >
               <Image
                 src="/assets/icons/others/chevron_left.svg"
@@ -334,7 +411,7 @@ export function MascotCreation({
             <button
               type="button"
               onClick={handleOptionRight}
-              className="flex h-[44px] w-[44px] items-center justify-center"
+              className="flex h-[44px] w-[44px] items-center justify-center cursor-pointer"
             >
               <Image
                 src="/assets/icons/others/chevron_right.svg"
@@ -346,15 +423,16 @@ export function MascotCreation({
           </div>
 
           {/* Options grid - 5 columns, variable rows */}
-          <div className="grid grid-cols-5 gap-x-[34px] gap-y-[14px]">
+          <div ref={optionsGridRef} className="grid grid-cols-5 gap-x-[34px] gap-y-[14px]">
             {currentOptions.map((optionId, index) => {
               const isSelected = currentSelected === optionId;
               return (
                 <button
                   key={optionId}
+                  data-option-id={optionId}
                   type="button"
-                  onClick={() => handlePartClick(optionId)}
-                  className="relative h-[105px] w-[105px] shrink-0 overflow-hidden rounded-full"
+                  onClick={(e) => handlePartClick(optionId, e.currentTarget)}
+                  className="relative h-[105px] w-[105px] shrink-0 overflow-hidden rounded-full cursor-pointer"
                   style={{
                     backgroundColor: "#131743",
                     border: isSelected
@@ -362,28 +440,63 @@ export function MascotCreation({
                       : "1px solid #434B93",
                   }}
                 >
-                  <Image
+                  <motion.div
                     style={{
                       position: "absolute",
-                      left: 0,
-                      top:
-                        currentStep === "hair"
-                          ? 50
-                          : currentStep === "head"
-                          ? 30
-                          : -20,
+                      inset: 0,
                     }}
-                    src={`${CATEGORY_PATHS[currentStep]}/${optionId}.svg`}
-                    alt={`${getCategoryLabel(currentStep)} ${index + 1}`}
-                    fill
-                    className={
-                      currentStep === "head" || currentStep === "hair"
-                        ? "object-cover scale-[2]"
+                    animate={
+                      currentStep === "head"
+                        ? {
+                            y: [0, -4, 0],
+                            rotate: [0, -2, 2, 0],
+                            scale: [1, 1.03, 1],
+                          }
+                        : currentStep === "hair"
+                        ? {
+                            y: [0, -3, 0],
+                            rotate: [0, -1.5, 1.5, 0],
+                            scale: [1, 1.025, 1],
+                          }
                         : currentStep === "body"
-                        ? "object-cover scale-[1.1]"
-                        : "object-contain p-[7px]"
+                        ? {
+                            y: [0, -2, 0],
+                            scale: [1, 1.02, 1],
+                          }
+                        : undefined
                     }
-                  />
+                    transition={{
+                      duration:
+                        currentStep === "head" ? 2.2 : currentStep === "hair" ? 2.4 : 2.6,
+                      repeat: Infinity,
+                      repeatType: "loop",
+                      ease: "easeInOut",
+                      delay: index * 0.08,
+                    }}
+                  >
+                    <Image
+                      style={{
+                        position: "absolute",
+                        left: 0,
+                        top:
+                          currentStep === "hair"
+                            ? 50
+                            : currentStep === "head"
+                            ? 30
+                            : -20,
+                      }}
+                      src={`${CATEGORY_PATHS[currentStep]}/${optionId}.svg`}
+                      alt={`${getCategoryLabel(currentStep)} ${index + 1}`}
+                      fill
+                      className={
+                        currentStep === "head" || currentStep === "hair"
+                          ? "object-cover scale-[2]"
+                          : currentStep === "body"
+                          ? "object-cover scale-[1.1]"
+                          : "object-contain p-[7px]"
+                      }
+                    />
+                  </motion.div>
                 </button>
               );
             })}
@@ -425,6 +538,7 @@ export function MascotCreation({
                       boxShadow: isSelected
                         ? "0 0 0 2px rgba(228, 81, 254, 0.3)"
                         : undefined,
+                      cursor: "pointer",
                     }}
                   >
                     {isSelected && (
@@ -463,6 +577,48 @@ export function MascotCreation({
         onCancel={handleCancelSave}
         onClose={handleCancelSave}
       />
+
+      <AnimatePresence>
+        {flyAnimation && (
+          <motion.div
+            key={`${flyAnimation.src}-${flyAnimation.fromX}-${flyAnimation.fromY}-${flyAnimation.toX}-${flyAnimation.toY}`}
+            className="fixed z-80 pointer-events-none"
+            style={{
+              left: flyAnimation.fromX - 52,
+              top: flyAnimation.fromY - 52,
+              width: "104px",
+              height: "104px",
+            }}
+            initial={{ x: 0, y: 0, scale: 1, opacity: 1, rotate: 0 }}
+            animate={{
+              x: flyAnimation.toX - flyAnimation.fromX,
+              y: flyAnimation.toY - flyAnimation.fromY,
+              scale: 0.65,
+              opacity: 0.15,
+              rotate: 18,
+            }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.55, ease: "easeOut" }}
+            onAnimationComplete={() => setFlyAnimation(null)}
+          >
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                borderRadius: "999px",
+                background: "rgba(228, 81, 254, 0.18)",
+                filter: "blur(14px)",
+              }}
+            />
+            <Image
+              src={flyAnimation.src}
+              alt="Selected mascot part"
+              fill
+              style={{ objectFit: "contain" }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ContactDetails } from "../../../components/ContactDetails";
@@ -14,6 +14,15 @@ type NotificationSetting = {
   id: string;
   label: string;
   enabled: boolean;
+};
+
+type AdminNotification = {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  isRead: boolean;
+  createdAt?: string;
 };
 
 const defaultNotificationSettings: NotificationSetting[] = [
@@ -48,6 +57,11 @@ export default function AdminSettingsPage() {
   const [notificationSettings, setNotificationSettings] = useState<NotificationSetting[]>(
     defaultNotificationSettings
   );
+  const notificationInFlightRef = useRef<Record<string, boolean>>({});
+  const notificationDesiredRef = useRef<Record<string, boolean>>({});
+  const notificationSentRef = useRef<Record<string, boolean>>({});
+  const [recentNotifications, setRecentNotifications] = useState<AdminNotification[]>([]);
+  const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
   const [contactData, setContactData] = useState<ContactDetailsFormData>({
     firstName: "James",
     lastName: "Dembele",
@@ -68,29 +82,64 @@ export default function AdminSettingsPage() {
     console.log("Saving contact details:", data);
   }
 
-  async function handleNotificationChange(id: string, enabled: boolean) {
-    // Optimistic update
-    setNotificationSettings((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, enabled } : item))
-    );
+  async function syncNotificationToggle(id: string) {
+    // Only one request per toggle key at a time.
+    if (notificationInFlightRef.current[id]) return;
+    const desired = notificationDesiredRef.current[id];
+    if (typeof desired !== "boolean") return;
 
+    notificationInFlightRef.current[id] = true;
+    notificationSentRef.current[id] = desired;
     try {
       const response = await api.patch<any>("/users/me/notification-settings", {
         id,
-        enabled,
+        enabled: desired,
       });
       const payload = response?.data ?? response ?? {};
       const map = payload.notifications ?? {};
+      // Keep UI in sync with server response, but don't override a newer local intent.
       setNotificationSettings((prev) =>
-        prev.map((item) => ({ ...item, enabled: Boolean(map[item.id]) }))
+        prev.map((item) =>
+          item.id === id
+            ? {
+                ...item,
+                enabled:
+                  typeof notificationDesiredRef.current[id] === "boolean"
+                    ? notificationDesiredRef.current[id]
+                    : Boolean(map[item.id]),
+              }
+            : item
+        )
       );
     } catch (error) {
       console.error("Failed to save notification setting:", error);
-      // Revert on failure
-      setNotificationSettings((prev) =>
-        prev.map((item) => (item.id === id ? { ...item, enabled: !enabled } : item))
-      );
+      // Only revert if user didn't issue a newer intent while request was in-flight.
+      if (notificationDesiredRef.current[id] === notificationSentRef.current[id]) {
+        setNotificationSettings((prev) =>
+          prev.map((item) =>
+            item.id === id
+              ? { ...item, enabled: !Boolean(notificationSentRef.current[id]) }
+              : item
+          )
+        );
+        notificationDesiredRef.current[id] = !Boolean(notificationSentRef.current[id]);
+      }
+    } finally {
+      notificationInFlightRef.current[id] = false;
+      // If user changed toggle again during in-flight request, send latest now.
+      if (notificationDesiredRef.current[id] !== notificationSentRef.current[id]) {
+        void syncNotificationToggle(id);
+      }
     }
+  }
+
+  async function handleNotificationChange(id: string, enabled: boolean) {
+    notificationDesiredRef.current[id] = enabled;
+    // Immediate optimistic update for smooth UX.
+    setNotificationSettings((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, enabled } : item))
+    );
+    void syncNotificationToggle(id);
   }
 
   useEffect(() => {
@@ -115,6 +164,61 @@ export default function AdminSettingsPage() {
       isMounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchRecentNotifications = async () => {
+      try {
+        const response = await api.get<any>("/users/me/notifications?limit=10");
+        const payload = response?.data ?? response ?? {};
+        if (!isMounted) return;
+        setRecentNotifications(Array.isArray(payload.notifications) ? payload.notifications : []);
+        setUnreadNotificationsCount(Number(payload.unreadCount ?? 0));
+      } catch (error) {
+        console.error("Failed to load recent notifications:", error);
+      }
+    };
+
+    fetchRecentNotifications();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  async function handleMarkAllNotificationsRead() {
+    try {
+      await api.patch("/users/me/notifications/read-all", {});
+      setRecentNotifications((prev) =>
+        prev.map((n) => ({
+          ...n,
+          isRead: true,
+        }))
+      );
+      setUnreadNotificationsCount(0);
+    } catch (error) {
+      console.error("Failed to mark all notifications as read:", error);
+    }
+  }
+
+  async function handleMarkNotificationRead(notificationId: string) {
+    try {
+      await api.patch(`/users/me/notifications/${notificationId}/read`, {});
+      setRecentNotifications((prev) =>
+        prev.map((n) =>
+          n.id === notificationId
+            ? {
+                ...n,
+                isRead: true,
+              }
+            : n
+        )
+      );
+      setUnreadNotificationsCount((prev) => Math.max(0, prev - 1));
+    } catch (error) {
+      console.error("Failed to mark notification as read:", error);
+    }
+  }
 
   function handleContactSupport() {
     setShowEditDialog(true);
@@ -204,6 +308,10 @@ export default function AdminSettingsPage() {
               <EnabledNotifications
                 notifications={notificationSettings}
                 onNotificationChange={handleNotificationChange}
+                recentNotifications={recentNotifications}
+                unreadCount={unreadNotificationsCount}
+                onMarkAllRead={handleMarkAllNotificationsRead}
+                onNotificationRead={handleMarkNotificationRead}
               />
             </div>
           </div>

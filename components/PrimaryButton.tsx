@@ -120,9 +120,17 @@ export function PrimaryButton({
                 </div>
               </>
             ) : isMedium ? (
-              <div className="absolute left-[45px] bottom-0 opacity-80">
-                <Image src="/assets/icons/others/star2.png" alt="" width={39} height={39} />
-              </div>
+              <>
+                <div className="absolute right-[52px] top-[-4px] opacity-70">
+                  <Image src="/assets/icons/others/star1.png" alt="" width={28} height={28} />
+                </div>
+                <div className="absolute left-[30px] bottom-[-2px] opacity-80">
+                  <Image src="/assets/icons/others/star2.png" alt="" width={32} height={32} />
+                </div>
+                <div className="absolute right-[86px] bottom-[-2px] opacity-60">
+                  <Image src="/assets/icons/others/star3.png" alt="" width={26} height={26} />
+                </div>
+              </>
             ) : (
               <>
                 <div className="absolute right-[80px] top-0 opacity-70">
@@ -159,9 +167,17 @@ export function PrimaryButton({
                   </div>
                 </>
               ) : isMedium ? (
-                <div className="absolute left-[45px] bottom-0">
-                  <Star2Icon width={40} height={40} />
-                </div>
+                <>
+                  <div className="absolute right-[52px] top-[-4px]">
+                    <Star1Icon width={28} height={28} />
+                  </div>
+                  <div className="absolute left-[30px] bottom-[-2px]">
+                    <Star2Icon width={32} height={32} />
+                  </div>
+                  <div className="absolute right-[86px] bottom-[-2px]">
+                    <Star3Icon width={26} height={26} />
+                  </div>
+                </>
               ) : (
                 <>
                   <div className="absolute right-[80px] top-0">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 
 export type LessonMapState = "active" | "closed" | "completed";
 
@@ -44,6 +44,7 @@ export function LevelMap({
 }: LevelMapProps) {
   const [svgContent, setSvgContent] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const hasAnimatedRouteRef = useRef(false);
 
   const lessonStates: Record<string, LessonMapState> =
     lessonStatesProp != null && Object.keys(lessonStatesProp).length > 0
@@ -69,13 +70,15 @@ export function LevelMap({
     };
   }, []);
 
-  // Apply visibility per lesson; create "completed" by cloning lesson01/active when missing
-  useEffect(() => {
+  // Apply visibility per lesson; create "completed" by cloning lesson01/active when missing.
+  // useLayoutEffect prevents a paint with raw/unfiltered SVG states (flicker on load).
+  useLayoutEffect(() => {
     if (!svgContent || !containerRef.current) return;
 
     const root = containerRef.current;
     const svg = root.querySelector("svg");
     if (!svg) return;
+    (svg as SVGSVGElement).style.visibility = "hidden";
     svg.setAttribute("width", "846");
     svg.setAttribute("height", "619");
     svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
@@ -84,6 +87,62 @@ export function LevelMap({
     (svg as SVGSVGElement).style.display = "block";
 
     const states: LessonMapState[] = ["active", "closed", "completed"];
+
+    // Inject one-time animation styles for active lesson marker shimmer.
+    const styleId = "levelmap-active-shimmer-style";
+    if (!svg.querySelector(`#${styleId}`)) {
+      const styleEl = document.createElementNS("http://www.w3.org/2000/svg", "style");
+      styleEl.setAttribute("id", styleId);
+      styleEl.textContent = `
+        @keyframes levelMapStarPulse {
+          0% { transform: scale(1); opacity: 0.88; filter: drop-shadow(0 0 0px rgba(228, 81, 254, 0.0)); }
+          50% { transform: scale(1.06); opacity: 1; filter: drop-shadow(0 0 6px rgba(228, 81, 254, 0.65)) drop-shadow(0 0 12px rgba(122, 148, 255, 0.55)); }
+          100% { transform: scale(1); opacity: 0.88; filter: drop-shadow(0 0 0px rgba(228, 81, 254, 0.0)); }
+        }
+        @keyframes levelMapGlowPulse {
+          0% { opacity: 0.65; }
+          50% { opacity: 1; }
+          100% { opacity: 0.65; }
+        }
+        .levelmap-active-shimmer {
+          transform-box: fill-box;
+          transform-origin: center center;
+          animation: levelMapStarPulse 1.6s ease-in-out infinite;
+        }
+        .levelmap-active-shimmer [filter],
+        .levelmap-active-shimmer [fill*="#E451FE"],
+        .levelmap-active-shimmer [fill*="#e451fe"],
+        .levelmap-active-shimmer [fill*="#FF"],
+        .levelmap-active-shimmer [style*="blur"] {
+          animation: levelMapGlowPulse 1.2s ease-in-out infinite;
+        }
+      `;
+      svg.prepend(styleEl);
+    }
+
+    // Animate map route draw only once per component lifecycle.
+    const routePath = root.querySelector(`[id="Vector 39"]`) as SVGPathElement | null;
+    if (routePath && !hasAnimatedRouteRef.current) {
+      const totalLength = routePath.getTotalLength();
+      routePath.style.strokeDasharray = `${totalLength}`;
+      routePath.style.strokeDashoffset = `${totalLength}`;
+      routePath.style.filter = "drop-shadow(0 0 4px rgba(122, 148, 255, 0.35))";
+      // Use WAAPI for reliable one-time SVG draw animation.
+      requestAnimationFrame(() => {
+        routePath.animate(
+          [
+            { strokeDashoffset: `${totalLength}`, opacity: 0.7 },
+            { strokeDashoffset: "0", opacity: 1 },
+          ],
+          {
+            duration: 2800,
+            easing: "ease-out",
+            fill: "forwards",
+          }
+        );
+      });
+      hasAnimatedRouteRef.current = true;
+    }
 
     // Discover lesson IDs from the SVG
     const lessonIdSet = new Set<string>();
@@ -145,9 +204,18 @@ export function LevelMap({
 
       states.forEach((s) => {
         const el = root.querySelector(`[id="${lessonId}/${s}"]`) as HTMLElement | null;
-        if (el) el.style.display = s === stateToShow ? "block" : "none";
+        if (!el) return;
+        const shouldShow = s === stateToShow;
+        el.style.display = shouldShow ? "block" : "none";
+        // Animate only the currently active lesson marker to look shiny.
+        if (shouldShow && stateToShow === "active") {
+          el.classList.add("levelmap-active-shimmer");
+        } else {
+          el.classList.remove("levelmap-active-shimmer");
+        }
       });
     });
+    (svg as SVGSVGElement).style.visibility = "visible";
   }, [svgContent, lessonStates]);
 
   if (!svgContent) {

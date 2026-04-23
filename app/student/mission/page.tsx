@@ -29,6 +29,7 @@ export default function MissionPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasPlayedIntro, setHasPlayedIntro] = useState(false);
   const [isContinueDisabled, setIsContinueDisabled] = useState(false);
+  const [animatedTitle, setAnimatedTitle] = useState("");
 
   // Find mission data
   const mission = currentLesson?.missions?.find(
@@ -39,8 +40,42 @@ export default function MissionPage() {
 
   const missionType =
     ((mission as any)?.mission_type || (mission as any)?.missionType || "Mission") as string;
+  const formattedMissionType = missionType.replace(/_/g, " ");
   const displayTitle =
-    missionType === "Mission" ? `${missionType} ${missionSequence}` : missionType;
+    formattedMissionType === "Mission"
+      ? `${formattedMissionType} ${missionSequence}`
+      : formattedMissionType;
+  const titleWords = displayTitle.trim().split(/\s+/);
+  const hasTwoWordTitle = titleWords.length === 2;
+  const firstWord = hasTwoWordTitle ? titleWords[0] : "";
+  const secondWord = hasTwoWordTitle ? titleWords[1] : "";
+  const typedFirstWord = hasTwoWordTitle
+    ? animatedTitle.slice(0, Math.min(animatedTitle.length, firstWord.length))
+    : "";
+  const typedSecondWord = hasTwoWordTitle
+    ? animatedTitle.length > firstWord.length
+      ? animatedTitle.slice(firstWord.length + 1)
+      : ""
+    : "";
+
+  // Typewriter animation for mission title
+  useEffect(() => {
+    const title = displayTitle || "";
+    setAnimatedTitle("");
+
+    if (!title) return;
+
+    let index = 0;
+    const timer = window.setInterval(() => {
+      index += 1;
+      setAnimatedTitle(title.slice(0, index));
+      if (index >= title.length) {
+        window.clearInterval(timer);
+      }
+    }, 45);
+
+    return () => window.clearInterval(timer);
+  }, [displayTitle]);
 
   // Switch platform background to mission_mode.png when this mission has mission_type === "mission_mode"
   useEffect(() => {
@@ -399,7 +434,15 @@ export default function MissionPage() {
           marginBottom: "40px",
         }}
       >
-        {displayTitle}
+        {hasTwoWordTitle ? (
+          <>
+            <span style={{ color: "#FFF" }}>{typedFirstWord}</span>
+            {animatedTitle.length > firstWord.length && " "}
+            <span style={{ color: "#E451FE" }}>{typedSecondWord}</span>
+          </>
+        ) : (
+          animatedTitle
+        )}
       </h1>
 
       {/* Continue Button */}

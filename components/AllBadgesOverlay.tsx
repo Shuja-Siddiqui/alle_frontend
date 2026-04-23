@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { BackButton } from "./BackButton";
+import { motion } from "framer-motion";
 
 type Badge = {
     /** Badge image source */
@@ -132,37 +134,7 @@ export function AllBadgesOverlay({
             >
                 {/* Header with Back Button and Title */}
                 <div className="flex gap-[16px] items-center w-full" style={{ width: "418.41px" }}>
-                    <button
-                        type="button"
-                        onClick={handleBackClick}
-                        className="relative shrink-0 cursor-pointer bg-transparent border-none p-0"
-                        style={{
-                            width: "36px",
-                            height: "36px",
-                        }}
-                    >
-                        <Image
-                            src="/assets/icons/others/arrow_back.svg"
-                            alt="Back"
-                            width={36}
-                            height={36}
-                            className="block max-w-none size-full"
-                        />
-                    </button>
-                    <p
-                        style={{
-                            color: "#FFFFFF",
-                            fontFamily: "var(--font-orbitron), system-ui, sans-serif",
-                            fontSize: "36px",
-                            fontStyle: "normal",
-                            fontWeight: 700,
-                            lineHeight: "42px",
-                            letterSpacing: "-0.396px",
-                            textTransform: "uppercase",
-                        }}
-                    >
-                        Badges
-                    </p>
+                    <BackButton text="Badges" onClick={handleBackClick} />
                 </div>
 
                 {/* Badge Grid */}
@@ -171,7 +143,7 @@ export function AllBadgesOverlay({
                     style={{ width: "398px", minHeight: "200px" }}
                 >
                     {badges.map((badge, index) => (
-                        <div
+                        <motion.div
                             key={index}
                             className="overflow-clip relative shrink-0"
                             style={{
@@ -180,6 +152,19 @@ export function AllBadgesOverlay({
                             }}
                             onMouseEnter={(e) => handleBadgeMouseEnter(index, e)}
                             onMouseLeave={handleBadgeMouseLeave}
+                            initial={{ y: 0, scale: 1, rotate: 0 }}
+                            animate={{
+                                y: [0, -4, 0],
+                                scale: [1, 1.04, 1],
+                                rotate: [0, -1.5, 1.5, 0],
+                            }}
+                            transition={{
+                                duration: 2.4,
+                                repeat: Infinity,
+                                repeatType: "loop",
+                                ease: "easeInOut",
+                                delay: index * 0.12,
+                            }}
                         >
                             {badge.earned ? (
                                 <div
@@ -234,7 +219,7 @@ export function AllBadgesOverlay({
 
                                 </>
                             )}
-                        </div>
+                        </motion.div>
                     ))}
                 </div>
 

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Fragment } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 
 type StarRingProps = {
     className?: string;
@@ -35,6 +36,7 @@ export function StarRing({
     const labelRadiusOffset = 22;
     
     const effectiveInitialValue = initialValue ?? 0;
+    const reduceMotion = useReducedMotion();
     
     // Initialize internal state with the initial value
     const [internalSelectedCircle, setInternalSelectedCircle] = useState<number | null>(effectiveInitialValue);
@@ -78,54 +80,71 @@ export function StarRing({
             data-name="Star Ring"
             data-node-id="2133:338"
         >
-            {/* Small circles around the perimeter */}
-            {circlePositions.map((pos, index) => {
-                const circleNumber = index + 1; // 1-based numbering
-                const isSelected = selectedCircle !== null && circleNumber <= selectedCircle;
-                const label = soundLabels[index] ? String(soundLabels[index]).toUpperCase() : "";
-                const labelX = Math.round((centerX + (radius + labelRadiusOffset) * Math.cos(pos.angle)) * 100) / 100;
-                const labelY = Math.round((centerY + (radius + labelRadiusOffset) * Math.sin(pos.angle)) * 100) / 100;
+            {/* Rotating perimeter: circles + labels */}
+            <motion.div
+                className="absolute inset-0"
+                animate={reduceMotion ? undefined : { rotate: 360 }}
+                transition={
+                    reduceMotion
+                        ? undefined
+                        : { duration: 14, repeat: Infinity, ease: "linear" }
+                }
+                style={{ transformOrigin: "50% 50%" }}
+            >
+                {circlePositions.map((pos, index) => {
+                    const circleNumber = index + 1; // 1-based numbering
+                    const isSelected = selectedCircle !== null && circleNumber <= selectedCircle;
+                    const label = soundLabels[index] ? String(soundLabels[index]).toUpperCase() : "";
+                    const labelX = Math.round((centerX + (radius + labelRadiusOffset) * Math.cos(pos.angle)) * 100) / 100;
+                    const labelY = Math.round((centerY + (radius + labelRadiusOffset) * Math.sin(pos.angle)) * 100) / 100;
 
-                return (
-                    <Fragment key={index}>
-                        <div
-                            className="absolute rounded-full transition-all duration-150"
-                            onClick={onCircleClick ? () => handleCircleClick(circleNumber) : undefined}
-                            style={{
-                                width: `${smallCircleSize}px`,
-                                height: `${smallCircleSize}px`,
-                                left: `${pos.x.toFixed(2)}px`,
-                                top: `${pos.y.toFixed(2)}px`,
-                                backgroundColor: isSelected ? "#75FF1A" : "#FFFFFF",
-                                filter: isSelected ? "drop-shadow(0 0 2.258px #98FF55)" : "none",
-                                transform: "translate(-50%, -50%)",
-                                cursor: onCircleClick ? "pointer" : "default",
-                            }}
-                        />
-                        {label ? (
+                    return (
+                        <Fragment key={index}>
                             <div
-                                className="absolute select-none"
+                                className="absolute rounded-full transition-all duration-150"
+                                onClick={onCircleClick ? () => handleCircleClick(circleNumber) : undefined}
                                 style={{
-                                    left: `${labelX.toFixed(2)}px`,
-                                    top: `${labelY.toFixed(2)}px`,
+                                    width: `${smallCircleSize}px`,
+                                    height: `${smallCircleSize}px`,
+                                    left: `${pos.x.toFixed(2)}px`,
+                                    top: `${pos.y.toFixed(2)}px`,
+                                    backgroundColor: isSelected ? "#75FF1A" : "#FFFFFF",
+                                    filter: isSelected ? "drop-shadow(0 0 2.258px #98FF55)" : "none",
                                     transform: "translate(-50%, -50%)",
-                                    color: "#E451FE",
-                                    fontFamily: "var(--font-orbitron), system-ui, sans-serif",
-                                    fontSize: "11px",
-                                    fontWeight: 700,
-                                    lineHeight: 1,
-                                    letterSpacing: "0.6px",
-                                    textTransform: "uppercase",
-                                    textShadow: "0 0 6px rgba(228, 81, 254, 0.55)",
-                                    pointerEvents: "none",
+                                    cursor: onCircleClick ? "pointer" : "default",
                                 }}
-                            >
-                                {label}
-                            </div>
-                        ) : null}
-                    </Fragment>
-                );
-            })}
+                            />
+                            {label ? (
+                                <motion.div
+                                    className="absolute select-none"
+                                    style={{
+                                        left: `${labelX.toFixed(2)}px`,
+                                        top: `${labelY.toFixed(2)}px`,
+                                        transform: "translate(-50%, -50%)",
+                                        color: "#E451FE",
+                                        fontFamily: "var(--font-orbitron), system-ui, sans-serif",
+                                        fontSize: "11px",
+                                        fontWeight: 700,
+                                        lineHeight: 1,
+                                        letterSpacing: "0.6px",
+                                        textTransform: "uppercase",
+                                        textShadow: "0 0 6px rgba(228, 81, 254, 0.55)",
+                                        pointerEvents: "none",
+                                    }}
+                                    animate={reduceMotion ? undefined : { rotate: -360 }}
+                                    transition={
+                                        reduceMotion
+                                            ? undefined
+                                            : { duration: 14, repeat: Infinity, ease: "linear" }
+                                    }
+                                >
+                                    {label}
+                                </motion.div>
+                            ) : null}
+                        </Fragment>
+                    );
+                })}
+            </motion.div>
 
             {/* Megaphone icon */}
             <Image

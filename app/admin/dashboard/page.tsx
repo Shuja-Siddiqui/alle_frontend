@@ -12,6 +12,7 @@ import { AddStudentDialog, AddStudentFormData } from "../../../components/AddStu
 import { AddTeacherDialog, AddTeacherFormData } from "../../../components/AddTeacherDialog";
 import { AdminDashboardSkeleton } from "../../../components/Skeletons/AdminDashboardSkeleton";
 import { api } from "../../../lib/api-client";
+import { motion } from "framer-motion";
 
 type DashboardStats = {
   totalStudents: number;
@@ -156,10 +157,21 @@ export default function AdminDashboardPage() {
     setRefreshTrigger((prev) => prev + 1);
   }
 
+  const fadeUp = {
+    initial: { opacity: 0, y: 16 },
+    animate: { opacity: 1, y: 0 },
+  } as const;
+
   return (
     <div className="flex flex-col h-full w-full">
       {/* Navbar */}
-      <div className="w-full" style={{ padding: "24px 32px" }}>
+      <motion.div
+        className="w-full"
+        style={{ padding: "24px 32px" }}
+        initial={fadeUp.initial}
+        animate={fadeUp.animate}
+        transition={{ duration: 0.35, ease: "easeOut" }}
+      >
         <AdminNavbar
           title="Dashboard"
           onNotificationClick={() => {
@@ -171,7 +183,7 @@ export default function AdminDashboardPage() {
             roleBase === "admin" ? () => setShowAddTeacherDialog(true) : undefined
           }
         />
-      </div>
+      </motion.div>
 
       {/* Main content area */}
       <div
@@ -185,72 +197,98 @@ export default function AdminDashboardPage() {
         ) : (
           <>
         {/* Stats Cards Row */}
-        <div className="flex gap-[24px] items-center" style={{ marginBottom: "32px" }}>
+        <motion.div
+          className="flex gap-[24px] items-center"
+          style={{ marginBottom: "32px" }}
+          initial="initial"
+          animate="animate"
+          variants={{
+            initial: {},
+            animate: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
+          }}
+        >
           {/* Card 1: Total students */}
-          <StatCard
-            title={
-              loadingStats
-                ? "..."
-                : String(stats?.totalStudents ?? 0)
-            }
-            subtitle="Total students"
-            iconSrc="/assets/icons/admin/students.svg"
-            iconAlt="Students icon"
-            className="w-[364px] shrink-0"
-          />
+          <motion.div variants={fadeUp} transition={{ duration: 0.4, ease: "easeOut" }}>
+            <StatCard
+              title={
+                loadingStats
+                  ? "..."
+                  : String(stats?.totalStudents ?? 0)
+              }
+              subtitle="Total students"
+              iconSrc="/assets/icons/admin/students.svg"
+              iconAlt="Students icon"
+              className="w-[364px] shrink-0"
+            />
+          </motion.div>
 
           {/* Card 2: Lesson completion */}
-          <StatCard
-            title={
-              loadingStats
-                ? "..."
-                : `${stats?.lessonCompletionPercentage ?? 0}%`
-            }
-            subtitle="Lesson completion"
-            iconSrc="/assets/icons/admin/modules.svg"
-            iconAlt="Modules icon"
-            className="w-[364px] shrink-0"
-          />
+          <motion.div variants={fadeUp} transition={{ duration: 0.4, ease: "easeOut" }}>
+            <StatCard
+              title={
+                loadingStats
+                  ? "..."
+                  : `${stats?.lessonCompletionPercentage ?? 0}%`
+              }
+              subtitle="Lesson completion"
+              iconSrc="/assets/icons/admin/modules.svg"
+              iconAlt="Modules icon"
+              className="w-[364px] shrink-0"
+            />
+          </motion.div>
 
           {/* Card 3: Engagement activity */}
-          <StatCard
-            title={
-              loadingStats
-                ? "..."
-                : String(stats?.engagementActivity?.count ?? 0)
-            }
-            supportiveText={
-              loadingStats
-                ? "Loading engagement..."
-                : stats?.engagementActivity?.moduleName
-                ? `students completed module '${stats.engagementActivity.moduleName}'`
-                : "students completed modules"
-            }
-            subtitle="Engagement activity"
-            iconSrc="/assets/icons/admin/analytics.svg"
-            iconAlt="Analytics icon"
-            className="w-[364px] shrink-0"
-          />
-        </div>
+          <motion.div variants={fadeUp} transition={{ duration: 0.4, ease: "easeOut" }}>
+            <StatCard
+              title={
+                loadingStats
+                  ? "..."
+                  : String(stats?.engagementActivity?.count ?? 0)
+              }
+              supportiveText={
+                loadingStats
+                  ? "Loading engagement..."
+                  : stats?.engagementActivity?.moduleName
+                  ? `students completed module '${stats.engagementActivity.moduleName}'`
+                  : "students completed modules"
+              }
+              subtitle="Engagement activity"
+              iconSrc="/assets/icons/admin/analytics.svg"
+              iconAlt="Analytics icon"
+              className="w-[364px] shrink-0"
+            />
+          </motion.div>
+        </motion.div>
 
         {/* Main Content: Metrics and Students in one container */}
-        <div
+        <motion.div
           className="flex gap-[24px] items-start justify-center"
           style={{
             width: "1140px",
             height: "336px",
           }}
+          initial={fadeUp.initial}
+          animate={fadeUp.animate}
+          transition={{ duration: 0.45, ease: "easeOut", delay: 0.2 }}
         >
           {roleBase === "admin" && (
-            <RetentionMetrics
-              percentage={66}
-              changePercentage={4}
+            <motion.div
+              whileHover={{ y: -3 }}
               className="shrink-0"
               style={{
                 width: "364px",
                 height: "100%",
               }}
-            />
+            >
+              <RetentionMetrics
+                percentage={66}
+                changePercentage={4}
+                style={{
+                  width: "364px",
+                  height: "100%",
+                }}
+              />
+            </motion.div>
           )}
 
           {/* Students Section */}
@@ -304,26 +342,38 @@ export default function AdminDashboardPage() {
                 dashboardStudents.map((student) => {
                   const name = [student.firstName, student.lastName].filter(Boolean).join(" ") || "Student";
                   return (
-                    <StudentStatCard
+                    <motion.div
                       key={student.id}
-                      avatarSrc={student.avatarUrl || DEFAULT_AVATAR}
-                      avatarAlt={name}
-                      studentName={name}
-                      grade={student.grade || "—"}
-                      modules={student.modulesCompleted}
-                      lessons={student.lessonsCompleted}
-                      className="shrink-0"
-                      style={{ width: "363px" }}
-                    />
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.35, ease: "easeOut" }}
+                      whileHover={{ y: -3 }}
+                    >
+                      <StudentStatCard
+                        avatarSrc={student.avatarUrl || DEFAULT_AVATAR}
+                        avatarAlt={name}
+                        studentName={name}
+                        grade={student.grade || "—"}
+                        modules={student.modulesCompleted}
+                        lessons={student.lessonsCompleted}
+                        className="shrink-0"
+                        style={{ width: "363px" }}
+                      />
+                    </motion.div>
                   );
                 })
               )}
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Modules Section */}
-        <div style={{ marginTop: "32px" }}>
+        <motion.div
+          style={{ marginTop: "32px" }}
+          initial={fadeUp.initial}
+          animate={fadeUp.animate}
+          transition={{ duration: 0.45, ease: "easeOut", delay: 0.35 }}
+        >
           {/* Header */}
           <div className="flex items-start justify-between" style={{ marginBottom: "16px" }}>
             <h2
@@ -377,27 +427,34 @@ export default function AdminDashboardPage() {
               <div style={{ color: "#FFF", padding: "24px" }}>No modules yet.</div>
             ) : (
               dashboardModules.map((mod, index) => (
-                <ModuleStatCard
+                <motion.div
                   key={mod.id}
-                  moduleId={mod.id}
-                  moduleNumber={`Module ${index + 1}`}
-                  title={mod.title}
-                  lessons={mod.lessonsCount ?? 0}
-                  students={mod.currentStudentsCount ?? 0}
-                  weeks={
-                    mod.estimatedTime
-                      ? mod.estimatedTime
-                      : mod.weeks != null
-                      ? String(mod.weeks)
-                      : ""
-                  }
-                  grades={mod.grades ?? ""}
-                  className="w-[558px] shrink-0"
-                />
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35, ease: "easeOut", delay: index * 0.04 }}
+                  whileHover={{ y: -3 }}
+                >
+                  <ModuleStatCard
+                    moduleId={mod.id}
+                    moduleNumber={`Module ${index + 1}`}
+                    title={mod.title}
+                    lessons={mod.lessonsCount ?? 0}
+                    students={mod.currentStudentsCount ?? 0}
+                    weeks={
+                      mod.estimatedTime
+                        ? mod.estimatedTime
+                        : mod.weeks != null
+                        ? String(mod.weeks)
+                        : ""
+                    }
+                    grades={mod.grades ?? ""}
+                    className="w-[558px] shrink-0"
+                  />
+                </motion.div>
               ))
             )}
           </div>
-        </div>
+        </motion.div>
         </>
         )}
       </div>

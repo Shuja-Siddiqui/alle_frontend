@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 type DailyActivityData = {
   day: string;
@@ -239,7 +240,7 @@ export function StudentsActivityChart({
               const isSelected = selectedIndex === index;
 
               return (
-                <div
+                <motion.div
                   key={index}
                   ref={(el: HTMLDivElement | null) => {
                     barRefs.current[index] = el;
@@ -247,8 +248,14 @@ export function StudentsActivityChart({
                   className="rounded-[12px] shrink-0 cursor-pointer transition-colors"
                   onMouseEnter={(e) => handleBarHover(index, e)}
                   onMouseLeave={handleBarLeave}
+                  initial={{ height: 0, opacity: 0.85 }}
+                  animate={{ height: barHeight, opacity: 1 }}
+                  transition={{
+                    duration: 0.8,
+                    ease: "easeOut",
+                    delay: index * 0.07,
+                  }}
                   style={{
-                    height: `${barHeight}px`,
                     width: "40px",
                     backgroundColor: isSelected ? "#FF00CA" : "#434b93",
                     borderRadius: "12px",
