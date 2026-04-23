@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { PrimaryButton } from "./PrimaryButton";
+import { AdminNotificationsMenu } from "./AdminNotificationsMenu";
 
 type AdminNavbarProps = {
   /** Page title to display on the left */
@@ -51,34 +51,7 @@ export function AdminNavbar({
       {/* Right side - Notification and Add student button */}
       <div className="flex gap-[28px] items-center">
         {/* Notification icon */}
-        <button
-          type="button"
-          onClick={onNotificationClick}
-          className="relative shrink-0 cursor-pointer bg-transparent border-none p-0"
-          style={{
-            width: "52px",
-            height: "52px",
-            background: "transparent",
-            border: "none",
-            padding: 0,
-            cursor: "pointer",
-          }}
-        >
-          <div
-            className="absolute"
-            style={{
-              inset: "-1.65%",
-            }}
-          >
-            <Image
-              src="/assets/icons/admin/notification.svg"
-              alt="Notifications"
-              width={54}
-              height={54}
-              className="block max-w-none size-full"
-            />
-          </div>
-        </button>
+        <AdminNotificationsMenu onOpen={onNotificationClick} />
 
         {/* Add student / Add teacher or Download report button */}
         {showDownloadReport ? (

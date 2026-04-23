@@ -45,22 +45,26 @@ export function Toggle({
       <button
         type="button"
         onClick={handleClick}
-        className="relative inline-flex items-center rounded-[30px] transition-colors"
+        className="relative inline-flex items-center rounded-[30px] transition-colors duration-200 ease-out"
         style={{
           width: "55px",
           height: "32px",
           background: checked ? "#FF00CA" : "#434B93",
+          opacity: props.disabled ? 0.7 : 1,
+          cursor: props.disabled ? "not-allowed" : "pointer",
         }}
         aria-pressed={checked}
+        disabled={props.disabled}
         {...props}
       >
         {/* Thumb */}
         <span
-          className="absolute inline-block rounded-full transition-transform"
+          className="absolute inline-block rounded-full transition-all duration-200 ease-out"
           style={{
             width: "24px",
             height: "24px",
-            left: checked ? "25px" : "5px",
+            left: "5px",
+            transform: checked ? "translateX(20px)" : "translateX(0)",
             // OFF state: gradient thumb with shadow on inactive track
             // ON state: plain white thumb on pink track
             background: checked
