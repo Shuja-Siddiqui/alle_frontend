@@ -9,6 +9,7 @@ import { MascotDisplay } from "@/components/MascotDisplay";
 import { AllBadgesOverlay } from "@/components/AllBadgesOverlay";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { api } from "../../../lib/api-client";
+import { motion } from "framer-motion";
 
 const DEFAULT_AVATAR = "/assets/icons/others/profile_avatar_large.png";
 
@@ -249,12 +250,17 @@ export default function ProfileSettingsPage() {
                 padding: 0,
               }}
             >
-              <Image
-                src="/assets/icons/others/pink_gear.svg"
-                alt="Settings"
-                width={70}
-                height={70}
-              />
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+              >
+                <Image
+                  src="/assets/icons/others/pink_gear.svg"
+                  alt="Settings"
+                  width={70}
+                  height={70}
+                />
+              </motion.div>
             </button>
 
             {isMenuOpen && (
@@ -346,12 +352,18 @@ export default function ProfileSettingsPage() {
                 height: "36px",
               }}
             >
-              <Image
-                src="/assets/icons/others/pink_forward.svg"
-                alt="View all badges"
-                width={36}
-                height={36}
-              />
+              <motion.div
+                animate={{ x: [0, 6, 0] }}
+                transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+                style={{ width: "36px", height: "36px", display: "flex" }}
+              >
+                <Image
+                  src="/assets/icons/others/pink_forward.svg"
+                  alt="View all badges"
+                  width={36}
+                  height={36}
+                />
+              </motion.div>
             </div>
           </div>
 
@@ -373,7 +385,7 @@ export default function ProfileSettingsPage() {
               }
 
               return (
-                <div
+                <motion.div
                   key={badge.title ?? index}
                   style={{
                     width: "96.871px",
@@ -382,6 +394,19 @@ export default function ProfileSettingsPage() {
                     alignItems: "center",
                     justifyContent: "center",
                     position: "relative",
+                  }}
+                  initial={{ y: 0, scale: 1, rotate: 0 }}
+                  animate={{
+                    y: [0, -4, 0],
+                    scale: [1, 1.04, 1],
+                    rotate: [0, -1.5, 1.5, 0],
+                  }}
+                  transition={{
+                    duration: 2.4,
+                    repeat: Infinity,
+                    repeatType: "loop",
+                    ease: "easeInOut",
+                    delay: index * 0.12,
                   }}
                 >
                   <Image
@@ -393,7 +418,7 @@ export default function ProfileSettingsPage() {
                       objectFit: "contain",
                     }}
                   />
-                </div>
+                </motion.div>
               );
             })}
           </div>
@@ -473,12 +498,18 @@ export default function ProfileSettingsPage() {
                 height: "36px",
               }}
             >
-              <Image
-                src="/assets/icons/others/pink_forward.svg"
-                alt="Edit"
-                width={36}
-                height={36}
-              />
+              <motion.div
+                animate={{ x: [0, 6, 0] }}
+                transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut", delay: 0.15 }}
+                style={{ width: "36px", height: "36px", display: "flex" }}
+              >
+                <Image
+                  src="/assets/icons/others/pink_forward.svg"
+                  alt="Edit"
+                  width={36}
+                  height={36}
+                />
+              </motion.div>
             </div>
           </div>
         </div>

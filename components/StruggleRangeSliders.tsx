@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { motion } from "framer-motion";
 
 type StruggleData = {
     module: string;
@@ -100,10 +100,16 @@ export function StruggleRangeSliders({
                                         }}
                                     >
                                         {/* Filled gradient portion */}
-                                        <div
+                                        <motion.div
                                             className="h-full"
+                                            initial={{ width: 0 }}
+                                            animate={{ width: `${item.percentage}%` }}
+                                            transition={{
+                                                duration: 1.1,
+                                                ease: "easeOut",
+                                                delay: index * 0.12,
+                                            }}
                                             style={{
-                                                width: `${item.percentage}%`,
                                                 borderRadius: "40px",
                                                 borderRight: "1.261px solid rgba(255,255,255,0.24)",
                                                 backgroundImage:

@@ -9,6 +9,7 @@ import { AdminNavbar } from "../../../components/AdminNavbar";
 import { DownloadReportDialog, DownloadReportFormData } from "../../../components/DownloadReportDialog";
 import { AdminAnalyticsSkeleton } from "../../../components/Skeletons/AdminAnalyticsSkeleton";
 import { api } from "../../../lib/api-client";
+import { motion } from "framer-motion";
 
 type DailyActivityPoint = {
   day: string;
@@ -276,6 +277,11 @@ export default function AnalyticsPage() {
     // Reset is handled inside the dialog
   }
 
+  const fadeUp = {
+    initial: { opacity: 0, y: 16 },
+    animate: { opacity: 1, y: 0 },
+  } as const;
+
   return (
     <div
       className="flex-1 overflow-auto"
@@ -288,81 +294,122 @@ export default function AnalyticsPage() {
       ) : (
         <>
       {/* Navbar */}
-      <div style={{ marginBottom: "24px" }}>
+      <motion.div
+        style={{ marginBottom: "24px" }}
+        initial={fadeUp.initial}
+        animate={fadeUp.animate}
+        transition={{ duration: 0.35, ease: "easeOut" }}
+      >
         <AdminNavbar
           title="Analytics"
           onNotificationClick={handleNotificationClick}
           onDownloadReportClick={handleDownloadReportClick}
           showDownloadReport={true}
         />
-      </div>
+      </motion.div>
 
       {/* Stats Cards Row */}
-      <div className="flex gap-[24px] items-center" style={{ marginBottom: "24px" }}>
+      <motion.div
+        className="flex gap-[24px] items-center"
+        style={{ marginBottom: "24px" }}
+        initial="initial"
+        animate="animate"
+        variants={{
+          initial: {},
+          animate: { transition: { staggerChildren: 0.09, delayChildren: 0.08 } },
+        }}
+      >
         {/* Card 1: Total Students */}
-        <StatCard
-          title={String(totalStudentsInSchool)}
-          supportiveText={
-            studentsGrowthPercent != null
-              ? `${studentsGrowthPercent >= 0 ? "+" : ""}${studentsGrowthPercent}% vs last month`
-              : "vs last month"
-          }
-          supportiveTextColor="green"
-          subtitle="Total Students"
-          iconSrc="/assets/icons/admin/students.svg"
-          iconAlt="Students icon"
-          className="w-[364px] shrink-0"
-        />
+        <motion.div variants={fadeUp} transition={{ duration: 0.4, ease: "easeOut" }}>
+          <StatCard
+            title={String(totalStudentsInSchool)}
+            supportiveText={
+              studentsGrowthPercent != null
+                ? `${studentsGrowthPercent >= 0 ? "+" : ""}${studentsGrowthPercent}% vs last month`
+                : "vs last month"
+            }
+            supportiveTextColor="green"
+            subtitle="Total Students"
+            iconSrc="/assets/icons/admin/students.svg"
+            iconAlt="Students icon"
+            className="w-[364px] shrink-0"
+          />
+        </motion.div>
 
         {/* Card 2: Students improved results */}
-        <StatCard
-          title={
-            avgAccuracyThisWeek != null ? String(avgAccuracyThisWeek) : "–"
-          }
-          supportiveText={
-            avgAccuracyChange != null
-              ? `${avgAccuracyChange >= 0 ? "+" : ""}${avgAccuracyChange}% vs last week`
-              : "vs last week"
-          }
-          supportiveTextColor="green"
-          subtitle="Avg accuracy (this week)."
-          iconSrc="/assets/icons/admin/analytics.svg"
-          iconAlt="Analytics icon"
-          className="w-[364px] shrink-0"
-        />
+        <motion.div variants={fadeUp} transition={{ duration: 0.4, ease: "easeOut" }}>
+          <StatCard
+            title={
+              avgAccuracyThisWeek != null ? String(avgAccuracyThisWeek) : "–"
+            }
+            supportiveText={
+              avgAccuracyChange != null
+                ? `${avgAccuracyChange >= 0 ? "+" : ""}${avgAccuracyChange}% vs last week`
+                : "vs last week"
+            }
+            supportiveTextColor="green"
+            subtitle="Avg accuracy (this week)."
+            iconSrc="/assets/icons/admin/analytics.svg"
+            iconAlt="Analytics icon"
+            className="w-[364px] shrink-0"
+          />
+        </motion.div>
 
         {/* Card 3: Avg. Session Time */}
-        <StatCard
-          title={
-            avgSessionMinutesThisWeek != null
-              ? String(avgSessionMinutesThisWeek)
-              : "–"
-          }
-          supportiveText="Avg session time per student (this week)"
-          supportiveTextColor="gray"
-          subtitle="Avg. Session Time"
-          iconSrc="/assets/icons/admin/modules.svg"
-          iconAlt="Modules icon"
-          className="w-[364px] shrink-0"
-        />
-      </div>
+        <motion.div variants={fadeUp} transition={{ duration: 0.4, ease: "easeOut" }}>
+          <StatCard
+            title={
+              avgSessionMinutesThisWeek != null
+                ? String(avgSessionMinutesThisWeek)
+                : "–"
+            }
+            supportiveText="Avg session time per student (this week)"
+            supportiveTextColor="gray"
+            subtitle="Avg. Session Time"
+            iconSrc="/assets/icons/admin/modules.svg"
+            iconAlt="Modules icon"
+            className="w-[364px] shrink-0"
+          />
+        </motion.div>
+      </motion.div>
 
       {/* Charts Row */}
       <div className="flex gap-[24px] items-start">
         {/* Left: Retention Metrics Chart */}
-        <RetentionMetrics
-          percentage={engagementRate}
-          changePercentage={engagementChange}
-          analyticsStyle={true}
-        />
+        <motion.div
+          initial={fadeUp.initial}
+          animate={fadeUp.animate}
+          transition={{ duration: 0.45, ease: "easeOut", delay: 0.2 }}
+          whileHover={{ y: -3 }}
+        >
+          <RetentionMetrics
+            percentage={engagementRate}
+            changePercentage={engagementChange}
+            analyticsStyle={true}
+          />
+        </motion.div>
 
         {/* Right: Students Activity Chart and Struggle Sliders stacked */}
         <div className="flex flex-col gap-[24px] items-start">
           {/* Students Activity Chart */}
-          <StudentsActivityChart dailyData={dailyActivity} totalStudents={totalStudentsThisWeek} />
+          <motion.div
+            initial={fadeUp.initial}
+            animate={fadeUp.animate}
+            transition={{ duration: 0.45, ease: "easeOut", delay: 0.3 }}
+            whileHover={{ y: -3 }}
+          >
+            <StudentsActivityChart dailyData={dailyActivity} totalStudents={totalStudentsThisWeek} />
+          </motion.div>
 
           {/* Struggle Range Sliders - directly under Students Activity Chart */}
-          <StruggleRangeSliders struggleData={struggleData} />
+          <motion.div
+            initial={fadeUp.initial}
+            animate={fadeUp.animate}
+            transition={{ duration: 0.45, ease: "easeOut", delay: 0.4 }}
+            whileHover={{ y: -3 }}
+          >
+            <StruggleRangeSliders struggleData={struggleData} />
+          </motion.div>
         </div>
       </div>
 

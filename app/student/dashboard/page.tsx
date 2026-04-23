@@ -13,6 +13,7 @@ import { useApiPost } from "../../../hooks/useApi";
 import { api } from "../../../lib/api-client";
 import { BadgeSkeleton } from "../../../components/Skeletons/BadgeSkeleton";
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 interface ResumePoint {
   lessonId: string;
@@ -47,7 +48,23 @@ export default function StudentDashboardPage() {
   const [completedLessonMapIds, setCompletedLessonMapIds] = useState<string[]>([]);
   const [masteredSoundsCount, setMasteredSoundsCount] = useState(0);
   const [masteredSoundLabels, setMasteredSoundLabels] = useState<string[]>([]);
+  const [animatedHeading, setAnimatedHeading] = useState("");
   const totalSoundRingSlots = 45;
+  const headingText = "Your galaxy progress";
+
+  useEffect(() => {
+    let index = 0;
+    setAnimatedHeading("");
+    const timer = window.setInterval(() => {
+      index += 1;
+      setAnimatedHeading(headingText.slice(0, index));
+      if (index >= headingText.length) {
+        window.clearInterval(timer);
+      }
+    }, 70); // intentionally a little slower
+
+    return () => window.clearInterval(timer);
+  }, []);
   
   const handleLevelClick = (level: number) => {
     // TODO: Navigate to level or show level details
@@ -314,7 +331,7 @@ export default function StudentDashboardPage() {
             paddingLeft: "32px",
           }}
         >
-          Your galaxy progress
+          {animatedHeading}
         </h1>
 
         {/* Main Content */}
@@ -498,13 +515,26 @@ export default function StudentDashboardPage() {
                     const altText = def.title || (isUnlocked ? "Unlocked badge" : "Locked badge");
 
                     return (
-                      <div
+                      <motion.div
                         key={def.id ?? index}
                         style={{
                           display: "flex",
                           justifyContent: "center",
                           alignItems: "center",
                           boxSizing: "border-box",
+                        }}
+                        initial={{ y: 0, scale: 1, rotate: 0 }}
+                        animate={{
+                          y: [0, -4, 0],
+                          scale: [1, 1.04, 1],
+                          rotate: [0, -1.5, 1.5, 0],
+                        }}
+                        transition={{
+                          duration: 2.4,
+                          repeat: Infinity,
+                          repeatType: "loop",
+                          ease: "easeInOut",
+                          delay: index * 0.12,
                         }}
                       >
                         {iconSrc && (
@@ -514,7 +544,7 @@ export default function StudentDashboardPage() {
                             style={{ width: "auto", height: "auto" }}
                           />
                         )}
-                      </div>
+                      </motion.div>
                     );
                   });
                 })()}

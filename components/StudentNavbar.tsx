@@ -6,6 +6,7 @@ import { EduPortal } from "./EduPortal";
 import { Profile } from "./Profile";
 import { XpProgressBar } from "./XpProgressBar";
 import { useAuth } from "../contexts/AuthContext";
+import { motion } from "framer-motion";
 
 type StudentNavbarProps = {
   /** Current XP value */
@@ -75,14 +76,59 @@ export function StudentNavbar({
       <div className="flex  gap-[33px] shrink-0 justify-center items-center" data-node-id="2133:245">
         {/* XP Slider with battery icon - container includes both battery and slider */}
         {!hideXpSlider && (
-          <XpProgressBar
-            value={xp}
-            max={xpMax}
-            label=""
-            hideNumbers={true}
-            width={217}
-            height={43}
-          />
+          <div style={{ height: "46px", display: "flex", alignItems: "center" }}>
+            <div style={{ position: "relative", width: "217px", flexShrink: 0 }}>
+              {/* Soft glow behind the start of XP bar */}
+              <motion.div
+                aria-hidden="true"
+                style={{
+                  position: "absolute",
+                  left: "-20px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  width: "108px",
+                  height: "108px",
+                  borderRadius: "50%",
+                  background: "rgba(228, 81, 254, 0.3)",
+                  filter: "blur(30px)",
+                  pointerEvents: "none",
+                  zIndex: 0,
+                }}
+                initial={{ opacity: 0.8 }}
+                animate={{ opacity: [0.8, 1, 0.8] }}
+                transition={{ duration: 1.1, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <motion.div
+                aria-hidden="true"
+                style={{
+                  position: "absolute",
+                  left: "-2px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  width: "48px",
+                  height: "48px",
+                  borderRadius: "50%",
+                  background: "rgba(122, 148, 255, 0.4)",
+                  mixBlendMode: "color-dodge",
+                  filter: "blur(18px)",
+                  pointerEvents: "none",
+                  zIndex: 0,
+                }}
+                initial={{ opacity: 0.8 }}
+                animate={{ opacity: [0.8, 1, 0.8] }}
+                transition={{ duration: 1.1, repeat: Infinity, ease: "easeInOut", delay: 0.08 }}
+              />
+              <div style={{ position: "relative", zIndex: 1 }}>
+                <XpProgressBar
+                  value={xp}
+                  max={xpMax}
+                  label=""
+                  hideNumbers={true}
+                  width={217}
+                />
+              </div>
+            </div>
+          </div>
         )}
         
         {/* Profile + menu */}

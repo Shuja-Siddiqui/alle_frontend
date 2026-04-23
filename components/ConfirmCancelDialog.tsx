@@ -2,6 +2,9 @@
 
 import Image from "next/image";
 import type { ReactNode, MouseEventHandler } from "react";
+import { Star1Icon } from "./icons/Star1Icon";
+import { Star2Icon } from "./icons/Star2Icon";
+import { Star3Icon } from "./icons/Star3Icon";
 
 type ConfirmCancelDialogProps = {
     open: boolean;
@@ -75,7 +78,7 @@ export function ConfirmCancelDialog({
                     {/* Cancel button */}
                     <button
                         type="button"
-                        className="flex min-h-[70px] min-w-[234.18px] items-center justify-center gap-[12px] rounded-full border border-[#434B93] px-[23.902px] py-[9.612px] text-sm text-[#B0B3FF] transition hover:bg-white/5"
+                        className="flex min-h-[70px] min-w-[234.18px] cursor-pointer items-center justify-center gap-[12px] rounded-full border border-[#434B93] px-[23.902px] py-[9.612px] text-sm text-[#B0B3FF] transition hover:bg-white/5"
                         onClick={onCancel}
                     >
                         {cancelIconSrc && (
@@ -101,23 +104,38 @@ export function ConfirmCancelDialog({
                     {/* Confirm button (success variant) */}
                     <button
                         type="button"
-                        className="relative flex min-h-[70px] min-w-[234.18px] items-center justify-center gap-[12px] overflow-hidden rounded-full border-2 border-[#FFFFFF3D] px-[23.902px] py-[9.612px] text-sm font-medium text-white transition hover:brightness-110"
+                        className="group relative flex min-h-[70px] min-w-[234.18px] cursor-pointer items-center justify-center gap-[12px] overflow-hidden rounded-full border-2 border-[#FFFFFF3D] px-[23.902px] py-[9.612px] text-sm font-medium text-white transition hover:brightness-110 shadow-[0px_0px_0px_1.6px_#E451FE] hover:shadow-[0px_0px_18.7px_1.602px_#ff00c8]"
                         style={{
                             fontFamily: "var(--font-orbitron), system-ui, sans-serif",
                             backgroundImage:
                                 "linear-gradient(88.47deg, #F529F9 1.65%, #0756FF 57.2%, #FF21C8 89.22%)",
-                            boxShadow: "0px 0px 0px 1.6px #E451FE",
                         }}
                         onClick={onConfirm}
                     >
-                        {/* Single decorative star, similar to PrimaryButton but only one */}
-                        <div className="pointer-events-none absolute left-[45px] bottom-0 opacity-80">
-                            <Image
-                                src="/assets/icons/others/star2.png"
-                                alt=""
-                                width={39}
-                                height={39}
-                            />
+                        {/* Decorative stars: default PNGs */}
+                        <div className="pointer-events-none absolute inset-0 transition-opacity group-hover:opacity-0">
+                            <div className="absolute right-[52px] top-[-4px] opacity-70">
+                                <Image src="/assets/icons/others/star1.png" alt="" width={28} height={28} />
+                            </div>
+                            <div className="absolute left-[30px] bottom-[-2px] opacity-80">
+                                <Image src="/assets/icons/others/star2.png" alt="" width={32} height={32} />
+                            </div>
+                            <div className="absolute right-[86px] bottom-[-2px] opacity-60">
+                                <Image src="/assets/icons/others/star3.png" alt="" width={26} height={26} />
+                            </div>
+                        </div>
+
+                        {/* Hover stars: glowing SVGs */}
+                        <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100">
+                            <div className="absolute right-[52px] top-[-4px]">
+                                <Star1Icon width={28} height={28} />
+                            </div>
+                            <div className="absolute left-[30px] bottom-[-2px]">
+                                <Star2Icon width={32} height={32} />
+                            </div>
+                            <div className="absolute right-[86px] bottom-[-2px]">
+                                <Star3Icon width={26} height={26} />
+                            </div>
                         </div>
 
                         {confirmIconSrc && (
