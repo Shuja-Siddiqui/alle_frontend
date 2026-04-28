@@ -185,7 +185,7 @@ export default function AnalyticsPage() {
           : [];
 
         const mapped: StruggleData[] = rows.map((row) => {
-          const struggling = Number(row.studentsWhoFailed ?? 0);
+          const struggling = Number(row.studentsWhoStruggled ?? 0);
           const total = Number(row.totalStudentsAttempted ?? struggling);
 
           return {

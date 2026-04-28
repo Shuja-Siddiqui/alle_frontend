@@ -8,11 +8,38 @@ import { api } from "../../../lib/api-client";
 
 type AdminNotification = {
   id: string;
+  type?: string;
   title: string;
   message: string;
   isRead: boolean;
   createdAt?: string;
+  payload?: Record<string, unknown> | string | null;
 };
+
+function parsePayload(payload: AdminNotification["payload"]): Record<string, unknown> {
+  if (!payload) return {};
+  if (typeof payload === "string") {
+    try {
+      const parsed = JSON.parse(payload);
+      return parsed && typeof parsed === "object" ? parsed : {};
+    } catch {
+      return {};
+    }
+  }
+  return payload && typeof payload === "object" ? payload : {};
+}
+
+function resolveDetailUrl(notification: AdminNotification): string {
+  const payload = parsePayload(notification.payload);
+  const explicit = payload.detailUrl;
+  if (typeof explicit === "string" && explicit.trim().length > 0) {
+    return explicit;
+  }
+  if (notification.type === "weeklySummary" || notification.type === "inactive") {
+    return "/admin/analytics";
+  }
+  return "/admin/notifications";
+}
 
 function formatNotificationTime(createdAt?: string) {
   if (!createdAt) return "";
@@ -126,8 +153,12 @@ export default function AdminNotificationsPage() {
                 <button
                   key={notification.id}
                   type="button"
-                  onClick={() => {
-                    if (!notification.isRead) void markNotificationRead(notification.id);
+                  onClick={async () => {
+                    if (!notification.isRead) {
+                      await markNotificationRead(notification.id);
+                    }
+                    const detailUrl = resolveDetailUrl(notification);
+                    router.push(detailUrl);
                   }}
                   style={{
                     display: "flex",

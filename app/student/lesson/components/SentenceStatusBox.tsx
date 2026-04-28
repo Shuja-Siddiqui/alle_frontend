@@ -1,5 +1,9 @@
 import React from "react";
 import { AlphabetDisplay } from "../../../../components/AlphabetDisplay";
+import {
+  ALPHABET_ROW_UNCONSTRAINED_WIDTH,
+  computeWordLetterSlotLayout,
+} from "../../../../lib/alphabet-intrinsic-layout";
 
 type SentenceStatusBoxProps = {
   /** Sentence to display */
@@ -89,19 +93,31 @@ export function SentenceStatusBox({
           flexWrap: "wrap",
         }}
       >
-        {(words.length > 0 ? words : [sentence]).map((word, index) => (
-          <AlphabetDisplay
-            key={`${word}-${index}`}
-            text={word}
-            variant={getAlphabetVariant()}
-            letterWidth={letterWidth}
-            letterHeight={letterHeight}
-            gap={letterGap}
-            spaceHandling="skip"
-            applyBoxModel={false}
-            exactGap={true}
-          />
-        ))}
+        {(words.length > 0 ? words : [sentence]).map((word, index) => {
+          const letters = [...word]
+            .filter((ch) => /[a-z]/i.test(ch))
+            .map((c) => c.toUpperCase());
+          const { capHeight, slotWidthsPx } = computeWordLetterSlotLayout({
+            letters,
+            capHeightMax: letterHeight,
+            gap: letterGap,
+            innerRowMaxPx: ALPHABET_ROW_UNCONSTRAINED_WIDTH,
+          });
+          return (
+            <AlphabetDisplay
+              key={`${word}-${index}`}
+              text={word}
+              variant={getAlphabetVariant()}
+              letterWidth={capHeight}
+              letterHeight={capHeight}
+              gap={letterGap}
+              spaceHandling="skip"
+              applyBoxModel={false}
+              exactGap={true}
+              perLetterSlotWidths={slotWidthsPx}
+            />
+          );
+        })}
       </div>
     </div>
   );

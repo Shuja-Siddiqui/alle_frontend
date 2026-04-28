@@ -25,6 +25,7 @@ import {
   loadTaskOutcomeState,
   saveTaskOutcomeState,
 } from "../../../lib/taskOutcomeState";
+import { devMockSyncWordCorrect } from "../../../lib/dev-mock-checkpoint-sync";
 import Image from "next/image";
 
 type StatusVariant = "initial" | "default" | "success" | "error";
@@ -343,23 +344,20 @@ export default function BlendingPage() {
     // MOCK MODE: Skip recording and API calls, simulate success
     const mockMode = localStorage.getItem('MOCK_MODE') === 'true';
     if (mockMode && !newMicState) {
-      // Mic was stopped
-      console.log('[MOCK MODE] Skipping recording and assessment, simulating success');
+      console.log(
+        "[MOCK MODE] Skipping mic/API; syncing blend word success to checkpoint like real flow"
+      );
       setIsProcessing(true);
-
-      // Simulate exactMatch result (90%+ accuracy)
-      const mockResult = {
+      setFeedbackData({
         feedbackType: "exactMatch",
         qualityScore: 90,
         success: true,
-      };
-      setFeedbackData(mockResult);
-
-      // Set success variant
+      });
       setStatusVariant("success");
-
-      // Don't save checkpoint here - wait for continue button click
-      // Don't auto-advance - wait for continue button
+      const blendWord = String((currentTask as any)?.word ?? "").trim();
+      if (lessonId && blendWord) {
+        await devMockSyncWordCorrect(lessonId, blendWord);
+      }
       setIsProcessing(false);
       return;
     }
@@ -682,7 +680,26 @@ export default function BlendingPage() {
 
       // Check if there are more tasks (order = array order; task_id is for identification only)
       if (nextIndex >= blendingTasks.length) {
-        // All blending_practice tasks completed - next task type or next mission (skip empty arrays)
+        // End of blending batch: always show mastery-check summary first; Continue then follows real next step.
+        let correctCount = blendingTasks.length;
+        try {
+          const progressResponse = await api.get<any>(`/lessons/${lessonId}/progress`);
+          const checkpoint =
+            progressResponse.data?.checkpoint ?? progressResponse.checkpoint ?? null;
+          const wp = checkpoint?.wordProgress ?? {};
+          const keys = blendingTasks
+            .map((t) => String((t as any).word ?? "").trim())
+            .filter((w) => w.length > 0);
+          if (keys.length > 0) {
+            correctCount = keys.reduce(
+              (acc, w) => acc + (wp[w]?.correct === true ? 1 : 0),
+              0
+            );
+          }
+        } catch (e) {
+          console.warn("[Blending] Could not load progress for mastery-check summary:", e);
+        }
+
         const nextStep = getNextLessonStep(
           currentLesson.missions,
           missionSeqNum,
@@ -690,18 +707,20 @@ export default function BlendingPage() {
           effectiveTaskIndex,
           blendingTasks.length
         );
-        if (nextStep?.type === "task_page") {
-          router.push(
-            `/student/${nextStep.page}?lessonId=${lessonId}&missionSequence=${nextStep.missionSequence}&taskId=${nextStep.taskId}&taskIndex=${nextStep.taskIndex}`
-          );
-          return;
-        }
-        if (nextStep?.type === "mission_page") {
-          router.push(
-            `/student/mission?lessonId=${lessonId}&missionSequence=${nextStep.missionSequence}`
-          );
-          return;
-        }
+        const continuePath =
+          nextStep?.type === "task_page"
+            ? `/student/${nextStep.page}?lessonId=${lessonId}&missionSequence=${nextStep.missionSequence}&taskId=${nextStep.taskId}&taskIndex=${nextStep.taskIndex}`
+            : nextStep?.type === "mission_page"
+            ? `/student/mission?lessonId=${lessonId}&missionSequence=${nextStep.missionSequence}`
+            : "/student/dashboard";
+        const firstTaskId =
+          (blendingTasks[0] as any)?.task_id ?? (blendingTasks[0] as any)?.id ?? "1";
+        const retryPath = `/student/blending?lessonId=${lessonId}&missionSequence=${missionSequence}&taskId=${firstTaskId}&taskIndex=0`;
+        router.push(
+          `/student/mastery-check?lessonId=${lessonId}&missionSequence=${missionSeqNum}&correct=${correctCount}&total=${blendingTasks.length}&continueTo=${encodeURIComponent(
+            continuePath
+          )}&retryTo=${encodeURIComponent(retryPath)}`
+        );
         return;
       }
 

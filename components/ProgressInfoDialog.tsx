@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 type ProgressInfoDialogProps = {
   /** Student ID for navigation */
@@ -26,11 +27,13 @@ export function ProgressInfoDialog({
   className,
 }: ProgressInfoDialogProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const roleBase = pathname?.startsWith("/teacher") ? "teacher" : "admin";
 
   if (!visible) return null;
 
   function handleShowProfile() {
-    router.push(`/admin/students/${studentId}`);
+    router.push(`/${roleBase}/students/${studentId}`);
   }
 
   return (

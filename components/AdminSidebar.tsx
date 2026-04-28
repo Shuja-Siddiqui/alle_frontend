@@ -53,12 +53,10 @@ export function AdminSidebar({ onLogoClick }: AdminSidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const roleBase = pathname?.startsWith("/teacher") ? "teacher" : "admin";
-  const menuItems = MENU_ITEMS
-    .filter((item) => !(roleBase === "teacher" && item.id === "analytics"))
-    .map((item) => ({
-      ...item,
-      path: `/${roleBase}/${item.id}`,
-    }));
+  const menuItems = MENU_ITEMS.map((item) => ({
+    ...item,
+    path: `/${roleBase}/${item.id}`,
+  }));
 
   const handleLogoClick = () => {
     if (onLogoClick) {

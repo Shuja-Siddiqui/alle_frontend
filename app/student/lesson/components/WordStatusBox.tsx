@@ -1,6 +1,7 @@
 import Image from "next/image";
 import React from "react";
 import { AlphabetDisplay } from "../../../../components/AlphabetDisplay";
+import { computeWordLetterSlotLayout } from "../../../../lib/alphabet-intrinsic-layout";
 
 type WordStatusBoxProps = {
   /** Word to display (e.g., "MAP", "SAT") */
@@ -47,6 +48,9 @@ const VARIANT_STYLES: Record<
   },
 };
 
+/** Box content width for the letter row (450px card − horizontal padding − max border). */
+const WORD_BOX_LETTER_ROW_INNER_PX = 450 - 64 * 2 - 3 * 2;
+
 export function WordStatusBox({
   word,
   variant = "default",
@@ -57,12 +61,16 @@ export function WordStatusBox({
 }: WordStatusBoxProps) {
   const variantStyle = VARIANT_STYLES[variant];
   const normalizedWord = (word || "").toUpperCase();
+  const letters = [...normalizedWord].filter((ch) => /[A-Z]/.test(ch));
 
-  // For words, treat letterHeight as the max height, but allow letters to use a
-  // slightly narrower width so skinny letters like "i" don't create huge visual
-  // gaps. Width stays <= 100, height stays at the requested size.
-  const effectiveLetterHeight = letterHeight;
-  const effectiveLetterWidth = Math.min(effectiveLetterHeight * 0.65, 100);
+  // Slot widths follow each letter’s SVG viewBox (see `alphabet-intrinsic-layout.ts`), so
+  // cap height is shared but I doesn’t sit in a full-width square and A/W scale consistently.
+  const { capHeight, slotWidthsPx } = computeWordLetterSlotLayout({
+    letters,
+    capHeightMax: letterHeight,
+    gap: letterGap,
+    innerRowMaxPx: WORD_BOX_LETTER_ROW_INNER_PX,
+  });
 
   // Map StatusBox variant to AlphabetDisplay variant
   const getAlphabetVariant = (): "default" | "done" | "error" => {
@@ -115,17 +123,17 @@ export function WordStatusBox({
         </div>
       )}
 
-      {/* Alphabet Display for the word — letters at ~100px tall with 16px gap */}
       <AlphabetDisplay
         text={normalizedWord}
         variant={getAlphabetVariant()}
-        letterWidth={effectiveLetterWidth}
-        letterHeight={effectiveLetterHeight}
+        letterWidth={capHeight}
+        letterHeight={capHeight}
         gap={letterGap}
         spaceHandling="skip"
         applyBoxModel={false}
-        letterScaleFactor={1} /* No shrinking — render letters at exact specified size */
-        exactGap={true} /* Use gap value as-is (16px) without reduction */
+        letterScaleFactor={1}
+        exactGap={true}
+        perLetterSlotWidths={slotWidthsPx}
       />
     </div>
   );

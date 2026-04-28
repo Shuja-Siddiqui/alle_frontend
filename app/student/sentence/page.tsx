@@ -22,6 +22,7 @@ import {
   loadTaskOutcomeState,
   saveTaskOutcomeState,
 } from "../../../lib/taskOutcomeState";
+import { devMockSyncWordCorrect } from "../../../lib/dev-mock-checkpoint-sync";
 import Image from "next/image";
 
 type StatusVariant = "initial" | "default" | "success" | "error";
@@ -177,7 +178,9 @@ export default function SentencePage() {
       // MOCK MODE: Skip recording and API calls, simulate success (same pattern as other pages)
       const mockMode = typeof window !== "undefined" && localStorage.getItem("MOCK_MODE") === "true";
       if (mockMode) {
-        console.log("[MOCK MODE] Sentence page: skipping recording and assessment, simulating success");
+        console.log(
+          "[MOCK MODE] Sentence page: skipping mic/API; syncing sentence success to checkpoint"
+        );
         setIsProcessing(true);
         setStatusVariant("success");
         setFeedbackData({
@@ -185,9 +188,15 @@ export default function SentencePage() {
           feedbackText: "Great job!",
         });
         setShowingFeedback(true);
+        const expectedResponse: any = (taskData as any)?.expectedResponse || {};
+        const sentenceText = String(
+          (taskData as any)?.sentence || expectedResponse?.value || ""
+        ).trim();
+        if (lessonId && sentenceText) {
+          await devMockSyncWordCorrect(lessonId, sentenceText);
+        }
         setIsMicActive(false);
         setIsProcessing(false);
-        // User will click Continue to complete and move to next task
         return;
       }
 
@@ -354,6 +363,29 @@ export default function SentencePage() {
       const nextIndex = effectiveTaskIndex + 1;
 
       if (sentenceTasksLength > 0 && nextIndex >= sentenceTasksLength) {
+        // End of sentence batch: mastery-check summary, then Continue advances the real next step.
+        let correctCount = sentenceTasksLength;
+        try {
+          const progressResponse = await api.get<any>(`/lessons/${lessonId}/progress`);
+          const checkpoint =
+            progressResponse.data?.checkpoint ?? progressResponse.checkpoint ?? null;
+          const wp = checkpoint?.wordProgress ?? {};
+          const keys = (sentenceTasks as any[]).map((t) => {
+            const raw = String(t?.word || t?.sentence || "").trim();
+            return raw.length ? raw : "";
+          }).filter(Boolean);
+          if (keys.length > 0) {
+            correctCount = keys.reduce((acc, key) => {
+              const lower = key.toLowerCase();
+              const hit =
+                wp[key]?.correct === true || wp[lower]?.correct === true;
+              return acc + (hit ? 1 : 0);
+            }, 0);
+          }
+        } catch (e) {
+          console.warn("[Sentence] Could not load progress for mastery-check summary:", e);
+        }
+
         const nextStep = getNextLessonStep(
           currentLesson?.missions,
           missionSeqNum,
@@ -361,18 +393,23 @@ export default function SentencePage() {
           effectiveTaskIndex,
           sentenceTasksLength
         );
-        if (nextStep?.type === "task_page") {
-          router.push(
-            `/student/${nextStep.page}?lessonId=${lessonId}&missionSequence=${nextStep.missionSequence}&taskId=${nextStep.taskId}&taskIndex=${nextStep.taskIndex}`
-          );
-          return;
-        }
-        if (nextStep?.type === "mission_page") {
-          router.push(
-            `/student/mission?lessonId=${lessonId}&missionSequence=${nextStep.missionSequence}`
-          );
-          return;
-        }
+        const continuePath =
+          nextStep?.type === "task_page"
+            ? `/student/${nextStep.page}?lessonId=${lessonId}&missionSequence=${nextStep.missionSequence}&taskId=${nextStep.taskId}&taskIndex=${nextStep.taskIndex}`
+            : nextStep?.type === "mission_page"
+            ? `/student/mission?lessonId=${lessonId}&missionSequence=${nextStep.missionSequence}`
+            : "/student/dashboard";
+        const firstTaskId =
+          (sentenceTasks as any[])?.[0]?.task_id ??
+          (sentenceTasks as any[])?.[0]?.id ??
+          "1";
+        const retryPath = `/student/sentence?lessonId=${lessonId}&missionSequence=${missionSequence}&taskId=${firstTaskId}&taskIndex=0`;
+        router.push(
+          `/student/mastery-check?lessonId=${lessonId}&missionSequence=${missionSeqNum}&correct=${correctCount}&total=${sentenceTasksLength}&continueTo=${encodeURIComponent(
+            continuePath
+          )}&retryTo=${encodeURIComponent(retryPath)}`
+        );
+        return;
       }
 
       if (sentenceTasksLength > 0 && nextIndex < sentenceTasksLength) {

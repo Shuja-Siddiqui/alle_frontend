@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useState, useEffect, useRef } from "react";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { LessonStatsCard } from "../../../../../../components/LessonStatsCard";
 import { LessonObjective } from "../../../../../../components/LessonObjective";
@@ -10,7 +10,9 @@ import { StudentsTable, StudentRowData } from "../../../../../../components/Stud
 import { LessonDetailsSkeleton } from "../../../../../../components/Skeletons/LessonDetailsSkeleton";
 import { StudentsTableSkeleton } from "../../../../../../components/Skeletons/StudentsTableSkeleton";
 import { AddStudentDialog, AddStudentFormData } from "../../../../../../components/AddStudentDialog";
-import { api } from "../../../../../../lib/api-client";
+import { AdminNotificationsMenu } from "../../../../../../components/AdminNotificationsMenu";
+import { api, ApiError } from "../../../../../../lib/api-client";
+import { useAuth } from "../../../../../../contexts/AuthContext";
 
 const LANGUAGE_NAMES: Record<string, string> = {
   en: "English",
@@ -60,15 +62,15 @@ const DEFAULT_PERFORMANCE_MARKERS: PerformanceMarkersApiData = {
   criticalErrors: 0,
 };
 
-export default function LessonDetailsPage({
-  params,
-}: {
-  params: Promise<{ moduleId: string; lessonId: string }>;
-}) {
+export default function LessonDetailsPage() {
   const router = useRouter();
+  const params = useParams<{ moduleId: string; lessonId: string }>();
   const pathname = usePathname();
-  const roleBase = pathname?.startsWith("/teacher") ? "teacher" : "admin";
-  const { moduleId, lessonId } = use(params);
+  const { user } = useAuth();
+  const roleBase =
+    user?.role === "teacher" ? "teacher" : pathname?.startsWith("/teacher") ? "teacher" : "admin";
+  const moduleId = Array.isArray(params?.moduleId) ? params.moduleId[0] : params?.moduleId;
+  const lessonId = Array.isArray(params?.lessonId) ? params.lessonId[0] : params?.lessonId;
   const [showAddStudentDialog, setShowAddStudentDialog] = useState(false);
   const [lessonData, setLessonData] = useState<LessonApiData | null>(null);
   const [lessonStudents, setLessonStudents] = useState<StudentRowData[]>([]);
@@ -78,9 +80,35 @@ export default function LessonDetailsPage({
   const [loadingLesson, setLoadingLesson] = useState(true);
   const [loadingStudents, setLoadingStudents] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [accessDenied, setAccessDenied] = useState(false);
+  const redirectScheduledRef = useRef(false);
+  const hasRouteParams = Boolean(moduleId && lessonId);
+
+  const navigateBackToModules = () => {
+    if (moduleId) {
+      router.push(`/${roleBase}/modules/${moduleId}`);
+      return;
+    }
+    router.push(`/${roleBase}/modules`);
+  };
+
+  const handleAccessDenied = () => {
+    if (redirectScheduledRef.current) return;
+    redirectScheduledRef.current = true;
+    setAccessDenied(true);
+    window.setTimeout(() => {
+      navigateBackToModules();
+    }, 1200);
+  };
+
+  const is403 = (error: unknown) =>
+    error instanceof ApiError
+      ? error.statusCode === 403
+      : (error as { statusCode?: number; response?: { statusCode?: number } })?.statusCode === 403 ||
+        (error as { response?: { statusCode?: number } })?.response?.statusCode === 403;
 
   function handleBackClick() {
-    router.push(`/${roleBase}/modules/${moduleId}`);
+    navigateBackToModules();
   }
 
   function handleAddStudent() {
@@ -88,6 +116,7 @@ export default function LessonDetailsPage({
   }
 
   useEffect(() => {
+    if (!hasRouteParams) return;
     let isMounted = true;
 
     const fetchLesson = async () => {
@@ -99,8 +128,15 @@ export default function LessonDetailsPage({
           setLessonData(lesson as LessonApiData);
         }
       } catch (error) {
-        console.error("❌ Failed to load lesson:", error);
-        if (isMounted) setLessonData(null);
+        if (is403(error)) {
+          if (isMounted) {
+            setLessonData(null);
+            handleAccessDenied();
+          }
+        } else {
+          console.error("❌ Failed to load lesson:", error);
+          if (isMounted) setLessonData(null);
+        }
       } finally {
         if (isMounted) setLoadingLesson(false);
       }
@@ -108,9 +144,10 @@ export default function LessonDetailsPage({
 
     fetchLesson();
     return () => { isMounted = false; };
-  }, [lessonId]);
+  }, [lessonId, hasRouteParams]);
 
   useEffect(() => {
+    if (!hasRouteParams) return;
     let isMounted = true;
 
     const fetchMarkers = async () => {
@@ -127,16 +164,24 @@ export default function LessonDetailsPage({
           });
         }
       } catch (error) {
-        console.error("❌ Failed to load lesson performance markers:", error);
-        if (isMounted) setPerformanceMarkers(DEFAULT_PERFORMANCE_MARKERS);
+        if (is403(error)) {
+          if (isMounted) {
+            setPerformanceMarkers(DEFAULT_PERFORMANCE_MARKERS);
+            handleAccessDenied();
+          }
+        } else {
+          console.error("❌ Failed to load lesson performance markers:", error);
+          if (isMounted) setPerformanceMarkers(DEFAULT_PERFORMANCE_MARKERS);
+        }
       }
     };
 
     fetchMarkers();
     return () => { isMounted = false; };
-  }, [lessonId, refreshTrigger]);
+  }, [lessonId, refreshTrigger, hasRouteParams]);
 
   useEffect(() => {
+    if (!hasRouteParams) return;
     let isMounted = true;
 
     const fetchStudents = async () => {
@@ -164,8 +209,15 @@ export default function LessonDetailsPage({
           setLessonStudents(mapped);
         }
       } catch (error) {
-        console.error("❌ Failed to load students:", error);
-        if (isMounted) setLessonStudents([]);
+        if (is403(error)) {
+          if (isMounted) {
+            setLessonStudents([]);
+            handleAccessDenied();
+          }
+        } else {
+          console.error("❌ Failed to load students:", error);
+          if (isMounted) setLessonStudents([]);
+        }
       } finally {
         if (isMounted) setLoadingStudents(false);
       }
@@ -173,7 +225,7 @@ export default function LessonDetailsPage({
 
     fetchStudents();
     return () => { isMounted = false; };
-  }, [lessonId, refreshTrigger]);
+  }, [lessonId, refreshTrigger, hasRouteParams]);
 
   const studentsCount = lessonStudents.length;
   const avgProgress =
@@ -205,34 +257,8 @@ export default function LessonDetailsPage({
 
           {/* Right side: Notification and Add student button */}
           <div className="flex gap-[28px] items-center">
-            {/* Notification icon */}
-            <button
-              type="button"
-              onClick={() => {
-                // TODO: Handle notification click
-                console.log("Notification clicked");
-              }}
-              className="relative shrink-0 cursor-pointer bg-transparent border-none p-0"
-              style={{
-                width: "52px",
-                height: "52px",
-              }}
-            >
-              <div
-                className="absolute"
-                style={{
-                  inset: "-1.65%",
-                }}
-              >
-                <Image
-                  src="/assets/icons/admin/notification.svg"
-                  alt="Notifications"
-                  width={54}
-                  height={54}
-                  className="block max-w-none size-full"
-                />
-              </div>
-            </button>
+            {/* Shared notifications menu with live unread count */}
+            <AdminNotificationsMenu />
 
             {/* Add student button */}
             <button
@@ -334,7 +360,11 @@ export default function LessonDetailsPage({
           padding: "0 32px 32px 32px",
         }}
       >
-        {loadingLesson ? (
+        {accessDenied ? (
+          <div style={{ color: "#FFF", padding: "24px" }}>
+            Access denied for this lesson. Returning to modules...
+          </div>
+        ) : loadingLesson ? (
           <LessonDetailsSkeleton />
         ) : lessonData ? (
           <>

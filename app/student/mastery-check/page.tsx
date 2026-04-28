@@ -1,27 +1,96 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PrimaryButton } from "../../../components/PrimaryButton";
-import { useMasteryCheckData } from "../hooks/useLessonData";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { StudentMascotAvatar } from "../../../components/StudentMascotAvatar";
+import { starsFromCorrectTotal } from "../../../lib/score-stars";
+import { resolveMasteryCheckScoreFromApis } from "../../../lib/mastery-check-resolve-score";
+import { api } from "../../../lib/api-client";
+
+function parseNonNegativeInt(value: string | null): number | null {
+    if (value == null) return null;
+    const parsed = Number.parseInt(value, 10);
+    if (Number.isNaN(parsed) || parsed < 0) return null;
+    return parsed;
+}
 
 export default function MasteryCheckPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    
-    // Get data from URL params
-    const lessonId = searchParams.get("lessonId") || "lesson1";
-    const missionSequence = parseInt(searchParams.get("missionSequence") || "1", 10);
-    
-    // Fetch mastery check data
-    const masteryData = useMasteryCheckData(lessonId, missionSequence);
-    
-    const currentScore = masteryData?.currentScore || 6;
-    const totalScore = masteryData?.totalScore || 10;
-    const starsEarned = masteryData?.starsEarned || 3;
+
+    const lessonId = searchParams.get("lessonId");
+    const missionSequenceRaw = searchParams.get("missionSequence");
+    const missionSequence =
+        missionSequenceRaw != null ? Number.parseInt(missionSequenceRaw, 10) : Number.NaN;
+
+    const queryCorrect = parseNonNegativeInt(searchParams.get("correct"));
+    const queryTotal = parseNonNegativeInt(searchParams.get("total"));
+    const hasQueryScore = queryCorrect !== null && queryTotal !== null;
+    const hasOnlyOneQueryScore = (queryCorrect !== null) !== (queryTotal !== null);
+
+    const scoreFromUrl = useMemo(() => {
+        if (hasQueryScore && queryCorrect !== null && queryTotal !== null) {
+            return { correct: queryCorrect, total: queryTotal };
+        }
+        return null;
+    }, [hasQueryScore, queryCorrect, queryTotal]);
+
+    const [fetchedScore, setFetchedScore] = useState<{ correct: number; total: number } | null>(
+        null
+    );
+    const [scoreError, setScoreError] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (scoreFromUrl) {
+            setFetchedScore(null);
+            setScoreError(null);
+            return;
+        }
+        if (!lessonId || !Number.isFinite(missionSequence) || missionSequence < 1 || hasOnlyOneQueryScore) {
+            setFetchedScore(null);
+            setScoreError("Missing or invalid mastery-check parameters.");
+            return;
+        }
+        let cancelled = false;
+        (async () => {
+            try {
+                const [progRes, lessonRes] = await Promise.all([
+                    api.get<any>(`/lessons/${lessonId}/progress`),
+                    api.get<any>(`/lessons/${lessonId}`),
+                ]);
+                const checkpoint =
+                    progRes?.data?.checkpoint ?? progRes?.checkpoint ?? null;
+                const score = resolveMasteryCheckScoreFromApis({
+                    lessonPayload: lessonRes,
+                    missionSequence,
+                    checkpoint,
+                });
+                if (!cancelled) {
+                    setFetchedScore(score);
+                    setScoreError(null);
+                }
+            } catch (e: unknown) {
+                if (!cancelled) {
+                    setFetchedScore(null);
+                    setScoreError(e instanceof Error ? e.message : "Unable to resolve real mastery score.");
+                }
+            }
+        })();
+        return () => {
+            cancelled = true;
+        };
+    }, [lessonId, missionSequence, scoreFromUrl, hasOnlyOneQueryScore]);
+
+    const displayScores = scoreFromUrl ?? fetchedScore;
+    const scoreReady = displayScores !== null && scoreError === null;
+    const currentScore = displayScores?.correct ?? 0;
+    const totalScore = displayScores?.total ?? 0;
+    const starsEarned = scoreReady ? starsFromCorrectTotal(currentScore, totalScore) : 0;
+    const continueTo = searchParams.get("continueTo");
+    const retryTo = searchParams.get("retryTo");
     const [animatedCorrectScore, setAnimatedCorrectScore] = useState(0);
     const [startCorrectCount, setStartCorrectCount] = useState(false);
 
@@ -180,6 +249,20 @@ export default function MasteryCheckPage() {
 
                 {/* Score Display */}
                 <div className="flex items-center gap-2">
+                    {scoreError ? (
+                        <div
+                            style={{
+                                color: "#FF8EA4",
+                                fontFamily: "var(--font-orbitron), system-ui, sans-serif",
+                                fontSize: "24px",
+                                textAlign: "center",
+                                maxWidth: "860px",
+                            }}
+                        >
+                            {scoreError}
+                        </div>
+                    ) : (
+                        <>
                     <motion.span
                         style={{
                             color: "#FF51D4",
@@ -197,7 +280,7 @@ export default function MasteryCheckPage() {
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ type: "spring", stiffness: 130, damping: 16, delay: 1.05 }}
                     >
-                        {animatedCorrectScore}
+                        {scoreReady ? animatedCorrectScore : "…"}
                     </motion.span>
                     <motion.span
                         style={{
@@ -230,10 +313,14 @@ export default function MasteryCheckPage() {
                         initial={{ x: 220, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
                         transition={{ type: "spring", stiffness: 130, damping: 16, delay: 1.18 }}
-                        onAnimationComplete={() => setStartCorrectCount(true)}
+                        onAnimationComplete={() => {
+                            if (scoreReady) setStartCorrectCount(true);
+                        }}
                     >
-                        {totalScore}
+                        {scoreReady ? totalScore : "…"}
                     </motion.span>
+                        </>
+                    )}
                 </div>
 
                 {/* Retry + Continue Buttons */}
@@ -247,7 +334,9 @@ export default function MasteryCheckPage() {
                         type="button"
                         onClick={() =>
                             router.push(
-                                `/student/mission?lessonId=${lessonId}&missionSequence=${missionSequence}`
+                                retryTo
+                                    ? decodeURIComponent(retryTo)
+                                    : `/student/mission?lessonId=${lessonId}&missionSequence=${missionSequence}`
                             )
                         }
                         style={{
@@ -285,7 +374,9 @@ export default function MasteryCheckPage() {
                         iconAlt="Continue"
                         size="medium"
                         variant="filled"
-                        onClick={() => router.push("/student/dashboard")}
+                        onClick={() =>
+                            router.push(continueTo ? decodeURIComponent(continueTo) : "/student/dashboard")
+                        }
                     />
                 </motion.div>
             </div>

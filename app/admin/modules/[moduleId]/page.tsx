@@ -7,6 +7,7 @@ import { ModuleGeneralStats } from "../../../../components/ModuleGeneralStats";
 import { LessonStatCard, LessonType } from "../../../../components/LessonStatCard";
 import { LessonCapsuleSkeleton } from "../../../../components/Skeletons/LessonCapsuleSkeleton";
 import { AddStudentDialog, AddStudentFormData } from "../../../../components/AddStudentDialog";
+import { AdminNotificationsMenu } from "../../../../components/AdminNotificationsMenu";
 import { api } from "../../../../lib/api-client";
 
 const LESSON_TYPE_LABELS: Record<LessonType, string> = {
@@ -210,38 +211,8 @@ export default function ModuleDetailsPage({
 
           {/* Right side: Notification and Add student button */}
           <div className="flex gap-[28px] items-center">
-            {/* Notification icon */}
-            <button
-              type="button"
-              onClick={() => {
-                // TODO: Handle notification click
-                console.log("Notification clicked");
-              }}
-              className="relative shrink-0 cursor-pointer bg-transparent border-none p-0"
-              style={{
-                width: "52px",
-                height: "52px",
-                background: "transparent",
-                border: "none",
-                padding: 0,
-                cursor: "pointer",
-              }}
-            >
-              <div
-                className="absolute"
-                style={{
-                  inset: "-1.65%",
-                }}
-              >
-                <Image
-                  src="/assets/icons/admin/notification.svg"
-                  alt="Notifications"
-                  width={54}
-                  height={54}
-                  className="block max-w-none size-full"
-                />
-              </div>
-            </button>
+            {/* Shared notifications menu with live unread count */}
+            <AdminNotificationsMenu />
 
             {/* Add student button */}
             <button
