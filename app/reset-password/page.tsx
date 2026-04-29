@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { RolePageLayout } from "../../components/RolePageLayout";
 import { EduPortal } from "../../components/EduPortal";
@@ -9,7 +9,7 @@ import { PrimaryButton } from "../../components/PrimaryButton";
 import { api } from "../../lib/api-client";
 import { useUI } from "../../contexts/UIContext";
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const router = useRouter();
   const params = useSearchParams();
   const { showError, showLoader, hideLoader, showSuccess } = useUI();
@@ -165,5 +165,13 @@ export default function ResetPasswordPage() {
         </main>
       </div>
     </RolePageLayout>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={null}>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }
