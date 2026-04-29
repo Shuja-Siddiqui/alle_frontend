@@ -8,24 +8,20 @@ import { InputField } from "../../../../components/InputField";
 import { PrimaryButton } from "../../../../components/PrimaryButton";
 import { ResetPasswordDialog } from "../../../../components/ResetPasswordDialog";
 import { Toast } from "../../../../components/Toast";
-import { SetNewPasswordDialog } from "../../../../components/SetNewPasswordDialog";
-import { ConfirmCancelDialog } from "../../../../components/ConfirmCancelDialog";
 import { useAuth } from "../../../../contexts/AuthContext";
 import { useUI } from "../../../../contexts/UIContext";
+import { useApiPost } from "../../../../hooks/useApi";
 
 export default function AdminLoginPage() {
   const router = useRouter();
   const { login } = useAuth();
   const { showSuccess, showError, showLoader, hideLoader } = useUI();
+  const { post } = useApiPost();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [showResetToast, setShowResetToast] = useState(false);
-  const [showSetPasswordDialog, setShowSetPasswordDialog] = useState(false);
-  const [resetNewPassword, setResetNewPassword] = useState("");
-  const [resetConfirmPassword, setResetConfirmPassword] = useState("");
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -34,8 +30,14 @@ export default function AdminLoginPage() {
       const user = await login(email, password);
       hideLoader();
       showSuccess("Login successful! Redirecting...");
-      // Redirect by role: admin → admin dashboard, student/teacher → student dashboard
-      router.push(user?.role === "admin" ? "/admin" : "/student");
+      // Redirect by role so teachers land on teacher workspace.
+      if (user?.role === "admin") {
+        router.push("/admin");
+      } else if (user?.role === "teacher") {
+        router.push("/teacher");
+      } else {
+        router.push("/student");
+      }
     } catch (error: unknown) {
       hideLoader();
       const err = error as { message?: string; response?: { message?: string } };
@@ -54,38 +56,23 @@ export default function AdminLoginPage() {
     setResetDialogOpen(false);
   };
 
-  const handleSendReset = () => {
-    // TODO: wire up to reset password API using `resetEmail`
-    setResetDialogOpen(false);
-    setShowResetToast(true);
+  const handleSendReset = async () => {
+    try {
+      showLoader("Sending reset email...");
+      await post("/auth/forgot-password", { email: resetEmail });
+      hideLoader();
+      setResetDialogOpen(false);
+      setShowResetToast(true);
+    } catch (error: any) {
+      hideLoader();
+      const message = error?.response?.message || error?.message || "Failed to send reset email";
+      showError(message);
+    }
   };
 
   const handleToastOk = () => {
-    // Close toast and show password dialog
+    // Link and code are sent to email; reset continues from email flow.
     setShowResetToast(false);
-    setShowSetPasswordDialog(true);
-  };
-
-  const handleSetPasswordSave = () => {
-    // Show confirmation dialog
-    setShowSetPasswordDialog(false);
-    setShowConfirmDialog(true);
-  };
-
-  const handleConfirmReset = () => {
-    // TODO: wire up to reset password API using resetNewPassword and resetConfirmPassword
-    console.log("Resetting password:", { newPassword: resetNewPassword, confirmPassword: resetConfirmPassword });
-    setShowConfirmDialog(false);
-    // Reset form
-    setResetNewPassword("");
-    setResetConfirmPassword("");
-    setResetEmail("");
-  };
-
-  const handleCancelReset = () => {
-    setShowConfirmDialog(false);
-    // Reopen password dialog
-    setShowSetPasswordDialog(true);
   };
 
   return (
@@ -190,34 +177,6 @@ export default function AdminLoginPage() {
           </div>
         )}
 
-        {/* Set new password dialog - shown after success toast */}
-        <SetNewPasswordDialog
-          open={showSetPasswordDialog}
-          newPassword={resetNewPassword}
-          confirmPassword={resetConfirmPassword}
-          onNewPasswordChange={setResetNewPassword}
-          onConfirmPasswordChange={setResetConfirmPassword}
-          onSave={handleSetPasswordSave}
-          onClose={() => {
-            setShowSetPasswordDialog(false);
-            setResetNewPassword("");
-            setResetConfirmPassword("");
-          }}
-        />
-
-        {/* Confirmation dialog - shown after setting password */}
-        <ConfirmCancelDialog
-          open={showConfirmDialog}
-          title="Reset Password?"
-          description="Are you sure you want to reset your password?"
-          confirmLabel="Yes, reset"
-          cancelLabel="Cancel"
-          confirmIconSrc="/assets/icons/others/tick_white.svg"
-          cancelIconSrc="/assets/icons/others/cancel_white.svg"
-          onConfirm={handleConfirmReset}
-          onCancel={handleCancelReset}
-          onClose={handleCancelReset}
-        />
       </div>
     </RolePageLayout>
   );

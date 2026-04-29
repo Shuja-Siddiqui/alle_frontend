@@ -18,9 +18,19 @@ type DashboardStats = {
   totalStudents: number;
   lessonCompletionPercentage: number;
   engagementActivity: {
-    count: number;
-    moduleName: string | null;
+    percentage: number;
+    completedModuleRecords: number;
+    totalPossibleModules: number;
   };
+};
+
+type WeeklyEngagementStats = {
+  engagementRateThisWeek: number;
+  engagementRateLastWeek: number;
+  changeInPercentagePoints: number;
+  totalStudents: number;
+  engagedThisWeek: number;
+  engagedLastWeek: number;
 };
 
 type DashboardModule = {
@@ -56,6 +66,8 @@ export default function AdminDashboardPage() {
   const [loadingStudents, setLoadingStudents] = useState(true);
   const [dashboardModules, setDashboardModules] = useState<DashboardModule[]>([]);
   const [loadingModules, setLoadingModules] = useState(true);
+  const [weeklyEngagement, setWeeklyEngagement] = useState<WeeklyEngagementStats | null>(null);
+  const [loadingWeeklyEngagement, setLoadingWeeklyEngagement] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
@@ -81,6 +93,35 @@ export default function AdminDashboardPage() {
     };
 
     fetchStats();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [refreshTrigger]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchWeeklyEngagement = async () => {
+      try {
+        const response = await api.get<any>("/reports/school-weekly-engagement");
+        const payload: WeeklyEngagementStats = response?.data ?? response;
+        if (isMounted) {
+          setWeeklyEngagement(payload);
+        }
+      } catch (error) {
+        console.error("❌ Failed to load weekly engagement:", error);
+        if (isMounted) {
+          setWeeklyEngagement(null);
+        }
+      } finally {
+        if (isMounted) {
+          setLoadingWeeklyEngagement(false);
+        }
+      }
+    };
+
+    fetchWeeklyEngagement();
 
     return () => {
       isMounted = false;
@@ -243,14 +284,12 @@ export default function AdminDashboardPage() {
               title={
                 loadingStats
                   ? "..."
-                  : String(stats?.engagementActivity?.count ?? 0)
+                  : `${stats?.engagementActivity?.percentage ?? 0}%`
               }
               supportiveText={
                 loadingStats
                   ? "Loading engagement..."
-                  : stats?.engagementActivity?.moduleName
-                  ? `students completed module '${stats.engagementActivity.moduleName}'`
-                  : "students completed modules"
+                  : `${stats?.engagementActivity?.completedModuleRecords ?? 0} / ${stats?.engagementActivity?.totalPossibleModules ?? 0} completed module records`
               }
               subtitle="Engagement activity"
               iconSrc="/assets/icons/admin/analytics.svg"
@@ -271,31 +310,37 @@ export default function AdminDashboardPage() {
           animate={fadeUp.animate}
           transition={{ duration: 0.45, ease: "easeOut", delay: 0.2 }}
         >
-          {roleBase === "admin" && (
-            <motion.div
-              whileHover={{ y: -3 }}
-              className="shrink-0"
+          <motion.div
+            whileHover={{ y: -3 }}
+            className="shrink-0"
+            style={{
+              width: "364px",
+              height: "100%",
+            }}
+          >
+            <RetentionMetrics
+              percentage={
+                loadingWeeklyEngagement
+                  ? 0
+                  : Math.max(0, Math.min(100, Math.round(weeklyEngagement?.engagementRateThisWeek ?? 0)))
+              }
+              changePercentage={
+                loadingWeeklyEngagement
+                  ? 0
+                  : Math.round(weeklyEngagement?.changeInPercentagePoints ?? 0)
+              }
               style={{
                 width: "364px",
                 height: "100%",
               }}
-            >
-              <RetentionMetrics
-                percentage={66}
-                changePercentage={4}
-                style={{
-                  width: "364px",
-                  height: "100%",
-                }}
-              />
-            </motion.div>
-          )}
+            />
+          </motion.div>
 
           {/* Students Section */}
           <div
             className="flex flex-col shrink-0"
             style={{
-              width: roleBase === "admin" ? "752px" : "1140px",
+              width: "752px",
             }}
           >
             {/* Header */}

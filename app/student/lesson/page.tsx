@@ -31,6 +31,7 @@ import {
   loadTaskOutcomeState,
   saveTaskOutcomeState,
 } from "../../../lib/taskOutcomeState";
+import { devMockSyncAlphabetMastered } from "../../../lib/dev-mock-checkpoint-sync";
 import Image from "next/image";
 
 type StatusVariant = "initial" | "default" | "success" | "error";
@@ -316,23 +317,28 @@ export default function LessonPage() {
     // MOCK MODE: Skip recording and API calls, simulate success
     const mockMode = localStorage.getItem('MOCK_MODE') === 'true';
     if (mockMode && !newMicState) {
-      // Mic was stopped
-      console.log('[MOCK MODE] Skipping recording and assessment, simulating success');
+      console.log(
+        "[MOCK MODE] Skipping mic/API assessment; syncing letter mastered to checkpoint like real flow"
+      );
       setIsProcessing(true);
-
-      // Simulate exactMatch result (90%+ accuracy)
-      const mockResult = {
+      setFeedbackData({
         feedbackType: "exactMatch",
         qualityScore: 90,
         success: true,
-      };
-      setFeedbackData(mockResult);
-
-      // Set success variant
+      });
       setStatusVariant("success");
-
-      // Don't save checkpoint here - wait for continue button click
-      // Don't auto-advance - wait for continue button
+      const resolvedLetter = String(
+        (currentTask as any)?.letter ??
+          letterFromContext ??
+          taskData?.letter ??
+          (taskData?.expectedResponse?.type === "phoneme"
+            ? taskData?.expectedResponse?.value
+            : "") ??
+          ""
+      ).trim();
+      if (lessonId && resolvedLetter) {
+        await devMockSyncAlphabetMastered(lessonId, resolvedLetter);
+      }
       setIsProcessing(false);
       return;
     }
@@ -677,7 +683,33 @@ export default function LessonPage() {
 
       // Check if there are more tasks (order = array order; task_id is for identification only)
       if (nextIndex >= alphabetTasks.length) {
-        // All alphabet_practice tasks completed - next task type or next mission (skip empty arrays)
+        // End of alphabet batch: mastery-check summary, then Continue advances the real next step.
+        let correctCount = alphabetTasks.length;
+        try {
+          const progressResponse = await api.get<any>(`/lessons/${lessonId}/progress`);
+          const checkpoint =
+            progressResponse.data?.checkpoint ?? progressResponse.checkpoint ?? null;
+          const soundProgress = checkpoint?.alphabetSoundProgress ?? {};
+          const letters = alphabetTasks
+            .map((t) =>
+              String((t as any).letter || (t as any).visual?.[0]?.word || "").trim()
+            )
+            .filter((L) => L.length > 0);
+          if (letters.length > 0) {
+            correctCount = letters.reduce((acc, L) => {
+              const upper = L.toUpperCase();
+              const lower = L.toLowerCase();
+              const hit =
+                soundProgress[L]?.mastered === true ||
+                soundProgress[upper]?.mastered === true ||
+                soundProgress[lower]?.mastered === true;
+              return acc + (hit ? 1 : 0);
+            }, 0);
+          }
+        } catch (e) {
+          console.warn("[Lesson] Could not load progress for mastery-check summary:", e);
+        }
+
         const nextStep = getNextLessonStep(
           currentLesson.missions,
           missionSeqNum,
@@ -685,18 +717,20 @@ export default function LessonPage() {
           effectiveTaskIndex,
           alphabetTasks.length
         );
-        if (nextStep?.type === "task_page") {
-          router.push(
-            `/student/${nextStep.page}?lessonId=${lessonId}&missionSequence=${nextStep.missionSequence}&taskId=${nextStep.taskId}&taskIndex=${nextStep.taskIndex}`
-          );
-          return;
-        }
-        if (nextStep?.type === "mission_page") {
-          router.push(
-            `/student/mission?lessonId=${lessonId}&missionSequence=${nextStep.missionSequence}`
-          );
-          return;
-        }
+        const continuePath =
+          nextStep?.type === "task_page"
+            ? `/student/${nextStep.page}?lessonId=${lessonId}&missionSequence=${nextStep.missionSequence}&taskId=${nextStep.taskId}&taskIndex=${nextStep.taskIndex}`
+            : nextStep?.type === "mission_page"
+            ? `/student/mission?lessonId=${lessonId}&missionSequence=${nextStep.missionSequence}`
+            : "/student/dashboard";
+        const firstTaskId =
+          (alphabetTasks[0] as any)?.task_id ?? (alphabetTasks[0] as any)?.id ?? "1";
+        const retryPath = `/student/lesson?lessonId=${lessonId}&missionSequence=${missionSequence}&taskId=${firstTaskId}&taskIndex=0`;
+        router.push(
+          `/student/mastery-check?lessonId=${lessonId}&missionSequence=${missionSeqNum}&correct=${correctCount}&total=${alphabetTasks.length}&continueTo=${encodeURIComponent(
+            continuePath
+          )}&retryTo=${encodeURIComponent(retryPath)}`
+        );
         setIsProcessing(false);
         return;
       }

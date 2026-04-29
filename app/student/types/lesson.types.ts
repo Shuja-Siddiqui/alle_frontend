@@ -83,14 +83,3 @@ export type LessonPageData = {
   task: Task;
 };
 
-export type MasteryCheckData = {
-  lessonId: string;
-  missionSequence: number;
-  currentScore: number;
-  totalScore: number;
-  starsEarned: number; // 0-5
-};
-
-
-
-

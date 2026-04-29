@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { Lesson, Mission, Task, MissionPageData, LessonPageData, MasteryCheckData } from "../types/lesson.types";
+import type { Lesson, Mission, Task, MissionPageData, LessonPageData } from "../types/lesson.types";
 import { useLesson } from "../../../contexts/LessonContext";
 
 // Mock data - Replace with actual API call
@@ -180,22 +180,3 @@ export function useLessonPageData(
     task,
   };
 }
-
-/**
- * Get mastery check data
- * TODO: Replace with actual API call to get student's score
- */
-export function useMasteryCheckData(
-  lessonId: string,
-  missionSequence: number
-): MasteryCheckData | null {
-  // Mock data - Replace with actual API call
-  return {
-    lessonId,
-    missionSequence,
-    currentScore: 6,
-    totalScore: 10,
-    starsEarned: 3, // Calculate based on score
-  };
-}
-

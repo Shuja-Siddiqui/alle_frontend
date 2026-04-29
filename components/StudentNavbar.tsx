@@ -53,6 +53,11 @@ export function StudentNavbar({
     router.push("/student/login");
   };
 
+  const handlePhonemeCatalogNavigate = () => {
+    setIsProfileMenuOpen(false);
+    router.push("/student/phoneme-catalog");
+  };
+
   return (
     <div
       className={className ?? ""}
@@ -173,6 +178,28 @@ export function StudentNavbar({
                 }}
               >
                 Profile
+              </button>
+
+              <button
+                type="button"
+                onClick={handlePhonemeCatalogNavigate}
+                className="text-white transition-colors hover:text-[#FF00CA]"
+                style={{
+                  width: "100%",
+                  padding: "4px 0",
+                  border: "none",
+                  background: "transparent",
+                  textAlign: "left",
+                  fontFamily: "var(--font-orbitron), system-ui, sans-serif",
+                  fontSize: "16px",
+                  fontWeight: 500,
+                  lineHeight: "22px",
+                  letterSpacing: "-0.176px",
+                  marginBottom: "8px",
+                  cursor: "pointer",
+                }}
+              >
+                Phoneme Catalog
               </button>
 
               <button

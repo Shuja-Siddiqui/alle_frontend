@@ -9,8 +9,6 @@ import { InputField } from "../../../../components/InputField";
 import { PrimaryButton } from "../../../../components/PrimaryButton";
 import { ResetPasswordDialog } from "../../../../components/ResetPasswordDialog";
 import { Toast } from "../../../../components/Toast";
-import { SetNewPasswordDialog } from "../../../../components/SetNewPasswordDialog";
-import { ConfirmCancelDialog } from "../../../../components/ConfirmCancelDialog";
 import { useAuth } from "../../../../contexts/AuthContext";
 import { useUI } from "../../../../contexts/UIContext";
 import { useApiPost } from "../../../../hooks/useApi";
@@ -30,10 +28,6 @@ function StudentLoginContent() {
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [showResetToast, setShowResetToast] = useState(false);
-  const [showSetPasswordDialog, setShowSetPasswordDialog] = useState(false);
-  const [resetNewPassword, setResetNewPassword] = useState("");
-  const [resetConfirmPassword, setResetConfirmPassword] = useState("");
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -49,8 +43,14 @@ function StudentLoginContent() {
 
       hideLoader();
       showSuccess('Login successful! Redirecting...');
-      // Redirect by role: admin → admin dashboard, student/teacher → student dashboard
-      router.push(user?.role === 'admin' ? '/admin' : '/student');
+      // Redirect by role so teachers land on teacher workspace.
+      if (user?.role === "admin") {
+        router.push("/admin");
+      } else if (user?.role === "teacher") {
+        router.push("/teacher");
+      } else {
+        router.push("/student");
+      }
     } catch (error: any) {
       hideLoader();
       console.error('❌ Login error:', error);
@@ -94,59 +94,8 @@ function StudentLoginContent() {
   };
 
   const handleToastOk = () => {
-    // Close toast and show password dialog
+    // Link and code are sent to email; reset continues from email flow.
     setShowResetToast(false);
-    setShowSetPasswordDialog(true);
-  };
-
-  const handleSetPasswordSave = () => {
-    // Show confirmation dialog
-    setShowSetPasswordDialog(false);
-    setShowConfirmDialog(true);
-  };
-
-  const handleConfirmReset = async () => {
-    try {
-      // Validate passwords match
-      if (resetNewPassword !== resetConfirmPassword) {
-        showError('Passwords do not match');
-        return;
-      }
-
-      showLoader('Resetting password...');
-      console.log('🚀 Resetting password');
-
-      // Note: This would typically require a token from the email link
-      // For now, we'll just show a success message
-      const response = await post('/auth/reset-password', {
-        token: 'token-from-email', // This should come from the email link
-        newPassword: resetNewPassword,
-        confirmPassword: resetConfirmPassword,
-      });
-
-      console.log('✅ Password reset successful:', response);
-
-      hideLoader();
-      showSuccess('Password reset successfully!');
-      
-      setShowConfirmDialog(false);
-      // Reset form
-      setResetNewPassword("");
-      setResetConfirmPassword("");
-      setResetEmail("");
-    } catch (error: any) {
-      hideLoader();
-      console.error('❌ Password reset confirmation error:', error);
-      
-      const errorMessage = error?.response?.message || error?.message || 'Failed to reset password';
-      showError(errorMessage);
-    }
-  };
-
-  const handleCancelReset = () => {
-    setShowConfirmDialog(false);
-    // Reopen password dialog
-    setShowSetPasswordDialog(true);
   };
 
   return (
@@ -269,34 +218,6 @@ function StudentLoginContent() {
           </div>
         )}
 
-        {/* Set new password dialog - shown after success toast */}
-        <SetNewPasswordDialog
-          open={showSetPasswordDialog}
-          newPassword={resetNewPassword}
-          confirmPassword={resetConfirmPassword}
-          onNewPasswordChange={setResetNewPassword}
-          onConfirmPasswordChange={setResetConfirmPassword}
-          onSave={handleSetPasswordSave}
-          onClose={() => {
-            setShowSetPasswordDialog(false);
-            setResetNewPassword("");
-            setResetConfirmPassword("");
-          }}
-        />
-
-        {/* Confirmation dialog - shown after setting password */}
-        <ConfirmCancelDialog
-          open={showConfirmDialog}
-          title="Reset Password?"
-          description="Are you sure you want to reset your password?"
-          confirmLabel="Yes, reset"
-          cancelLabel="Cancel"
-          confirmIconSrc="/assets/icons/others/tick_white.svg"
-          cancelIconSrc="/assets/icons/others/cancel_white.svg"
-          onConfirm={handleConfirmReset}
-          onCancel={handleCancelReset}
-          onClose={handleCancelReset}
-        />
       </div>
     </RolePageLayout>
   );

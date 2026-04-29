@@ -8,6 +8,7 @@ import { StudentEngagementCard } from "../../../../components/StudentEngagementC
 import { StudentStatsBar } from "../../../../components/StudentStatsBar";
 import { LearningTimeChart } from "../../../../components/LearningTimeChart";
 import { StudentBadgesGrid } from "../../../../components/StudentBadgesGrid";
+import { AdminNotificationsMenu } from "../../../../components/AdminNotificationsMenu";
 import { api } from "../../../../lib/api-client";
 import { StudentDetailsSkeleton } from "../../../../components/Skeletons/StudentDetailsSkeleton";
 
@@ -129,6 +130,10 @@ export default function StudentDetailsPage() {
           typeof payload.lessonsCompletedFromStudentLessons === "number"
             ? payload.lessonsCompletedFromStudentLessons
             : undefined;
+        const studentOverallProgress =
+          typeof payload.studentOverallProgress === "number"
+            ? payload.studentOverallProgress
+            : undefined;
         const modules = Array.isArray(payload.modules) ? payload.modules : [];
         const badges = Array.isArray(payload.badges) ? payload.badges : [];
         const timeSpent = Array.isArray(payload.timeSpentLast7Days)
@@ -150,6 +155,18 @@ export default function StudentDetailsPage() {
         );
         const currentModule =
           startedModules.length > 0 ? startedModules.length : 0;
+        const modulesWithProgress = modules.filter(
+          (m: any) => typeof m?.progress === "number" && Number.isFinite(m.progress)
+        );
+        const moduleProgressAvg =
+          modulesWithProgress.length > 0
+            ? Math.round(
+                modulesWithProgress.reduce(
+                  (sum: number, m: any) => sum + Number(m.progress || 0),
+                  0
+                ) / modulesWithProgress.length
+              )
+            : null;
 
         // Map badges from API to UI shape
         const mappedBadges =
@@ -172,21 +189,46 @@ export default function StudentDetailsPage() {
                 const dayLabel = date.toLocaleDateString(undefined, {
                   weekday: "short",
                 });
-                const minutes = Math.round(t.totalMinutes ?? 0);
+                const secondsValue = Number(
+                  t.totalSeconds ?? t.total_seconds ?? 0
+                );
+                const minutesValue = Number(
+                  t.totalMinutes ?? t.total_minutes ?? 0
+                );
+                // Prefer seconds as source-of-truth to avoid unit mismatches.
+                const minutes = Math.round(
+                  secondsValue > 0 ? secondsValue / 60 : minutesValue
+                );
                 return { day: dayLabel, minutes };
               })
             : studentData.learningTime.daily;
 
-        const totalMinutesWeek = learningDailyData.reduce(
-          (sum: number, d: { day: string; minutes: number }) => sum + d.minutes,
-          0
-        );
-        const totalHours = Math.floor(totalMinutesWeek / 60);
-        const remainingMinutes = totalMinutesWeek % 60;
+        const totalSecondsWeek =
+          timeSpent.length > 0
+            ? timeSpent.reduce((sum: number, t: any) => {
+                const secondsValue = Number(
+                  t.totalSeconds ?? t.total_seconds ?? 0
+                );
+                if (Number.isFinite(secondsValue) && secondsValue > 0) {
+                  return sum + secondsValue;
+                }
+                const minutesValue = Number(
+                  t.totalMinutes ?? t.total_minutes ?? 0
+                );
+                return sum + (Number.isFinite(minutesValue) ? minutesValue * 60 : 0);
+              }, 0)
+            : learningDailyData.reduce(
+                (sum: number, d: { day: string; minutes: number }) =>
+                  sum + d.minutes * 60,
+                0
+              );
+        const totalHours = Math.floor(totalSecondsWeek / 3600);
+        const remainingMinutes = Math.floor((totalSecondsWeek % 3600) / 60);
+        const remainingSeconds = Math.floor(totalSecondsWeek % 60);
         const totalTimeLabel =
           totalHours > 0
             ? `${totalHours}h ${remainingMinutes}m`
-            : `${remainingMinutes}m`;
+            : `${remainingMinutes}m ${remainingSeconds}s`;
 
         const thisWeekDaysActive =
           typeof weekData?.thisWeek?.daysActive === "number"
@@ -219,10 +261,19 @@ export default function StudentDetailsPage() {
               : typeof progress.lessonsCompleted === "number"
               ? progress.lessonsCompleted
               : prev.lessonsCompleted,
-          // Simple proxy for "progress" using totalXp if present
           progress:
-            typeof progress.totalXp === "number"
-              ? Math.min(100, Math.round((progress.totalXp / 1000) * 100)) // scale XP to 0-100
+            studentOverallProgress != null
+              ? Math.max(0, Math.min(100, Math.round(studentOverallProgress)))
+              : moduleProgressAvg != null
+              ? Math.max(0, Math.min(100, moduleProgressAvg))
+              : typeof progress.lessonsCompleted === "number"
+              ? Math.max(
+                  0,
+                  Math.min(
+                    100,
+                    Math.round((Number(progress.lessonsCompleted || 0) / 20) * 100)
+                  )
+                )
               : prev.progress,
           currentModule,
           badges: mappedBadges.length > 0 ? mappedBadges : prev.badges,
@@ -273,38 +324,8 @@ export default function StudentDetailsPage() {
 
           {/* Right side: Notification and Add student button */}
           <div className="flex gap-[28px] items-center">
-            {/* Notification icon */}
-            <button
-              type="button"
-              onClick={() => {
-                // TODO: Handle notification click
-                console.log("Notification clicked");
-              }}
-              className="relative shrink-0 cursor-pointer bg-transparent border-none p-0"
-              style={{
-                width: "52px",
-                height: "52px",
-                background: "transparent",
-                border: "none",
-                padding: 0,
-                cursor: "pointer",
-              }}
-            >
-              <div
-                className="absolute"
-                style={{
-                  inset: "-1.65%",
-                }}
-              >
-                <Image
-                  src="/assets/icons/admin/notification.svg"
-                  alt="Notifications"
-                  width={54}
-                  height={54}
-                  className="block max-w-none size-full"
-                />
-              </div>
-            </button>
+            {/* Shared notifications menu with live unread count */}
+            <AdminNotificationsMenu />
 
             {/* Add student button */}
             <button

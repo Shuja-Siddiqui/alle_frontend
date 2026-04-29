@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Image from "next/image";
 import { textToAlphabet, type LetterData, type AlphabetVariant } from "../utils/textToAlphabet";
 
@@ -32,11 +33,162 @@ type AlphabetDisplayProps = {
   letterScaleFactor?: number;
   /** When true, the gap value is used as-is without the default 0.6 reduction (default: false) */
   exactGap?: boolean;
+  /**
+   * Optional per-letter slot widths (px), in order of each **letter** glyph rendered.
+   * When set, each letter cell uses its entry; spaces/punctuation still use `letterWidth`.
+   * Build with `computeWordLetterSlotLayout` from `lib/alphabet-intrinsic-layout.ts`.
+   */
+  perLetterSlotWidths?: number[];
 };
+
+type RenderRowParams = {
+  letterData: LetterData[];
+  letterWidth: number;
+  letterHeight: number;
+  letterScaleFactor: number;
+  spaceHandling: "skip" | "spacer" | "dash";
+  letterClassName?: string;
+  letterStyle?: React.CSSProperties;
+  perLetterSlotWidths?: number[];
+};
+
+function renderAlphabetFlexRowItems({
+  letterData,
+  letterWidth,
+  letterHeight,
+  letterScaleFactor,
+  spaceHandling,
+  letterClassName,
+  letterStyle,
+  perLetterSlotWidths,
+}: RenderRowParams): ReactNode[] {
+  let letterSlotIndex = 0;
+
+  return letterData.map((item, index) => {
+    if (item.isSpace) {
+      if (spaceHandling === "skip") {
+        return null;
+      }
+      if (spaceHandling === "dash") {
+        return (
+          <div
+            key={`space-${index}`}
+            className={letterClassName}
+            style={{
+              width: `${letterWidth * 0.3}px`,
+              height: `${letterHeight}px`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              ...letterStyle,
+            }}
+          >
+            <span
+              style={{
+                color: "#FFF",
+                fontSize: `${letterHeight * 0.4}px`,
+              }}
+            >
+              -
+            </span>
+          </div>
+        );
+      }
+      return (
+        <div
+          key={`space-${index}`}
+          style={{
+            width: `${letterWidth * 0.4}px`,
+            height: `${letterHeight}px`,
+          }}
+        />
+      );
+    }
+
+    if (!item.isLetter) {
+      return (
+        <div
+          key={`char-${index}`}
+          className={letterClassName}
+          style={{
+            width: `${letterWidth}px`,
+            height: `${letterHeight}px`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            ...letterStyle,
+          }}
+        >
+          <span
+            style={{
+              color: "#FFF",
+              fontSize: `${letterHeight * 0.6}px`,
+              fontFamily: "var(--font-orbitron), system-ui, sans-serif",
+            }}
+          >
+            {item.char}
+          </span>
+        </div>
+      );
+    }
+
+    const slotW = perLetterSlotWidths?.[letterSlotIndex] ?? letterWidth;
+    if (perLetterSlotWidths) {
+      letterSlotIndex += 1;
+    }
+
+    return (
+      <div
+        key={`letter-${index}-${item.char}`}
+        className={letterClassName}
+        style={{
+          width: `${slotW}px`,
+          height: `${letterHeight}px`,
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+          ...letterStyle,
+        }}
+      >
+        {item.svgPath && (
+          <Image
+            src={item.svgPath}
+            alt={item.char}
+            width={slotW}
+            height={letterHeight}
+            style={{
+              width: `${slotW * letterScaleFactor}px`,
+              height: `${letterHeight * letterScaleFactor}px`,
+              maxWidth: `${slotW * letterScaleFactor}px`,
+              maxHeight: `${letterHeight * letterScaleFactor}px`,
+              objectFit: "contain",
+              objectPosition: "center",
+            }}
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.style.display = "none";
+              const parent = target.parentElement;
+              if (parent) {
+                const fallback = document.createElement("span");
+                fallback.textContent = item.char.toUpperCase();
+                fallback.style.color = "#FFF";
+                fallback.style.fontSize = `${letterHeight * 0.6}px`;
+                fallback.style.fontFamily = "var(--font-orbitron), system-ui, sans-serif";
+                parent.appendChild(fallback);
+              }
+            }}
+          />
+        )}
+      </div>
+    );
+  });
+}
 
 /**
  * Component that displays text as alphabet SVG images.
- * 
+ *
  * Example usage:
  * ```tsx
  * <AlphabetDisplay text="apple" letterWidth={50} letterHeight={50} />
@@ -55,11 +207,11 @@ export function AlphabetDisplay({
   letterClassName,
   letterStyle,
   spaceHandling = "spacer",
-  applyBoxModel = true, // Default to true to match Figma design
+  applyBoxModel = true,
   letterScaleFactor = 1.0951,
   exactGap = false,
+  perLetterSlotWidths,
 }: AlphabetDisplayProps) {
-  // Convert text to letter data with variant
   const letterData = lettersOnly
     ? textToAlphabet(text, variant).filter((item) => item.isLetter)
     : textToAlphabet(text, variant);
@@ -68,7 +220,6 @@ export function AlphabetDisplay({
     return null;
   }
 
-  // Content container with border - only the original inner div with border
   const contentStyle: React.CSSProperties = applyBoxModel
     ? {
         width: "126px",
@@ -78,12 +229,24 @@ export function AlphabetDisplay({
         justifyContent: "center",
         overflow: "hidden",
         boxSizing: "border-box",
-        // Border: 3px all sides (same as parent div had)
-        border: "3px solid transparent", // Border color can be customized via className/style
+        border: "3px solid transparent",
       }
     : {};
 
   const renderedGap = exactGap ? gap : Math.max(gap * 0.6, 2);
+
+  const rowParams: RenderRowParams = {
+    letterData,
+    letterWidth,
+    letterHeight,
+    letterScaleFactor,
+    spaceHandling,
+    letterClassName,
+    letterStyle,
+    perLetterSlotWidths,
+  };
+
+  const rowItems = renderAlphabetFlexRowItems(rowParams);
 
   const lettersContainer = (
     <div
@@ -93,144 +256,18 @@ export function AlphabetDisplay({
         ...contentStyle,
       }}
     >
-      {letterData.map((item, index) => {
-        // Handle spaces
-        if (item.isSpace) {
-          if (spaceHandling === "skip") {
-            return null;
-          } else if (spaceHandling === "dash") {
-            return (
-              <div
-                key={`space-${index}`}
-                className={letterClassName}
-                style={{
-                  width: `${letterWidth * 0.3}px`,
-                  height: `${letterHeight}px`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  ...letterStyle,
-                }}
-              >
-                <span
-                  style={{
-                    color: "#FFF",
-                    fontSize: `${letterHeight * 0.4}px`,
-                  }}
-                >
-                  -
-                </span>
-              </div>
-            );
-          } else {
-            // spacer - show empty space (moderated spacing between words)
-            return (
-              <div
-                key={`space-${index}`}
-                style={{
-                  width: `${letterWidth * 0.4}px`, // Moderate spacing - slightly more than before
-                  height: `${letterHeight}px`,
-                }}
-              />
-            );
-          }
-        }
-
-        // Handle non-letters (punctuation) - show as text
-        if (!item.isLetter) {
-          return (
-            <div
-              key={`char-${index}`}
-              className={letterClassName}
-              style={{
-                width: `${letterWidth}px`,
-                height: `${letterHeight}px`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                ...letterStyle,
-              }}
-            >
-              <span
-                style={{
-                  color: "#FFF",
-                  fontSize: `${letterHeight * 0.6}px`,
-                  fontFamily: "var(--font-orbitron), system-ui, sans-serif",
-                }}
-              >
-                {item.char}
-              </span>
-            </div>
-          );
-        }
-
-        // Handle letters - show SVG
-        // Scale down letters to appear more uniform, no cropping
-        const scaleFactor = letterScaleFactor;
-        return (
-          <div
-            key={`letter-${index}-${item.char}`}
-            className={letterClassName}
-            style={{
-              width: `${letterWidth}px`,
-              height: `${letterHeight}px`,
-              position: "relative",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-              ...letterStyle,
-            }}
-          >
-            {item.svgPath && (
-              <Image
-                src={item.svgPath}
-                alt={item.char}
-                width={letterWidth}
-                height={letterHeight}
-                style={{
-                  width: `${letterWidth * scaleFactor}px`,
-                  height: `${letterHeight * scaleFactor}px`,
-                  maxWidth: `${letterWidth * scaleFactor}px`,
-                  maxHeight: `${letterHeight * scaleFactor}px`,
-                  objectFit: "contain",
-                  objectPosition: "center",
-                }}
-                onError={(e) => {
-                  // Fallback: if SVG doesn't exist, show text
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = "none";
-                  const parent = target.parentElement;
-                  if (parent) {
-                    const fallback = document.createElement("span");
-                    fallback.textContent = item.char.toUpperCase();
-                    fallback.style.color = "#FFF";
-                    fallback.style.fontSize = `${letterHeight * 0.6}px`;
-                    fallback.style.fontFamily = "var(--font-orbitron), system-ui, sans-serif";
-                    parent.appendChild(fallback);
-                  }
-                }}
-              />
-            )}
-          </div>
-        );
-      })}
+      {rowItems}
     </div>
   );
 
-  // If box model is applied, return letters container directly (with border on the content div)
   if (applyBoxModel) {
     return (
-      <div
-        className={className}
-        style={style}
-      >
+      <div className={className} style={style}>
         {lettersContainer}
       </div>
     );
   }
 
-  // Otherwise, return letters container directly (without box model constraints)
   return (
     <div
       className={`flex items-center ${className || ""}`}
@@ -239,127 +276,7 @@ export function AlphabetDisplay({
         ...style,
       }}
     >
-      {letterData.map((item, index) => {
-        // Handle spaces
-        if (item.isSpace) {
-          if (spaceHandling === "skip") {
-            return null;
-          } else if (spaceHandling === "dash") {
-            return (
-              <div
-                key={`space-${index}`}
-                className={letterClassName}
-                style={{
-                  width: `${letterWidth * 0.3}px`,
-                  height: `${letterHeight}px`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  ...letterStyle,
-                }}
-              >
-                <span
-                  style={{
-                    color: "#FFF",
-                    fontSize: `${letterHeight * 0.4}px`,
-                  }}
-                >
-                  -
-                </span>
-              </div>
-            );
-          } else {
-            // spacer - show empty space (moderated spacing between words)
-            return (
-              <div
-                key={`space-${index}`}
-                style={{
-                  width: `${letterWidth * 0.4}px`,
-                  height: `${letterHeight}px`,
-                }}
-              />
-            );
-          }
-        }
-
-        // Handle non-letters (punctuation) - show as text
-        if (!item.isLetter) {
-          return (
-            <div
-              key={`char-${index}`}
-              className={letterClassName}
-              style={{
-                width: `${letterWidth}px`,
-                height: `${letterHeight}px`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                ...letterStyle,
-              }}
-            >
-              <span
-                style={{
-                  color: "#FFF",
-                  fontSize: `${letterHeight * 0.6}px`,
-                  fontFamily: "var(--font-orbitron), system-ui, sans-serif",
-                }}
-              >
-                {item.char}
-              </span>
-            </div>
-          );
-        }
-
-        // Handle letters - show SVG
-        const scaleFactor = letterScaleFactor;
-        return (
-          <div
-            key={`letter-${index}-${item.char}`}
-            className={letterClassName}
-            style={{
-              width: `${letterWidth}px`,
-              height: `${letterHeight}px`,
-              position: "relative",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-              ...letterStyle,
-            }}
-          >
-            {item.svgPath && (
-              <Image
-                src={item.svgPath}
-                alt={item.char}
-                width={letterWidth}
-                height={letterHeight}
-                style={{
-                  width: `${letterWidth * scaleFactor}px`,
-                  height: `${letterHeight * scaleFactor}px`,
-                  maxWidth: `${letterWidth * scaleFactor}px`,
-                  maxHeight: `${letterHeight * scaleFactor}px`,
-                  objectFit: "contain",
-                  objectPosition: "center",
-                }}
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = "none";
-                  const parent = target.parentElement;
-                  if (parent) {
-                    const fallback = document.createElement("span");
-                    fallback.textContent = item.char.toUpperCase();
-                    fallback.style.color = "#FFF";
-                    fallback.style.fontSize = `${letterHeight * 0.6}px`;
-                    fallback.style.fontFamily = "var(--font-orbitron), system-ui, sans-serif";
-                    parent.appendChild(fallback);
-                  }
-                }}
-              />
-            )}
-          </div>
-        );
-      })}
+      {rowItems}
     </div>
   );
 }
-

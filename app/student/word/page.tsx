@@ -22,6 +22,7 @@ import {
   loadTaskOutcomeState,
   saveTaskOutcomeState,
 } from "../../../lib/taskOutcomeState";
+import { devMockSyncWordCorrect } from "../../../lib/dev-mock-checkpoint-sync";
 import Image from "next/image";
 
 type StatusVariant = "initial" | "default" | "success" | "error";
@@ -36,6 +37,36 @@ interface TaskData {
   retryLimit: number;
   currentRetries: number;
   remainingRetries: number;
+}
+
+function missionSequenceMatches(m: any, seq: number): boolean {
+  const v = Number(m?.mission_sequence ?? m?.missionSequence);
+  return Number.isFinite(v) && v === seq;
+}
+
+/** Backend may send `mastery_check`, `Mastery_Check`, etc. */
+function isMasteryCheckMissionType(m: any): boolean {
+  const raw = m?.mission_type ?? m?.missionType;
+  if (raw == null) return false;
+  const t = String(raw).trim().toLowerCase().replace(/[\s-]+/g, "_");
+  return t === "mastery_check" || t === "masterycheck";
+}
+
+function resolveMasteryMission(missions: any[] | undefined, missionSeqNum: number): any | undefined {
+  if (!missions?.length) return undefined;
+  const typed = missions.find(
+    (m) => missionSequenceMatches(m, missionSeqNum) && isMasteryCheckMissionType(m)
+  );
+  if (typed) return typed;
+  return missions.find((m) => missionSequenceMatches(m, missionSeqNum));
+}
+
+function wordProgressEntryCorrect(wordProgress: Record<string, unknown>, word: string): boolean {
+  const w = String(word || "").trim();
+  if (!w.length) return false;
+  const lower = w.toLowerCase();
+  const hit = (wordProgress[w] ?? wordProgress[lower]) as { correct?: boolean } | undefined;
+  return hit?.correct === true;
 }
 
 export default function WordPage() {
@@ -57,6 +88,7 @@ export default function WordPage() {
   const [showingFeedback, setShowingFeedback] = useState(false);
   const [feedbackData, setFeedbackData] = useState<any>(null);
   const [isPlayingTTS, setIsPlayingTTS] = useState(false);
+  const [isTaskLoading, setIsTaskLoading] = useState(true);
   const [pendingReset, setPendingReset] = useState<{
     missionSequence: number;
     taskId: string;
@@ -105,6 +137,7 @@ export default function WordPage() {
 
     // Reset visual/interaction state when moving to a new task.
     // Without this, the previous task's success state can carry over (green box).
+    setIsTaskLoading(true);
     setStatusVariant("initial");
     setShowingFeedback(false);
     setFeedbackData(null);
@@ -139,6 +172,8 @@ export default function WordPage() {
         }
       } catch (error) {
         console.error("Error fetching task data:", error);
+      } finally {
+        setIsTaskLoading(false);
       }
     };
 
@@ -183,21 +218,28 @@ export default function WordPage() {
       }
     } else {
       // MOCK MODE: Skip recording and API calls, simulate success
-      const mockMode = localStorage.getItem('MOCK_MODE') === 'true';
+      const mockMode = localStorage.getItem("MOCK_MODE") === "true";
       if (mockMode) {
-        console.log('[MOCK MODE] Skipping recording and assessment, simulating success');
+        console.log("[MOCK MODE] Skipping mic/API assessment; syncing success to checkpoint like real flow");
         setIsProcessing(true);
         setStatusVariant("success");
-        
-        // Simulate exactMatch result
-        const mockResult = {
+        setFeedbackData({
           feedbackType: "exactMatch",
           qualityScore: 90,
           success: true,
-        };
-        setFeedbackData(mockResult);
-
-        // Always wait for explicit Continue click (mock and real).
+        });
+        const missionWord =
+          Array.isArray(wordTasksArray) && wordTasksArray[effectiveTaskIndex]
+            ? String((wordTasksArray[effectiveTaskIndex] as any)?.word ?? "").trim()
+            : "";
+        const w =
+          missionWord ||
+          String(taskData?.visual?.[0]?.word ?? "").trim() ||
+          String((taskData as any)?.expectedResponse?.value ?? "").trim() ||
+          "";
+        if (lessonId && w) {
+          await devMockSyncWordCorrect(lessonId, w);
+        }
         setIsProcessing(false);
         return;
       }
@@ -258,8 +300,7 @@ export default function WordPage() {
             const currentMission = currentLesson?.missions?.find(
               (m: any) => (m.mission_sequence ?? m.missionSequence) === parseInt(missionSequence || "0", 10)
             );
-            const isMasteryMission =
-              ((currentMission as any)?.mission_type ?? (currentMission as any)?.missionType) === "mastery_check";
+            const isMasteryMission = isMasteryCheckMissionType(currentMission);
             const resetMessage = isMasteryMission
               ? "Great effort! Mastery check is not complete yet. Let us practice the lesson again and come back even stronger. Tap Try again!"
               : "Great effort! Let us restart this quest from the beginning so you can get even stronger. Tap Try again!";
@@ -361,35 +402,16 @@ export default function WordPage() {
   const handleMasteryResults = async (missionSeqNum: number) => {
     if (!currentLesson || !lessonId) return;
 
-    const mockMode = typeof window !== "undefined" && localStorage.getItem("MOCK_MODE") === "true";
-    if (mockMode) {
-      // In mock mode, mastery is always treated as passed with no backend calls.
-      router.push(
-        `/student/mission?lessonId=${lessonId}&missionSequence=${missionSeqNum + 1}`
-      );
-      return;
-    }
-
     try {
       console.log("[Mastery] handleMasteryResults: start", {
         lessonId,
         missionSeqNum,
       });
 
-      // Get latest progress (includes checkpoint.wordProgress)
-      const progressResponse = await api.get<any>(`/lessons/${lessonId}/progress`);
-      const checkpoint = progressResponse.data?.checkpoint ?? progressResponse.checkpoint ?? null;
-
-      // Find mastery mission (current mission)
-      const masteryMission = currentLesson.missions?.find(
-        (m: any) =>
-          (m.mission_sequence ?? m.missionSequence) === missionSeqNum &&
-          (m.mission_type ?? m.missionType) === "mastery_check"
-      ) as any;
+      const masteryMission = resolveMasteryMission(currentLesson.missions, missionSeqNum) as any;
 
       if (!masteryMission) {
-        console.warn("[Mastery] No mastery mission found in currentLesson for sequence", missionSeqNum);
-        // Fallback: just go to next mission page
+        console.warn("[Mastery] No mission found in currentLesson for sequence", missionSeqNum);
         router.push(
           `/student/mission?lessonId=${lessonId}&missionSequence=${missionSeqNum + 1}`
         );
@@ -399,24 +421,27 @@ export default function WordPage() {
       const results = masteryMission.tasks?.results || {};
       const targetStr: string = masteryMission.target || "";
 
-      // Parse target like "1-3" and treat it as minimum threshold to pass.
-      // Rule: correctCount >= targetMin => pass, below targetMin => fail.
       let targetMin = 0;
       if (targetStr) {
         const parts = targetStr.split("-").map((p: string) => parseInt(p, 10));
         if (!Number.isNaN(parts[0])) targetMin = parts[0];
       }
 
-      // Collect mastery words for this mission
       const masteryWords: string[] = Array.isArray(masteryMission.tasks?.word_practice)
         ? masteryMission.tasks.word_practice.map((t: any) => t.word).filter(Boolean)
         : [];
 
+      const total = Math.max(1, masteryWords.length);
+
+      const progressResponse = await api.get<any>(`/lessons/${lessonId}/progress`);
+      const checkpoint =
+        progressResponse.data?.checkpoint ?? progressResponse.checkpoint ?? null;
+
       let correctCount = 0;
       if (checkpoint?.wordProgress && masteryWords.length > 0) {
+        const wp = checkpoint.wordProgress as Record<string, unknown>;
         for (const w of masteryWords) {
-          const wp = checkpoint.wordProgress[w];
-          if (wp && wp.correct) correctCount += 1;
+          if (wordProgressEntryCorrect(wp, String(w))) correctCount += 1;
         }
       }
 
@@ -427,14 +452,11 @@ export default function WordPage() {
         targetStr,
       });
 
-      // Decide band from results keys, e.g. tts_0-1_correct, tts_5-7_correct, tts_1-5_correct
-      const total = masteryWords.length || 10; // fallback denominator for messaging only
-
       let bandKey: string | null = null;
 
       const resultKeys = Object.keys(results).filter((k) => k.startsWith("tts_") && k.endsWith("_correct"));
       for (const key of resultKeys) {
-        const rangePart = key.slice(4, -"_correct".length); // e.g. "0-1"
+        const rangePart = key.slice(4, -"_correct".length);
         const [minStr, maxStr] = rangePart.split("-");
         const min = parseInt(minStr, 10);
         const max = parseInt(maxStr, 10);
@@ -444,7 +466,6 @@ export default function WordPage() {
         }
       }
 
-      // Fallback: if nothing matched, try using target range directly
       if (!bandKey && targetStr) {
         const candidate = `tts_${targetStr}_correct`;
         if (results[candidate]) {
@@ -452,7 +473,6 @@ export default function WordPage() {
         }
       }
 
-      // Final fallback band key
       if (!bandKey && resultKeys.length > 0) {
         bandKey = resultKeys[0];
       }
@@ -461,18 +481,20 @@ export default function WordPage() {
       const ssml: string | undefined = bandKey ? results[`${bandKey}_ssml`] : undefined;
       let text = textTemplate.replace("{obtained_correct}", String(correctCount));
 
-      // Fallback: if lesson JSON has no results text/ssml for this band, speak a generic summary
       if (!text && !ssml) {
         text = `You got ${correctCount} out of ${total} correct.`;
       }
 
-      // Play mastery results TTS
       console.log("[Mastery] Playing results TTS", {
         bandKey,
         text,
         hasSSML: !!ssml,
       });
-      await playTTSWithSSML(text, ssml);
+      try {
+        await playTTSWithSSML(text, ssml);
+      } catch (ttsErr) {
+        console.warn("[Mastery] Results TTS failed; still navigating to mastery summary", ttsErr);
+      }
 
       const passed = correctCount >= targetMin;
       console.log("[Mastery] Pass/fail decision", {
@@ -482,7 +504,6 @@ export default function WordPage() {
       });
 
       if (passed) {
-        // Student passed mastery → mark mastery mission complete and move to wrap mission
         try {
           await api.post(`/lessons/${lessonId}/progress/mission/complete`, {
             missionSequence: missionSeqNum,
@@ -490,12 +511,7 @@ export default function WordPage() {
         } catch (e) {
           console.error("Error completing mastery mission:", e);
         }
-
-        router.push(
-          `/student/mission?lessonId=${lessonId}&missionSequence=${missionSeqNum + 1}`
-        );
       } else {
-        // Student failed mastery → reset lesson to first mission / first task
         try {
           await api.post(`/lessons/${lessonId}/progress/checkpoint`, {
             missionSequence: 1,
@@ -510,19 +526,28 @@ export default function WordPage() {
             lessonMasteryScore: null,
           });
         } catch {
-          // Ignore reset errors; still send learner back to mission 1
+          // ignore
         }
-
-        router.push(
-          `/student/mission?lessonId=${lessonId}&missionSequence=1`
-        );
       }
+
+      const continuePath = passed
+        ? `/student/mission?lessonId=${lessonId}&missionSequence=${missionSeqNum + 1}`
+        : `/student/mission?lessonId=${lessonId}&missionSequence=1`;
+      const retryPath = `/student/mission?lessonId=${lessonId}&missionSequence=1`;
+      const masteryCheckUrl =
+        `/student/mastery-check?lessonId=${lessonId}` +
+        `&missionSequence=${missionSeqNum}` +
+        `&correct=${correctCount}` +
+        `&total=${total}` +
+        `&continueTo=${encodeURIComponent(continuePath)}` +
+        `&retryTo=${encodeURIComponent(retryPath)}`;
+
+      router.push(masteryCheckUrl);
     } catch (error) {
       console.error("[Mastery] Error handling mastery results:", error);
-      // Fallback: go to next mission page
-      const missionSeqNum = parseInt(missionSequence || "3", 10);
+      const seq = parseInt(missionSequence || "1", 10);
       router.push(
-        `/student/mission?lessonId=${lessonId}&missionSequence=${missionSeqNum + 1}`
+        `/student/mission?lessonId=${lessonId}&missionSequence=${seq + 1}`
       );
     }
   };
@@ -544,20 +569,12 @@ export default function WordPage() {
       const wordTasksLength = Array.isArray(wordTasks) ? wordTasks.length : 0;
       const nextIndex = effectiveTaskIndex + 1;
 
-      const missionType = (mission as any)?.mission_type ?? (mission as any)?.missionType;
-      const isMasteryMission = missionType === "mastery_check";
-      const mockMode = typeof window !== "undefined" && localStorage.getItem("MOCK_MODE") === "true";
+      const isMasteryMission = isMasteryCheckMissionType(mission);
 
-      // In mock mode, mastery should run fully client-side (no API calls).
-      if (!(mockMode && isMasteryMission)) {
-        await api.post<any>(
-          `/lessons/${lessonId}/progress/task/complete`,
-          {
-            missionSequence: parseInt(missionSequence),
-            taskId,
-          }
-        );
-      }
+      await api.post<any>(`/lessons/${lessonId}/progress/task/complete`, {
+        missionSequence: parseInt(missionSequence),
+        taskId,
+      });
 
       // Last word in this mission
       if (wordTasksLength > 0 && nextIndex >= wordTasksLength) {
@@ -568,7 +585,29 @@ export default function WordPage() {
           return;
         }
 
-        // Normal flow: next task type or next mission (order = array order)
+        // End of word_practice batch (non-mastery): mastery-check summary, then Continue follows real next step.
+        let correctCount = wordTasksLength;
+        try {
+          const progressResponse = await api.get<any>(`/lessons/${lessonId}/progress`);
+          const checkpoint =
+            progressResponse.data?.checkpoint ?? progressResponse.checkpoint ?? null;
+          const wp = checkpoint?.wordProgress ?? {};
+          const keys = (wordTasks as any[])
+            .map((t) => String(t?.word ?? "").trim())
+            .filter((w) => w.length > 0);
+          if (keys.length > 0) {
+            correctCount = keys.reduce((acc, w) => {
+              const lower = w.toLowerCase();
+              const hit =
+                wp[w]?.correct === true ||
+                wp[lower]?.correct === true;
+              return acc + (hit ? 1 : 0);
+            }, 0);
+          }
+        } catch (e) {
+          console.warn("[Word] Could not load progress for mastery-check summary:", e);
+        }
+
         const nextStep = getNextLessonStep(
           currentLesson?.missions,
           missionSeqNum,
@@ -576,18 +615,21 @@ export default function WordPage() {
           effectiveTaskIndex,
           wordTasksLength
         );
-        if (nextStep?.type === "task_page") {
-          router.push(
-            `/student/${nextStep.page}?lessonId=${lessonId}&missionSequence=${nextStep.missionSequence}&taskId=${nextStep.taskId}&taskIndex=${nextStep.taskIndex}`
-          );
-          return;
-        }
-        if (nextStep?.type === "mission_page") {
-          router.push(
-            `/student/mission?lessonId=${lessonId}&missionSequence=${nextStep.missionSequence}`
-          );
-          return;
-        }
+        const continuePath =
+          nextStep?.type === "task_page"
+            ? `/student/${nextStep.page}?lessonId=${lessonId}&missionSequence=${nextStep.missionSequence}&taskId=${nextStep.taskId}&taskIndex=${nextStep.taskIndex}`
+            : nextStep?.type === "mission_page"
+            ? `/student/mission?lessonId=${lessonId}&missionSequence=${nextStep.missionSequence}`
+            : "/student/dashboard";
+        const firstTask = Array.isArray(wordTasks) ? (wordTasks[0] as any) : null;
+        const firstTaskId = firstTask?.task_id ?? firstTask?.id ?? "1";
+        const retryPath = `/student/word?lessonId=${lessonId}&missionSequence=${missionSequence}&taskId=${firstTaskId}&taskIndex=0`;
+        router.push(
+          `/student/mastery-check?lessonId=${lessonId}&missionSequence=${missionSeqNum}&correct=${correctCount}&total=${wordTasksLength}&continueTo=${encodeURIComponent(
+            continuePath
+          )}&retryTo=${encodeURIComponent(retryPath)}`
+        );
+        return;
       }
 
       // Next word: use task at next index (array order); task_id when present for API
@@ -626,21 +668,13 @@ export default function WordPage() {
     );
   };
 
-  if (!taskData) {
-    return (
-      <div className="flex items-center justify-center w-full h-screen">
-        <p style={{ color: "#FFF" }}>Loading lesson...</p>
-      </div>
-    );
-  }
-
   const word =
-    taskData.visual?.[0]?.word ||
-    (taskData as any).expectedResponse?.value ||
+    taskData?.visual?.[0]?.word ||
+    (taskData as any)?.expectedResponse?.value ||
     "";
-  const wordImage = taskData.visual?.[0]?.image;
+  const wordImage = taskData?.visual?.[0]?.image;
   const isSuccess = statusVariant === "success";
-  const canContinue = isSuccess || feedbackData?.taskComplete === true;
+  const canContinue = !isTaskLoading && (isSuccess || feedbackData?.taskComplete === true);
 
   // Helper to convert blob to base64
   const blobToBase64 = (blob: Blob): Promise<string> => {
@@ -703,7 +737,14 @@ export default function WordPage() {
         )}
 
         {/* StatusBox — renders as WordStatusBox */}
-        {word && (
+        {isTaskLoading ? (
+          <StatusBox
+            text="..."
+            variant="default"
+            letterHeight={100}
+            letterGap={16}
+          />
+        ) : word ? (
           <StatusBox
             text={word}
             variant={statusVariant}
@@ -711,7 +752,7 @@ export default function WordPage() {
             letterHeight={100}
             letterGap={16}
           />
-        )}
+        ) : null}
 
         {/* Feedback bubble removed – feedback is delivered via lesson-config TTS only */}
 
@@ -724,7 +765,7 @@ export default function WordPage() {
                 size="medium"
                 variant="filled"
                 onClick={handleTryAgain}
-                disabled={isProcessing || isPlaying}
+                disabled={isProcessing || isPlaying || isTaskLoading}
                 className="flow-btn-attention"
               />
             </div>
@@ -763,7 +804,7 @@ export default function WordPage() {
                 size="medium"
                 variant="filled"
                 onClick={handleContinue}
-                disabled={isProcessing}
+                disabled={isProcessing || isTaskLoading}
                 className="flow-btn-attention"
               />
             </div>
@@ -772,7 +813,7 @@ export default function WordPage() {
               icon={isMicActive ? "pause" : "mic"}
               size={100}
               onClick={handleMicClick}
-              disabled={isProcessing || isPlaying}
+              disabled={isProcessing || isPlaying || isTaskLoading}
               className="flow-mic-btn-attention"
             />
           )}
