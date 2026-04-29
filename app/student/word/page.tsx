@@ -822,7 +822,7 @@ export default function WordPage() {
         {/* Retry counter */}
         {currentRetry > 0 && statusVariant !== "success" && (
           <p style={{ marginTop: "16px", color: "#FFF", opacity: 0.7, fontSize: "14px" }}>
-            Attempt {currentRetry + 1} of {taskData.retryLimit || 3}
+            Attempt {currentRetry + 1} of {taskData?.retryLimit ?? 3}
           </p>
         )}
       </div>
