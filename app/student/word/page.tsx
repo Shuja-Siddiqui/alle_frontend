@@ -497,16 +497,20 @@ export default function WordPage() {
       }
 
       const passed = correctCount >= targetMin;
+      const masteryScore =
+        total > 0 ? Math.round((correctCount / total) * 100) : 0;
       console.log("[Mastery] Pass/fail decision", {
         correctCount,
         targetMin,
         passed,
+        masteryScore,
       });
 
       if (passed) {
         try {
           await api.post(`/lessons/${lessonId}/progress/mission/complete`, {
             missionSequence: missionSeqNum,
+            masteryScore,
           });
         } catch (e) {
           console.error("Error completing mastery mission:", e);
