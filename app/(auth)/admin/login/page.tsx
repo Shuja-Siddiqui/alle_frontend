@@ -14,7 +14,7 @@ import { useApiPost } from "../../../../hooks/useApi";
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, logout } = useAuth();
   const { showSuccess, showError, showLoader, hideLoader } = useUI();
   const { post } = useApiPost();
   const [email, setEmail] = useState("");
@@ -28,15 +28,21 @@ export default function AdminLoginPage() {
     try {
       showLoader("Signing in...");
       const user = await login(email, password);
-      hideLoader();
-      showSuccess("Login successful! Redirecting...");
-      // Redirect by role so teachers land on teacher workspace.
+
+      // Admin login page should only allow admin/teacher accounts.
       if (user?.role === "admin") {
-        router.push("/admin");
+        hideLoader();
+        showSuccess("Login successful! Redirecting...");
+        router.push("/admin/dashboard");
       } else if (user?.role === "teacher") {
-        router.push("/teacher");
+        hideLoader();
+        showSuccess("Login successful! Redirecting...");
+        router.push("/teacher/dashboard");
       } else {
-        router.push("/student");
+        hideLoader();
+        logout();
+        showError("Student accounts must sign in from the student login page.");
+        router.push("/student/login");
       }
     } catch (error: unknown) {
       hideLoader();

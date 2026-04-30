@@ -19,7 +19,7 @@ export default function StudentLoginPage() {
 
 function StudentLoginContent() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, logout } = useAuth();
   const { showSuccess, showError, showLoader, hideLoader } = useUI();
   const { loading: apiLoading, post } = useApiPost();
 
@@ -41,16 +41,17 @@ function StudentLoginContent() {
 
       console.log('✅ Login successful');
 
+      if (user?.role !== "student") {
+        hideLoader();
+        logout();
+        showError("Only student accounts can sign in from this page.");
+        router.push("/admin/login");
+        return;
+      }
+
       hideLoader();
       showSuccess('Login successful! Redirecting...');
-      // Redirect by role so teachers land on teacher workspace.
-      if (user?.role === "admin") {
-        router.push("/admin");
-      } else if (user?.role === "teacher") {
-        router.push("/teacher");
-      } else {
-        router.push("/student");
-      }
+      router.push("/student/dashboard");
     } catch (error: any) {
       hideLoader();
       console.error('❌ Login error:', error);

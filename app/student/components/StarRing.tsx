@@ -87,7 +87,7 @@ export function StarRing({
                 transition={
                     reduceMotion
                         ? undefined
-                        : { duration: 14, repeat: Infinity, ease: "linear" }
+                        : { duration: 48, repeat: Infinity, ease: "linear" }
                 }
                 style={{ transformOrigin: "50% 50%" }}
             >
@@ -135,7 +135,7 @@ export function StarRing({
                                     transition={
                                         reduceMotion
                                             ? undefined
-                                            : { duration: 14, repeat: Infinity, ease: "linear" }
+                                            : { duration: 48, repeat: Infinity, ease: "linear" }
                                     }
                                 >
                                     {label}
