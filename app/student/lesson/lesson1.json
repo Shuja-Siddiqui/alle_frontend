@@ -179,6 +179,8 @@
         "visual": []
       },
       "tasks": {
+        "alphabet_practice": [],
+        "blending_practice": [],
         "word_practice": [
           {
             "task_id": "1",
@@ -196,6 +198,7 @@
             "xp": 5
           }
         ],
+        "sentence_practice": [],
         "results": {
           "tts_0-1_correct": "You've got it. That's mastery—8 out of 10 or better. Moving forward.",
           "tts_0-1_correct_ssml": "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\"><voice>You've got it.<break time=\"200ms\"/> That's mastery—eight out of ten or better.<break time=\"200ms\"/> Moving forward.</voice></speak>",
