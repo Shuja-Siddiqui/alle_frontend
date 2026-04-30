@@ -7,6 +7,7 @@ import { PhonemeIllustration } from "../../../components/PhonemeIllustration";
 import { useSpeechAssessment } from "../../../hooks/useSpeechAssessment";
 import { resolvePhonemeCode } from "../../../lib/phonemeCatalog";
 import { motion } from "framer-motion";
+import { useAuth } from "../../../contexts/AuthContext";
 
 interface PhonemeChartItem {
   code: string;
@@ -26,6 +27,12 @@ interface AssessmentUiResult {
 
 export default function PhonemeCatalogPage() {
   const {
+    phonemeCatalog,
+    isPhonemeCatalogLoading,
+    phonemeCatalogError,
+    fetchPhonemeCatalog,
+  } = useAuth();
+  const {
     startRecording,
     stopRecording,
     assessPhoneme,
@@ -34,25 +41,19 @@ export default function PhonemeCatalogPage() {
     error: recordingError,
   } = useSpeechAssessment();
 
-  const [chart, setChart] = useState<PhonemeChartItem[]>([]);
   const [selectedPhoneme, setSelectedPhoneme] = useState<string>("");
-  const [statusText, setStatusText] = useState<string>("Loading phoneme catalog...");
+  const [statusText, setStatusText] = useState<string>("");
   const [statusIsError, setStatusIsError] = useState<boolean>(false);
   const [listenLoadingCode, setListenLoadingCode] = useState<string>("");
   const [assessmentResult, setAssessmentResult] = useState<AssessmentUiResult | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [allowedPhonemeSet, setAllowedPhonemeSet] = useState<Set<string>>(new Set());
+  const chart = (phonemeCatalog?.chart as PhonemeChartItem[]) ?? [];
+  const allowedPhonemeSet = useMemo(
+    () => new Set((phonemeCatalog?.allowedCodes ?? []).map((code) => code.toUpperCase())),
+    [phonemeCatalog]
+  );
 
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:4000/api";
-
-  const normalizeSkillFocusToCode = (entry: unknown): string | null => {
-    const raw = String(entry ?? "").trim();
-    if (!raw) return null;
-    const withoutPrefix = raw.replace(/^sound\s+/i, "").trim();
-    if (!withoutPrefix) return null;
-    const token = withoutPrefix.split(/[\s,/|]+/).filter(Boolean)[0] || "";
-    return token ? token.toUpperCase() : null;
-  };
 
   const visibleChart = useMemo(() => {
     if (!allowedPhonemeSet.size) return [];
@@ -66,75 +67,8 @@ export default function PhonemeCatalogPage() {
   }, [visibleChart]);
 
   useEffect(() => {
-    let isMounted = true;
-
-    const loadCatalog = async () => {
-      try {
-        const token =
-          typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
-        const response = await fetch(`${apiBaseUrl}/testing/speech/phonemes`, {
-          headers: {
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-        });
-
-        const data = await response.json();
-        if (!response.ok || data?.success === false) {
-          throw new Error(data?.message || "Failed to load phoneme catalog");
-        }
-
-        const nextChart: PhonemeChartItem[] = Array.isArray(data?.chart) ? data.chart : [];
-
-        const catalogSourceResponse = await fetch(
-          `${apiBaseUrl}/lessons/progress/catalog-phonemes`,
-          {
-            headers: {
-              ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            },
-          }
-        );
-        const catalogSourceJson = await catalogSourceResponse.json().catch(() => ({}));
-        if (!catalogSourceResponse.ok || catalogSourceJson?.success === false) {
-          throw new Error(catalogSourceJson?.message || "Failed to load catalog phonemes");
-        }
-
-        const rawAllowedPhonemes =
-          catalogSourceJson?.data?.phonemes ?? catalogSourceJson?.phonemes ?? [];
-        const allowedPhonemes = Array.isArray(rawAllowedPhonemes)
-          ? rawAllowedPhonemes
-              .map((entry: unknown) => normalizeSkillFocusToCode(entry))
-              .filter((value: string | null): value is string => Boolean(value))
-              .map((code) => resolvePhonemeCode(code))
-              .filter(Boolean)
-          : [];
-
-        const allowed = new Set<string>(allowedPhonemes);
-        const filteredChart = nextChart.filter((item) => allowed.has(item.code.toUpperCase()));
-        if (!isMounted) return;
-
-        setChart(nextChart);
-        setAllowedPhonemeSet(allowed);
-        if (filteredChart.length > 0) {
-          setSelectedPhoneme(filteredChart[0].code);
-          setStatusText("Showing mastered sounds and sounds from your current lesson.");
-          setStatusIsError(false);
-        } else {
-          setSelectedPhoneme("");
-          setStatusText("No unlocked phonemes yet. Complete lesson tasks to unlock sounds.");
-          setStatusIsError(false);
-        }
-      } catch (error: any) {
-        if (!isMounted) return;
-        setStatusText(error?.message || "Failed to load phoneme catalog");
-        setStatusIsError(true);
-      }
-    };
-
-    loadCatalog();
-    return () => {
-      isMounted = false;
-    };
-  }, [apiBaseUrl]);
+    void fetchPhonemeCatalog(false);
+  }, [fetchPhonemeCatalog]);
 
   useEffect(() => {
     if (!visibleChart.length) {
@@ -148,6 +82,26 @@ export default function PhonemeCatalogPage() {
       setSelectedPhoneme(visibleChart[0].code);
     }
   }, [visibleChart, selectedPhoneme]);
+
+  useEffect(() => {
+    if (phonemeCatalogError) {
+      setStatusText(phonemeCatalogError);
+      setStatusIsError(true);
+      return;
+    }
+    if (isPhonemeCatalogLoading) {
+      setStatusText("Loading phoneme catalog...");
+      setStatusIsError(false);
+      return;
+    }
+    if (visibleChart.length > 0) {
+      setStatusText("Showing mastered sounds and sounds from your current lesson.");
+      setStatusIsError(false);
+    } else {
+      setStatusText("No unlocked phonemes yet. Complete lesson tasks to unlock sounds.");
+      setStatusIsError(false);
+    }
+  }, [isPhonemeCatalogLoading, phonemeCatalogError, visibleChart.length]);
 
   const handleListen = async (phonemeCode: string) => {
     try {

@@ -46,24 +46,49 @@ export default function ProfileSettingsPage() {
     return `collar${num}`;
   };
 
+  const getLessonsCompletedTarget = (rawCriteria: unknown): number | null => {
+    if (!rawCriteria) return null;
+    try {
+      let parsedCriteria: any = rawCriteria;
+      if (typeof parsedCriteria === "string") {
+        parsedCriteria = JSON.parse(parsedCriteria);
+        if (typeof parsedCriteria === "string") {
+          parsedCriteria = JSON.parse(parsedCriteria);
+        }
+      }
+      if (
+        parsedCriteria &&
+        typeof parsedCriteria === "object" &&
+        typeof parsedCriteria.lessons_completed === "number"
+      ) {
+        return parsedCriteria.lessons_completed;
+      }
+    } catch {
+      return null;
+    }
+    return null;
+  };
+
   // Badge data from user context (unlocked badges) + all badge defs - used for initial 4 badges
   const userBadges = user?.badges ?? [];
   const unlockedIds = new Set((userBadges ?? []).map((b: any) => b.id));
   const baseBadgeDefs = (badgeCatalog.length > 0 ? badgeCatalog : userBadges) as any[];
 
-  // Sort so unlocked badges come first
+  // Keep a stable progression order by lessons_completed criteria
   const sortedBadgeDefs = [...baseBadgeDefs].sort((a, b) => {
-    const aUnlocked = unlockedIds.has(a.id);
-    const bUnlocked = unlockedIds.has(b.id);
-    if (aUnlocked === bUnlocked) return 0;
-    return aUnlocked ? -1 : 1; // unlocked first
+    const aLessons = getLessonsCompletedTarget(a?.criteria);
+    const bLessons = getLessonsCompletedTarget(b?.criteria);
+    if (aLessons !== null && bLessons !== null) return aLessons - bLessons;
+    if (aLessons !== null) return -1;
+    if (bLessons !== null) return 1;
+    return 0;
   });
   // Only keep badges that actually have an icon from the API
   const filteredBadgeDefs = sortedBadgeDefs.filter(
     (def: any) => def && (def.iconActive || def.iconInactive)
   );
 
-  // First 4 badges to show in the profile box (unlocked first, then locked)
+  // First 4 badges to show in the profile box (same progression order as overlay)
   const unlockedBadgesFromUser = filteredBadgeDefs.slice(0, 4).map((def: any) => {
     const isUnlocked = unlockedIds.has(def.id);
     const imageSrc = isUnlocked
@@ -87,6 +112,8 @@ export default function ProfileSettingsPage() {
       alt?: string;
       title?: string;
       description?: string;
+      criteriaText?: string;
+      criteriaLabel?: string;
     }[]
   >([]);
   const [isBadgesOverlayOpen, setIsBadgesOverlayOpen] = useState(false);
@@ -104,7 +131,16 @@ export default function ProfileSettingsPage() {
       ? badgeCatalog
       : backendBadges) as any[];
 
-    const fullBadgeList = baseBadgeDefsOverlay
+    const sortedOverlayDefs = [...baseBadgeDefsOverlay].sort((a, b) => {
+      const aLessons = getLessonsCompletedTarget(a?.criteria);
+      const bLessons = getLessonsCompletedTarget(b?.criteria);
+      if (aLessons !== null && bLessons !== null) return aLessons - bLessons;
+      if (aLessons !== null) return -1;
+      if (bLessons !== null) return 1;
+      return 0;
+    });
+
+    const fullBadgeList = sortedOverlayDefs
       // Only include badges that actually have an icon from the API
       .filter((def: any) => def && (def.iconActive || def.iconInactive))
       .map((def: any) => {
@@ -113,12 +149,20 @@ export default function ProfileSettingsPage() {
           ? def.iconActive || def.iconInactive
           : def.iconInactive || def.iconActive;
 
+        const lessonsCompletedTarget = getLessonsCompletedTarget(def.criteria);
+
         return {
           imageSrc,
           earned: isUnlocked,
           alt: def.title || (isUnlocked ? "Unlocked badge" : "Locked badge"),
           title: def.title,
           description: def.description ?? undefined,
+          criteriaText:
+            lessonsCompletedTarget !== null
+              ? `Complete ${lessonsCompletedTarget} lessons`
+              : undefined,
+          criteriaLabel:
+            lessonsCompletedTarget !== null ? `Lesson ${lessonsCompletedTarget}` : undefined,
         };
       });
 

@@ -7,6 +7,8 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { api } from '../lib/api-client';
+import { ApiError } from '../lib/api-client';
+import { resolvePhonemeCode } from '../lib/phonemeCatalog';
 
 // ============================================
 // Types
@@ -30,6 +32,32 @@ export interface AuthContextType {
     iconInactive?: string | null;
     rarity?: string | null;
   }[];
+
+  // Daily streak cache
+  streakData: {
+    streakDayCounter: number;
+    maxStreak: number;
+    motivationalLine: string;
+    nextReward: string;
+    dateKey: string;
+  } | null;
+  isStreakLoading: boolean;
+  streakErrorMessage: string;
+  fetchStreakData: (forceRefresh?: boolean) => Promise<void>;
+
+  // Phoneme catalog cache
+  phonemeCatalog: {
+    chart: {
+      code: string;
+      ipa: string;
+      example: string;
+      group?: string;
+    }[];
+    allowedCodes: string[];
+  } | null;
+  isPhonemeCatalogLoading: boolean;
+  phonemeCatalogError: string;
+  fetchPhonemeCatalog: (forceRefresh?: boolean) => Promise<void>;
 
   // Auth actions
   login: (email: string, password: string) => Promise<User>;
@@ -85,6 +113,34 @@ export function AuthProvider({ children }: AuthProviderProps) {
       rarity?: string | null;
     }[]
   >([]);
+  const [streakData, setStreakData] = useState<{
+    streakDayCounter: number;
+    maxStreak: number;
+    motivationalLine: string;
+    nextReward: string;
+    dateKey: string;
+  } | null>(null);
+  const [isStreakLoading, setIsStreakLoading] = useState(false);
+  const [streakErrorMessage, setStreakErrorMessage] = useState('');
+  const STREAK_CACHE_KEY = 'streak_data_cache';
+  const [phonemeCatalog, setPhonemeCatalog] = useState<{
+    chart: {
+      code: string;
+      ipa: string;
+      example: string;
+      group?: string;
+    }[];
+    allowedCodes: string[];
+  } | null>(null);
+  const [isPhonemeCatalogLoading, setIsPhonemeCatalogLoading] = useState(false);
+  const [phonemeCatalogError, setPhonemeCatalogError] = useState('');
+
+  const getTodayDateKey = () => {
+    const now = new Date();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${now.getFullYear()}-${month}-${day}`;
+  };
 
   // Load token and user from localStorage on mount
   useEffect(() => {
@@ -108,6 +164,33 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
 
     loadAuthData();
+  }, []);
+
+  // Load streak cache from localStorage on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STREAK_CACHE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (
+        parsed &&
+        typeof parsed === 'object' &&
+        typeof parsed.streakDayCounter === 'number' &&
+        typeof parsed.maxStreak === 'number' &&
+        typeof parsed.dateKey === 'string'
+      ) {
+        setStreakData({
+          streakDayCounter: parsed.streakDayCounter,
+          maxStreak: parsed.maxStreak,
+          motivationalLine: String(parsed.motivationalLine || ''),
+          nextReward: String(parsed.nextReward || ''),
+          dateKey: parsed.dateKey,
+        });
+      }
+    } catch (error) {
+      console.error('Error loading streak cache:', error);
+      localStorage.removeItem(STREAK_CACHE_KEY);
+    }
   }, []);
 
   // Load global badge catalog once per session
@@ -205,6 +288,115 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // Clear in-memory auth state
     setTokenState(null);
     setUser(null);
+    setStreakData(null);
+    setStreakErrorMessage('');
+    setIsStreakLoading(false);
+  };
+
+  const fetchStreakData = async (forceRefresh: boolean = false) => {
+    const todayKey = getTodayDateKey();
+
+    if (!forceRefresh && streakData?.dateKey === todayKey) {
+      return;
+    }
+
+    setIsStreakLoading(true);
+    setStreakErrorMessage('');
+
+    try {
+      const response = await api.get<{ data?: any }>('/streaks/my-streak');
+      const payload = response?.data || {};
+      const normalized = {
+        streakDayCounter: Number(payload.streakDayCounter || 0),
+        maxStreak: Number(payload.maxStreak || 0),
+        motivationalLine: String(payload.motivationalLine || ''),
+        nextReward: String(payload.nextReward || ''),
+        dateKey: todayKey,
+      };
+      setStreakData(normalized);
+      localStorage.setItem(STREAK_CACHE_KEY, JSON.stringify(normalized));
+    } catch (error) {
+      if (error instanceof ApiError && error.statusCode === 404) {
+        try {
+          const created = await api.post<{ data?: any }>('/streaks/update', { xpEarned: 0 });
+          const payload = created?.data || {};
+          const normalized = {
+            streakDayCounter: Number(payload.streakDayCounter || 0),
+            maxStreak: Number(payload.maxStreak || 0),
+            motivationalLine: String(payload.motivationalLine || ''),
+            nextReward: String(payload.nextReward || ''),
+            dateKey: todayKey,
+          };
+          setStreakData(normalized);
+          localStorage.setItem(STREAK_CACHE_KEY, JSON.stringify(normalized));
+        } catch {
+          setStreakErrorMessage('Could not create streak record right now.');
+        }
+      } else {
+        setStreakErrorMessage('Could not load streak data. Please try again.');
+      }
+    } finally {
+      setIsStreakLoading(false);
+    }
+  };
+
+  const fetchPhonemeCatalog = async (forceRefresh: boolean = false) => {
+    if (!forceRefresh && phonemeCatalog) return;
+
+    setIsPhonemeCatalogLoading(true);
+    setPhonemeCatalogError('');
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000/api';
+    const normalizeSkillFocusToCode = (entry: unknown): string | null => {
+      const raw = String(entry ?? '').trim();
+      if (!raw) return null;
+      const withoutPrefix = raw.replace(/^sound\s+/i, '').trim();
+      if (!withoutPrefix) return null;
+      const token = withoutPrefix.split(/[\s,/|]+/).filter(Boolean)[0] || '';
+      return token ? token.toUpperCase() : null;
+    };
+
+    try {
+      const token =
+        typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+      const catalogResponse = await fetch(`${apiBaseUrl}/testing/speech/phonemes`, {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
+      const catalogJson = await catalogResponse.json().catch(() => ({}));
+      if (!catalogResponse.ok || catalogJson?.success === false) {
+        throw new Error(catalogJson?.message || 'Failed to load phoneme catalog');
+      }
+      const nextChart = Array.isArray(catalogJson?.chart) ? catalogJson.chart : [];
+
+      const allowedResponse = await fetch(`${apiBaseUrl}/lessons/progress/catalog-phonemes`, {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
+      const allowedJson = await allowedResponse.json().catch(() => ({}));
+      if (!allowedResponse.ok || allowedJson?.success === false) {
+        throw new Error(allowedJson?.message || 'Failed to load catalog phonemes');
+      }
+
+      const rawAllowedPhonemes = allowedJson?.data?.phonemes ?? allowedJson?.phonemes ?? [];
+      const allowedCodes = Array.isArray(rawAllowedPhonemes)
+        ? rawAllowedPhonemes
+            .map((entry: unknown) => normalizeSkillFocusToCode(entry))
+            .filter((value: string | null): value is string => Boolean(value))
+            .map((code) => resolvePhonemeCode(code))
+            .filter(Boolean)
+        : [];
+
+      setPhonemeCatalog({
+        chart: nextChart,
+        allowedCodes: Array.from(new Set(allowedCodes)),
+      });
+    } catch (error: any) {
+      setPhonemeCatalogError(error?.message || 'Failed to load phoneme catalog');
+    } finally {
+      setIsPhonemeCatalogLoading(false);
+    }
   };
 
   // Update user data locally
@@ -252,6 +444,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
     isLoading,
     token,
     allBadges,
+    streakData,
+    isStreakLoading,
+    streakErrorMessage,
+    fetchStreakData,
+    phonemeCatalog,
+    isPhonemeCatalogLoading,
+    phonemeCatalogError,
+    fetchPhonemeCatalog,
     login,
     register,
     logout,
