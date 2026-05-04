@@ -5,6 +5,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { useUI } from "../contexts/UIContext";
 import { useVolumeControl } from "./useVolumeControl";
 import { api } from "../lib/api-client";
 
@@ -21,6 +22,10 @@ interface TTSState {
 }
 
 const DEFAULT_VOICE = "en-US-JennyNeural";
+
+function normalizeSpeakableInput(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
+}
 
 /** True if the error is due to browser autoplay policy (no user interaction yet). */
 function isAutoplayBlockedError(error: unknown): boolean {
@@ -41,6 +46,7 @@ function isPlayInterruptedError(error: unknown): boolean {
  */
 export function useTTS() {
   const { user } = useAuth();
+  const { showInfo } = useUI();
   const { volume } = useVolumeControl();
   const [state, setState] = useState<TTSState>({
     isPlaying: false,
@@ -49,9 +55,14 @@ export function useTTS() {
   });
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const showInfoRef = useRef(showInfo);
   const lastKeyRef = useRef<string | null>(null);
   const queueRef = useRef<string[]>([]);
   const isProcessingQueueRef = useRef(false);
+
+  useEffect(() => {
+    showInfoRef.current = showInfo;
+  }, [showInfo]);
 
   // Get user's preferred voice or default
   const getVoice = useCallback((): string => {
@@ -69,7 +80,8 @@ export function useTTS() {
       text: string,
       options: TTSOptions = {}
     ): Promise<void> => {
-      if (!text || !text.trim()) {
+      const normalizedText = normalizeSpeakableInput(text);
+      if (!normalizedText) {
         return Promise.resolve();
       }
 
@@ -88,7 +100,7 @@ export function useTTS() {
 
         const voice = options.voice || getVoice();
         const lang = options.lang || "en-US";
-        const isSSML = options.useSSML ?? text.trim().startsWith("<speak");
+        const isSSML = options.useSSML ?? normalizedText.startsWith("<speak");
 
         // Call TTS API (use fetch directly for blob response)
         const API_BASE_URL =
@@ -96,7 +108,7 @@ export function useTTS() {
         const token = localStorage.getItem("auth_token");
 
         console.log("[LessonTTS] Starting TTS request", {
-          text,
+          text: normalizedText,
           voice,
           lang,
         });
@@ -107,7 +119,7 @@ export function useTTS() {
             "Content-Type": "application/json",
             ...(token && { Authorization: `Bearer ${token}` }),
           },
-          body: JSON.stringify({ text, voice, lang }),
+          body: JSON.stringify({ text: normalizedText, voice, lang }),
         })
           .then(async (response) => {
             console.log("[LessonTTS] Response status", response.status, response.statusText);
@@ -268,9 +280,16 @@ export function useTTS() {
       options: TTSOptions = {}
     ): Promise<void> => {
       // Prefer SSML if available
-      const textToUse = ssmlText && ssmlText.trim() ? ssmlText : text;
-      const useSSML = !!ssmlText && ssmlText.trim().startsWith("<speak");
-      const key = textToUse.trim();
+      const normalizedText = normalizeSpeakableInput(text);
+      const normalizedSSML = normalizeSpeakableInput(ssmlText);
+      const textToUse = normalizedSSML || normalizedText;
+      if (!textToUse) {
+        // Shared guard: surface a friendly message when no instruction content exists.
+        showInfoRef.current?.("No instructions available to read.");
+        return Promise.resolve();
+      }
+      const useSSML = normalizedSSML.startsWith("<speak");
+      const key = textToUse;
 
       // If we already have audio for this exact text/SSML, just replay it
       if (lastKeyRef.current === key && audioRef.current) {

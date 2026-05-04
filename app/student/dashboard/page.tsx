@@ -121,18 +121,13 @@ export default function StudentDashboardPage() {
         // Backend can explicitly signal completion with { allCompleted: true }
         if (nextLessonData?.allCompleted) {
           console.warn("[Dashboard] /next reports all lessons completed (200)");
-          // Pull lesson list from backend and mark all as completed for map visuals.
-          const lessonsRes = await api.get<any>("/lessons");
-          const lessonsData = Array.isArray(lessonsRes?.data)
-            ? lessonsRes.data
-            : Array.isArray(lessonsRes?.data?.data)
-            ? lessonsRes.data.data
-            : Array.isArray(lessonsRes)
-            ? lessonsRes
+          // Do not call /lessons here: endpoint is teacher/admin only.
+          // Use completed lesson orders from /next payload when available.
+          const lessonOrders = Array.isArray(nextLessonData?.completedLessonOrders)
+            ? nextLessonData.completedLessonOrders.filter(
+                (o: any) => typeof o === "number"
+              )
             : [];
-          const lessonOrders = lessonsData
-            .map((l: any) => l?.lessonOrder)
-            .filter((o: any) => typeof o === "number");
           setCompletedLessonMapIds(
             lessonOrders.map((order: number) => `lesson${String(order).padStart(2, "0")}`)
           );
