@@ -358,7 +358,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const token =
         typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
-      const catalogResponse = await fetch(`${apiBaseUrl}/testing/speech/phonemes`, {
+      const catalogResponse = await fetch(`${apiBaseUrl}/practice/speech/phonemes`, {
         headers: {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
