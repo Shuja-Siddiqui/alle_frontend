@@ -111,7 +111,7 @@ export default function PhonemeCatalogPage() {
 
       const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
       const response = await fetch(
-        `${apiBaseUrl}/testing/speech/phoneme/audio?phoneme=${encodeURIComponent(phonemeCode)}`,
+        `${apiBaseUrl}/practice/speech/phoneme/audio?phoneme=${encodeURIComponent(phonemeCode)}`,
         {
           headers: {
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
