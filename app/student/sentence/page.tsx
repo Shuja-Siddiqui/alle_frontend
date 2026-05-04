@@ -111,6 +111,7 @@ export default function SentencePage() {
         const payload = response.data?.data ?? response.data?.task ?? response.data;
         if (payload) {
           setTaskData(payload);
+          setCurrentRetry(payload.currentRetries || 0);
 
           const instruction =
             payload.tts?.text ??
@@ -129,6 +130,7 @@ export default function SentencePage() {
   useEffect(() => {
     // Reset UI state when moving to another sentence task
     setStatusVariant("initial");
+    setCurrentRetry(0);
     setShowingFeedback(false);
     setFeedbackData(null);
     setIsMicActive(false);
