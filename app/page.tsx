@@ -3,11 +3,22 @@
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import type { MouseEvent } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { PrimaryButton } from "../components/PrimaryButton";
 
 export default function Home() {
   const router = useRouter();
+  const [isNavPinned, setIsNavPinned] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      setIsNavPinned(window.scrollY > 110);
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
     <main
@@ -22,7 +33,7 @@ export default function Home() {
         }}
       />
       <div className="relative z-10">
-        <LandingNav onSignIn={() => router.push("/student/login")} />
+        <LandingNav isPinned={isNavPinned} onSignIn={() => router.push("/student/login")} />
         <HeroSection
           onStartStudentJourney={() => router.push("/student/signup")}
           onTeacherAdminLogin={() => router.push("/admin/login")}
@@ -59,35 +70,49 @@ function scrollToSection(event: MouseEvent<HTMLAnchorElement>, sectionId: string
   });
 }
 
-function LandingNav({ onSignIn }: { onSignIn: () => void }) {
+function LandingNav({ isPinned, onSignIn }: { isPinned: boolean; onSignIn: () => void }) {
   return (
     <motion.header
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6 }}
-      className="fixed top-0 inset-x-0 z-50"
+      className={`inset-x-0 z-50 transition-all duration-300 ease-in-out ${
+        isPinned ? "fixed top-0" : "absolute top-0"
+      }`}
     >
-      <div className="mx-auto max-w-[1440px] mt-4 px-6 md:px-10">
-        <div className="rounded-2xl border border-[#E451FE80] bg-[linear-gradient(135deg,rgba(16,22,66,0.72),rgba(27,31,78,0.58))] px-4 md:px-6 py-3 flex items-center justify-between backdrop-blur-2xl supports-backdrop-filter:bg-[linear-gradient(135deg,rgba(16,22,66,0.62),rgba(27,31,78,0.5))] shadow-[0_10px_35px_rgba(7,86,255,0.2),0_0_0_1px_rgba(255,255,255,0.14)_inset,0_0_32px_rgba(228,81,254,0.18)]">
-          <a href="#top" className="flex items-center gap-2 font-semibold tracking-tight">
-            <Image src="/assets/icons/admin/logo.svg" alt="EduPortal logo" width={32} height={32} />
-            <span><span className="text-[#E451FE]">Edu</span><span className="text-white">Portal</span></span>
-          </a>
-          <nav className="hidden md:flex items-center gap-8 text-sm text-[#C6CDFD]">
-            <a href="#capabilities" onClick={(e) => scrollToSection(e, "capabilities")} className="hover:text-white transition">Platform</a>
-            <a href="#why" onClick={(e) => scrollToSection(e, "why")} className="hover:text-white transition">Our Why</a>
-            <a href="#how" onClick={(e) => scrollToSection(e, "how")} className="hover:text-white transition">How it works</a>
-            <a href="#analytics" onClick={(e) => scrollToSection(e, "analytics")} className="hover:text-white transition">Analytics</a>
-          </nav>
-          <div className="flex items-center gap-2">
-            <PrimaryButton
-              text="Sign in"
-              size="navbar"
-              variant="outline"
-              hideStars
-              onClick={onSignIn}
-              className="hidden sm:inline-flex"
-            />
+      <div
+        className={`transition-all duration-300 ease-in-out ${
+          isPinned
+            ? "w-full max-w-none mx-0 mt-0 pt-0 px-0"
+            : "mx-auto mt-4 w-full max-w-[1440px] px-0"
+        }`}
+      >
+        <div
+          className={`w-full border border-[#E451FE80] bg-[linear-gradient(135deg,rgba(16,22,66,0.72),rgba(27,31,78,0.58))] backdrop-blur-2xl supports-backdrop-filter:bg-[linear-gradient(135deg,rgba(16,22,66,0.62),rgba(27,31,78,0.5))] shadow-[0_10px_35px_rgba(7,86,255,0.2),0_0_0_1px_rgba(255,255,255,0.14)_inset,0_0_32px_rgba(228,81,254,0.18)] transition-[border-radius] duration-300 ease-in-out ${
+            isPinned ? "rounded-none" : "rounded-2xl"
+          }`}
+        >
+          <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between px-6 py-3 md:px-10">
+            <a href="#top" className="flex items-center gap-2 font-semibold tracking-tight">
+              <Image src="/assets/icons/admin/logo.svg" alt="EduPortal logo" width={32} height={32} />
+              <span><span className="text-[#E451FE]">Edu</span><span className="text-white">Portal</span></span>
+            </a>
+            <nav className="hidden md:flex items-center gap-8 text-sm text-[#C6CDFD]">
+              <a href="#capabilities" onClick={(e) => scrollToSection(e, "capabilities")} className="hover:text-white transition">Platform</a>
+              <a href="#why" onClick={(e) => scrollToSection(e, "why")} className="hover:text-white transition">Our Why</a>
+              <a href="#how" onClick={(e) => scrollToSection(e, "how")} className="hover:text-white transition">How it works</a>
+              <a href="#analytics" onClick={(e) => scrollToSection(e, "analytics")} className="hover:text-white transition">Analytics</a>
+            </nav>
+            <div className="flex items-center gap-2">
+              <PrimaryButton
+                text="Sign in"
+                size="navbar"
+                variant="outline"
+                hideStars
+                onClick={onSignIn}
+                className="hidden sm:inline-flex"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -194,7 +219,6 @@ function HeroSection({
                 </div>
               </div>
               <div className="rounded-xl bg-[#1B1F4ECC] border border-[#E451FE55] p-4 mt-4 flex items-center gap-3">
-                <div className="text-[#66A3FF] text-xl">🎤</div>
                 <div className="flex-1">
                   <div className="text-sm font-medium">Pronunciation score</div>
                   <div className="mt-1.5 h-1.5 rounded-full bg-white/10 overflow-hidden">
