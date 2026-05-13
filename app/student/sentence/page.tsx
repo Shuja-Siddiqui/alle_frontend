@@ -121,6 +121,7 @@ export default function SentencePage() {
         const payload = response.data?.data ?? response.data?.task ?? response.data;
         if (payload) {
           setTaskData(payload);
+          setCurrentRetry(payload.currentRetries || 0);
 
           const instruction =
             payload.tts?.text ??

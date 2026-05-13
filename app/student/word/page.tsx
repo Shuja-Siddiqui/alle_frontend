@@ -285,23 +285,6 @@ export default function WordPage() {
           taskData?.visual?.[0]?.word ||
           (taskData as any)?.expectedResponse?.value ||
           "";
-        const expectedResponse: any = (taskData as any)?.expectedResponse || {};
-        const taskAny: any = taskData as any;
-        const phonemeCandidates = [
-          expectedResponse?.ipa,
-          Array.isArray(expectedResponse?.phonemes) ? expectedResponse.phonemes.join(" ") : null,
-          typeof expectedResponse?.phonemes === "string" ? expectedResponse.phonemes : null,
-          taskAny?.phoneme,
-          taskAny?.ipa,
-          Array.isArray(taskAny?.phonemes) ? taskAny.phonemes.join(" ") : null,
-          typeof taskAny?.phonemes === "string" ? taskAny.phonemes : null,
-          Array.isArray(taskAny?.word_phonemes) ? taskAny.word_phonemes.join(" ") : null,
-          typeof taskAny?.word_phonemes === "string" ? taskAny.word_phonemes : null,
-          Array.isArray(taskAny?.expected_phonemes) ? taskAny.expected_phonemes.join(" ") : null,
-          typeof taskAny?.expected_phonemes === "string" ? taskAny.expected_phonemes : null,
-        ];
-        const phonemeFromPayload =
-          phonemeCandidates.find((v) => typeof v === "string" && v.trim().length > 0)?.trim() || "";
         if (taskData && wordToAssess) {
           // Use the backend processStudentResponse endpoint for word assessment
           const formData = new FormData();
@@ -315,7 +298,7 @@ export default function WordPage() {
               audioData: await blobToBase64(audioBlob),
               mimeType: "audio/webm",
               word: wordToAssess || undefined,
-              phoneme: phonemeFromPayload || undefined,
+              assessmentMode: "phoneme_word_only",
               taskStartTime: getTaskStartTimeIso(taskStartTimeRef.current),
             }
           );

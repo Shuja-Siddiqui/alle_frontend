@@ -5,6 +5,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { useUI } from "../contexts/UIContext";
 import { useVolumeControl } from "./useVolumeControl";
 import { api } from "../lib/api-client";
 
@@ -21,6 +22,10 @@ interface TTSState {
 }
 
 const DEFAULT_VOICE = "en-US-JennyNeural";
+
+function normalizeSpeakableInput(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
+}
 
 /** True if the error is due to browser autoplay policy (no user interaction yet). */
 function isAutoplayBlockedError(error: unknown): boolean {
@@ -41,6 +46,7 @@ function isPlayInterruptedError(error: unknown): boolean {
  */
 export function useTTS() {
   const { user } = useAuth();
+  const { showInfo } = useUI();
   const { volume } = useVolumeControl();
   const [state, setState] = useState<TTSState>({
     isPlaying: false,
@@ -49,9 +55,14 @@ export function useTTS() {
   });
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const showInfoRef = useRef(showInfo);
   const lastKeyRef = useRef<string | null>(null);
   const queueRef = useRef<string[]>([]);
   const isProcessingQueueRef = useRef(false);
+
+  useEffect(() => {
+    showInfoRef.current = showInfo;
+  }, [showInfo]);
 
   // Get user's preferred voice or default
   const getVoice = useCallback((): string => {
@@ -69,7 +80,8 @@ export function useTTS() {
       text: string,
       options: TTSOptions = {}
     ): Promise<void> => {
-      if (!text || !text.trim()) {
+      const normalizedText = normalizeSpeakableInput(text);
+      if (!normalizedText) {
         return Promise.resolve();
       }
 
@@ -98,7 +110,7 @@ export function useTTS() {
         const token = localStorage.getItem("auth_token");
 
         console.log("[LessonTTS] Starting TTS request", {
-          text,
+          text: normalizedText,
           voice,
           lang,
         });
