@@ -9,6 +9,7 @@ import { VisualBox } from "../lesson/components/VisualBox";
 import { MicButton } from "../lesson/components/MicButton";
 import { PrimaryButton } from "../../../components/PrimaryButton";
 import { LevelOverlay } from "../components/LevelOverlay";
+import { TaskAttemptFraction } from "../components/TaskAttemptFraction";
 import { useLevelOverlay } from "../contexts/LevelOverlayContext";
 import { useLessonPageData } from "../hooks/useLessonData";
 import { useTTS } from "../../../hooks/useTTS";
@@ -22,11 +23,18 @@ import { getTaskStartTimeIso, markAttemptStart } from "../../../lib/attempt-timi
 import {
   clearTaskOutcomeState,
   clearTaskOutcomeStateScope,
-  loadTaskOutcomeState,
+  loadStudentTaskUiSnapshot,
   saveTaskOutcomeState,
 } from "../../../lib/taskOutcomeState";
 import { devMockSyncWordCorrect } from "../../../lib/dev-mock-checkpoint-sync";
 import Image from "next/image";
+
+function unwrapAssessmentPayload(response: unknown): Record<string, unknown> {
+  const r = response as Record<string, unknown>;
+  const inner = r?.data as Record<string, unknown> | undefined;
+  if (inner && typeof inner === "object" && "feedbackType" in inner) return inner;
+  return (inner?.data ?? inner ?? r) as Record<string, unknown>;
+}
 
 type StatusVariant = "initial" | "default" | "success" | "error";
 
@@ -102,7 +110,7 @@ export default function BlendingPage() {
     taskId: string;
     taskType: string;
   } | null>(null);
-  const [showTryAgainOnly, setShowTryAgainOnly] = useState(false);
+  const [showContinueAfterSkipOffer, setShowContinueAfterSkipOffer] = useState(false);
   const [currentTaskIndex, setCurrentTaskIndex] = useState(0); // Index in blending_practice array
   const taskStartTimeRef = useRef<number | null>(null);
   const taskStateKeyPage = "blending";
@@ -170,20 +178,29 @@ export default function BlendingPage() {
   }, [effectiveTaskIndex]);
 
   useEffect(() => {
-    const stored = loadTaskOutcomeState<any>(
+    setIsMicActive(false);
+    setIsProcessing(false);
+
+    const snap = loadStudentTaskUiSnapshot<any>(
       taskStateKeyPage,
       lessonId,
       missionSequence,
       taskId
     );
-    if (!stored) return;
-    setStatusVariant(stored.statusVariant);
-    setFeedbackData(stored.feedbackData ?? null);
-    setCurrentRetry(stored.currentRetry ?? 0);
-    setPendingReset(stored.pendingReset ?? null);
-    setShowTryAgainOnly(Boolean(stored.showTryAgainOnly));
-    setIsMicActive(false);
-    setIsProcessing(false);
+    if (!snap) {
+      setStatusVariant("initial");
+      setFeedbackData(null);
+      setCurrentRetry(0);
+      setPendingReset(null);
+      setShowContinueAfterSkipOffer(false);
+      setShowingFeedback(false);
+      return;
+    }
+    setStatusVariant(snap.statusVariant);
+    setFeedbackData(snap.feedbackData ?? null);
+    setCurrentRetry(snap.currentRetry);
+    setPendingReset(snap.pendingReset ?? null);
+    setShowContinueAfterSkipOffer(snap.showContinueAfterSkipOffer);
     setShowingFeedback(false);
   }, [lessonId, missionSequence, taskId]);
 
@@ -215,7 +232,7 @@ export default function BlendingPage() {
   useEffect(() => {
     if (!lessonId || !missionSequence) return;
     const hasStoredOutcome = Boolean(
-      loadTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId)
+      loadStudentTaskUiSnapshot(taskStateKeyPage, lessonId, missionSequence, taskId)
     );
 
     // If we have lesson context, use it to get current task
@@ -309,9 +326,7 @@ export default function BlendingPage() {
 
     fetchTaskData();
   }, [lessonId, missionSequence, taskId, taskIndexParam, currentLesson, currentTask, effectiveTaskIndex, playTTSWithSSML]);
-  useEffect(() => {
-    console.log("taskData", taskData);
-  }, [taskData]);
+
   // Save checkpoint to backend
   const saveCheckpoint = async () => {
     if (!lessonId || !missionSequence || !currentTask) return;
@@ -331,7 +346,7 @@ export default function BlendingPage() {
   // Handle mic button click
   const handleMicClick = async () => {
     // Prevent starting a new recording while agent TTS is playing
-    if (isProcessing || (!isMicActive && isPlaying)) return;
+    if (isProcessing || (!isMicActive && isPlaying) || showContinueAfterSkipOffer) return;
 
     const newMicState = !isMicActive;
     setIsMicActive(newMicState);
@@ -399,33 +414,19 @@ export default function BlendingPage() {
               taskStartTime: getTaskStartTimeIso(taskStartTimeRef.current),
             }
           );
-          const result = response.data;
+          const result = unwrapAssessmentPayload(response);
 
           setFeedbackData(result);
 
-          if (result?.maxRetryFailed) {
-            setShowTryAgainOnly(true);
-            setStatusVariant("error");
-            setShowingFeedback(false);
-            setIsMicActive(false);
-            saveTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId, {
-              statusVariant: "error",
-              feedbackData: result,
-              currentRetry,
-              pendingReset: null,
-              showTryAgainOnly: true,
-            });
-            await playTTSWithSSML(
-              "Let us try this word again. Tap Try again.",
-              "<speak version=\"1.0\" xml:lang=\"en-US\" xmlns=\"http://www.w3.org/2001/10/synthesis\">Let us try this word again. Tap Try again.</speak>"
-            );
-            return;
-          }
-
-          if (result.lessonResetToStart) {
-            const restartMission = Number(result?.restartAt?.missionSequence ?? 1);
-            const restartTaskId = String(result?.restartAt?.taskId ?? "1");
-            const restartTaskType = String(result?.restartAt?.taskType ?? "alphabet_practice");
+          if (result?.lessonResetToStart) {
+            const restartAt = result.restartAt as {
+              missionSequence?: number;
+              taskId?: string;
+              taskType?: string;
+            } | undefined;
+            const restartMission = Number(restartAt?.missionSequence ?? 1);
+            const restartTaskId = String(restartAt?.taskId ?? "1");
+            const restartTaskType = String(restartAt?.taskType ?? "alphabet_practice");
             const currentMission = currentLesson?.missions?.find(
               (m: any) => (m.mission_sequence ?? m.missionSequence) === parseInt(missionSequence || "0", 10)
             );
@@ -453,11 +454,14 @@ export default function BlendingPage() {
                 taskId: restartTaskId,
                 taskType: restartTaskType,
               },
-              showTryAgainOnly: false,
+              showContinueAfterSkipOffer: false,
             });
 
-            if (result?.feedback?.text || result?.feedback?.ssml) {
-              await playTTSWithSSML(result.feedback.text || "", result.feedback.ssml);
+            if (result?.feedback && typeof result.feedback === "object") {
+              const fb = result.feedback as { text?: string; ssml?: string };
+              if (fb.text || fb.ssml) {
+                await playTTSWithSSML(fb.text || "", fb.ssml);
+              }
             }
             await playTTSWithSSML(
               resetMessage,
@@ -475,12 +479,11 @@ export default function BlendingPage() {
               feedbackData: result,
               currentRetry,
               pendingReset: null,
-              showTryAgainOnly: false,
+              showContinueAfterSkipOffer: false,
             });
 
             const successSSML =
               (taskData.feedback as any)?.tts_exactMatch_ssml;
-            console.log(taskData.feedback);
 
             try {
               await playTTSWithSSML(successSSML || "", successSSML);
@@ -498,19 +501,11 @@ export default function BlendingPage() {
               feedbackData: result,
               currentRetry,
               pendingReset: null,
-              showTryAgainOnly: false,
+              showContinueAfterSkipOffer: false,
             });
 
             const improvementSSML =
               (taskData.feedback as any)?.tts_closeMatch_ssml;
-
-            console.log("[LessonTTS] blending closeMatch feedback", {
-              feedbackType: result.feedbackType,
-              taskFeedback: taskData.feedback,
-              chosenSSMLPreview: improvementSSML
-                ? String(improvementSSML).substring(0, 120)
-                : null,
-            });
 
             try {
               await playTTSWithSSML(
@@ -527,28 +522,34 @@ export default function BlendingPage() {
             const incorrectSSML =
               (taskData.feedback as any)?.tts_wrongSound_ssml;
 
-            console.log("[LessonTTS] blending wrongSound feedback", {
-              feedbackType: result.feedbackType,
-              taskFeedback: taskData.feedback,
-              chosenSSMLPreview: incorrectSSML
-                ? String(incorrectSSML).substring(0, 120)
-                : null,
-            });
-
             try {
               await playTTSWithSSML(incorrectSSML || "", incorrectSSML);
             } catch (ttsError) {
               console.error("[Blending Page] Non-blocking wrongSound TTS failure:", ttsError);
             }
 
-            // Check retry logic
-            if (taskData && currentRetry + 1 >= (taskData.retryLimit || 3)) {
+            const limit = taskData.retryLimit || 3;
+            const apiRetryCount =
+              typeof result.retryCount === "number" ? result.retryCount : currentRetry + 1;
+            const terminalThisAttempt = apiRetryCount >= limit;
+
+            if (result.allowContinueToNextSubtask && terminalThisAttempt) {
+              setShowContinueAfterSkipOffer(true);
+              setCurrentRetry(Math.max(0, apiRetryCount - 1));
+              saveTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId, {
+                statusVariant: "error",
+                feedbackData: result,
+                currentRetry: Math.max(0, apiRetryCount - 1),
+                pendingReset: null,
+                showContinueAfterSkipOffer: true,
+              });
+            } else if (currentRetry + 1 >= limit) {
               saveTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId, {
                 statusVariant: "error",
                 feedbackData: result,
                 currentRetry: currentRetry + 1,
                 pendingReset: null,
-                showTryAgainOnly: false,
+                showContinueAfterSkipOffer: false,
               });
             } else {
               setCurrentRetry(currentRetry + 1);
@@ -557,7 +558,7 @@ export default function BlendingPage() {
                 feedbackData: result,
                 currentRetry: currentRetry + 1,
                 pendingReset: null,
-                showTryAgainOnly: false,
+                showContinueAfterSkipOffer: false,
               });
             }
           }
@@ -589,13 +590,18 @@ export default function BlendingPage() {
 
   // Handle refresh (reset same word)
   const handleRefresh = () => {
+    if (showContinueAfterSkipOffer) {
+      setIsMicActive(false);
+      setIsProcessing(false);
+      return;
+    }
     clearTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId);
     if (isProcessing || isPlayingTTS) return;
     setStatusVariant("initial");
     setShowingFeedback(false);
     setFeedbackData(null);
     setPendingReset(null);
-    setShowTryAgainOnly(false);
+    setShowContinueAfterSkipOffer(false);
     setCurrentRetry(0);
     setIsMicActive(false);
     setIsProcessing(false);
@@ -617,18 +623,14 @@ export default function BlendingPage() {
     // If we are restarting a blending batch/flow, wipe cached outcomes
     // for this lesson+mission so stale "error/tilt" does not appear
     // on tasks the learner reaches again.
-    if (showTryAgainOnly || pendingReset) {
+    if (pendingReset) {
       clearTaskOutcomeStateScope(taskStateKeyPage, lessonId, missionSequence);
-    }
-    if (showTryAgainOnly) {
-      handleRefresh();
-      return;
     }
     if (!pendingReset) return;
     const { missionSequence: ms, taskId: tid, taskType: ttype } = pendingReset;
     const page = PAGE_BY_TASK_TYPE[ttype] ?? "lesson";
     setPendingReset(null);
-    setShowTryAgainOnly(false);
+    setShowContinueAfterSkipOffer(false);
     router.push(
       `/student/${page}?lessonId=${lessonId}&missionSequence=${ms}&taskId=${tid}&taskIndex=0`
     );
@@ -638,6 +640,7 @@ export default function BlendingPage() {
   const handleContinue = async () => {
     if (!lessonId || !missionSequence || !currentLesson || isProcessing || isPlayingTTS) return;
     setIsProcessing(true);
+    setShowContinueAfterSkipOffer(false);
 
     try {
       clearTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId);
@@ -783,6 +786,7 @@ export default function BlendingPage() {
   const hasPerLetterScores =
     azureLetterScores.some((s) => s !== null) || speechSuperLetterScores.some((s) => s !== null);
   const isSuccess = statusVariant === "success";
+  const showSkipContinueCTA = showContinueAfterSkipOffer;
 
   return (
     <div
@@ -802,7 +806,6 @@ export default function BlendingPage() {
               setIsPlayingTTS(true);
               try {
                 await playTTSWithSSML(taskData.tts.text, taskData.tts.ssml || taskData.tts.text);
-                console.log('Manual TTS playback completed');
               } catch (error) {
                 console.error('Manual TTS playback failed:', error);
               } finally {
@@ -901,7 +904,7 @@ export default function BlendingPage() {
 
         {/* MicButton or Continue Button based on variant - fixed 101px total gap */}
         <div style={{ marginTop: "69px" }}>
-          {showTryAgainOnly || pendingReset ? (
+          {pendingReset ? (
             <div className="flex items-center gap-8 justify-center">
               <PrimaryButton
                 text="Try again"
@@ -953,6 +956,17 @@ export default function BlendingPage() {
                 className="flow-btn-attention"
               />
             </div>
+          ) : showSkipContinueCTA ? (
+            <div className="flex flex-col items-center gap-6">
+              <PrimaryButton
+                text="Skip"
+                size="medium"
+                variant="filled"
+                onClick={handleContinue}
+                disabled={isProcessing || isPlayingTTS || isPlaying}
+                className="flow-btn-attention"
+              />
+            </div>
           ) : (
             <MicButton
               icon={isMicActive ? "pause" : "mic"}
@@ -966,9 +980,10 @@ export default function BlendingPage() {
 
         {/* Retry counter */}
         {currentRetry > 0 && statusVariant !== "success" && (
-          <p style={{ marginTop: "16px", color: "#FFF", opacity: 0.7, fontSize: "14px" }}>
-            Attempt {currentRetry + 1} of {taskData.retryLimit || 3}
-          </p>
+          <TaskAttemptFraction
+            attemptCurrent={currentRetry + 1}
+            attemptLimit={taskData.retryLimit || 3}
+          />
         )}
 
       </div>

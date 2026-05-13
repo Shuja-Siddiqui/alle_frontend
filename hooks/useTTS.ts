@@ -88,7 +88,9 @@ export function useTTS() {
 
         const voice = options.voice || getVoice();
         const lang = options.lang || "en-US";
-        const isSSML = options.useSSML ?? text.trim().startsWith("<speak");
+        const isSSML =
+          options.useSSML ??
+          /^\s*<speak\b/i.test(text.trim());
 
         // Call TTS API (use fetch directly for blob response)
         const API_BASE_URL =
@@ -107,7 +109,7 @@ export function useTTS() {
             "Content-Type": "application/json",
             ...(token && { Authorization: `Bearer ${token}` }),
           },
-          body: JSON.stringify({ text, voice, lang }),
+          body: JSON.stringify({ text, voice, lang, isSSML }),
         })
           .then(async (response) => {
             console.log("[LessonTTS] Response status", response.status, response.statusText);
@@ -269,7 +271,8 @@ export function useTTS() {
     ): Promise<void> => {
       // Prefer SSML if available
       const textToUse = ssmlText && ssmlText.trim() ? ssmlText : text;
-      const useSSML = !!ssmlText && ssmlText.trim().startsWith("<speak");
+      const useSSML =
+        !!ssmlText && /^\s*<speak\b/i.test(ssmlText.trim());
       const key = textToUse.trim();
 
       // If we already have audio for this exact text/SSML, just replay it

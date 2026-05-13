@@ -276,17 +276,12 @@ export function LessonFlowProvider({ children }: LessonFlowProviderProps) {
         },
       };
 
-      // If retry count >= 3, reset to first task
+      // If retry count >= 3, stay on feedback so UI can offer skip; do not wipe batch progress.
       if (retryCount >= 3) {
         return {
           ...prev,
-          currentBatchProgress: {
-            ...updatedBatch,
-            completedTasks: [], // Clear completed tasks
-            xpEarned: 0, // Reset XP (not awarded yet)
-          },
-          currentTaskIndex: 0,
-          taskState: "idle",
+          currentBatchProgress: updatedBatch,
+          taskState: "feedback",
         };
       }
 

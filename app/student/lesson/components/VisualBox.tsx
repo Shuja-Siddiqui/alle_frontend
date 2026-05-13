@@ -6,7 +6,15 @@ type VisualBoxProps = {
   imageWidth?: number;
   imageHeight?: number;
   className?: string;
+  /**
+   * When true, applies the platform's pink/violet tint to the image so it
+   * matches the rest of the UI (used for OpenMoji illustrations).
+   */
+  tintToPlatform?: boolean;
 };
+
+const PLATFORM_TINT_FILTER =
+  "grayscale(1) contrast(1.18) brightness(1.08) sepia(1) hue-rotate(285deg) saturate(4.2)";
 
 export function VisualBox({
   imageSrc,
@@ -14,6 +22,7 @@ export function VisualBox({
   imageWidth = 100,
   imageHeight = 100,
   className,
+  tintToPlatform = false,
 }: VisualBoxProps) {
   const isValidImageSrc =
     typeof imageSrc === "string" &&
@@ -21,6 +30,10 @@ export function VisualBox({
     (imageSrc.startsWith("/") ||
       imageSrc.startsWith("http://") ||
       imageSrc.startsWith("https://"));
+
+  const imageStyle = tintToPlatform
+    ? { filter: PLATFORM_TINT_FILTER, opacity: 0.98 }
+    : undefined;
 
   return (
     <div
@@ -39,6 +52,7 @@ export function VisualBox({
           alt={imageAlt}
           width={imageWidth}
           height={imageHeight}
+          style={imageStyle}
         />
       ) : imageSrc ? (
         <span className="text-center text-sm text-white">{imageAlt || imageSrc}</span>

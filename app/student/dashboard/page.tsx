@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { LevelMap } from "../components/LevelMap";
-import { StarRing } from "../components/StarRing";
+import { StarRing, type SoundRingSlot } from "../components/StarRing";
 import { PrimaryButton } from "../../../components/PrimaryButton";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useUI } from "../../../contexts/UIContext";
@@ -31,6 +31,60 @@ interface StudentSoundsResponse {
   studentId: string;
   totalMastered: number;
   phonemes: string[];
+  sounds?: Array<{ phoneme?: string; status?: string }>;
+}
+
+function formatSoundRingLabel(raw: string): string {
+  const s = String(raw || "").trim();
+  if (!s) return "";
+  const u = s.toUpperCase();
+  let display = u;
+  if (u.startsWith("W-") || u.startsWith("B-") || u.startsWith("M-")) {
+    display = u.slice(2).replace(/_/g, " ").trim() || u;
+  } else if (u.startsWith("S-")) {
+    display = "Sentence";
+  }
+  return display.length > 14 ? `${display.slice(0, 14)}…` : display;
+}
+
+function parseSoundRingPayload(payload: unknown): {
+  totalMastered: number;
+  passedLabels: string[];
+  slots: Array<SoundRingSlot | null>;
+} {
+  const p = payload as StudentSoundsResponse | null | undefined;
+  const totalMastered = Number(p?.totalMastered ?? 0);
+  const phonemes = Array.isArray(p?.phonemes) ? p.phonemes : [];
+  const passedLabels = phonemes
+    .map((x) => String(x ?? "").trim().toUpperCase())
+    .filter(Boolean);
+
+  const totalSlots = 45;
+  const hasSoundsArray = Array.isArray(p?.sounds);
+  const soundsRaw = hasSoundsArray
+    ? (p!.sounds as Array<{ phoneme?: string; status?: string }>)
+    : null;
+
+  if (hasSoundsArray && soundsRaw) {
+    const slots: Array<SoundRingSlot | null> = Array.from({ length: totalSlots }, () => null);
+    soundsRaw.slice(0, totalSlots).forEach((row, i) => {
+      const phoneme = String(row?.phoneme ?? "").trim();
+      if (!phoneme) return;
+      const st = String(row?.status ?? "").toLowerCase();
+      const status: SoundRingSlot["status"] = st === "failed" ? "failed" : "passed";
+      slots[i] = {
+        label: formatSoundRingLabel(phoneme),
+        status,
+      };
+    });
+    return { totalMastered, passedLabels, slots };
+  }
+
+  const slots: Array<SoundRingSlot | null> = Array.from({ length: totalSlots }, () => null);
+  passedLabels.slice(0, totalSlots).forEach((label, i) => {
+    slots[i] = { label: formatSoundRingLabel(label), status: "passed" };
+  });
+  return { totalMastered, passedLabels, slots };
 }
 
 export default function StudentDashboardPage() {
@@ -48,6 +102,7 @@ export default function StudentDashboardPage() {
   const [completedLessonMapIds, setCompletedLessonMapIds] = useState<string[]>([]);
   const [masteredSoundsCount, setMasteredSoundsCount] = useState(0);
   const [masteredSoundLabels, setMasteredSoundLabels] = useState<string[]>([]);
+  const [soundRingSlots, setSoundRingSlots] = useState<Array<SoundRingSlot | null> | null>(null);
   const [animatedHeading, setAnimatedHeading] = useState("");
   const totalSoundRingSlots = 45;
   const headingText = "Your galaxy progress";
@@ -66,13 +121,11 @@ export default function StudentDashboardPage() {
     return () => window.clearInterval(timer);
   }, []);
   
-  const handleLevelClick = (level: number) => {
-    // TODO: Navigate to level or show level details
-    console.log(`Clicked level ${level}`);
+  const handleLevelClick = (_level: number) => {
+    // Reserved for future level navigation or detail view
   };
 
-  // TODO: Fetch actual student data from API
-  const studentXp = user?.xp || 150; // Example: student has 150 XP
+  const studentXp = user?.xp || 150;
   const totalLevels = 44;
   const xpPerLevel = 10;
   const totalXpNeeded = totalLevels * xpPerLevel; // 440 XP total
@@ -118,21 +171,14 @@ export default function StudentDashboardPage() {
 
         const nextLessonData = response.data || response;
 
-        // Backend can explicitly signal completion with { allCompleted: true }
+        // Backend signals completion with { allCompleted: true, completedLessonOrders, ... }
         if (nextLessonData?.allCompleted) {
           console.warn("[Dashboard] /next reports all lessons completed (200)");
-          // Pull lesson list from backend and mark all as completed for map visuals.
-          const lessonsRes = await api.get<any>("/lessons");
-          const lessonsData = Array.isArray(lessonsRes?.data)
-            ? lessonsRes.data
-            : Array.isArray(lessonsRes?.data?.data)
-            ? lessonsRes.data.data
-            : Array.isArray(lessonsRes)
-            ? lessonsRes
+          const lessonOrders = Array.isArray(nextLessonData.completedLessonOrders)
+            ? nextLessonData.completedLessonOrders.filter(
+                (o: unknown) => typeof o === "number"
+              )
             : [];
-          const lessonOrders = lessonsData
-            .map((l: any) => l?.lessonOrder)
-            .filter((o: any) => typeof o === "number");
           setCompletedLessonMapIds(
             lessonOrders.map((order: number) => `lesson${String(order).padStart(2, "0")}`)
           );
@@ -225,39 +271,45 @@ export default function StudentDashboardPage() {
     };
   }, [user?.id, currentLesson, checkpoint]); // depend on context so we can prefer it when available
 
+  const fetchStudentSounds = useCallback(async () => {
+    if (!user || user.role !== "student") return;
+    try {
+      const response = await api.get<{ success?: boolean; data?: StudentSoundsResponse }>(
+        "/student-sounds/me"
+      );
+      const payload =
+        response && typeof response === "object" && "data" in response
+          ? (response as { data: StudentSoundsResponse }).data
+          : (response as unknown as StudentSoundsResponse);
+      const { totalMastered, passedLabels, slots } = parseSoundRingPayload(payload);
+      setMasteredSoundsCount(Math.max(0, Math.min(totalSoundRingSlots, totalMastered)));
+      setMasteredSoundLabels(passedLabels.slice(0, totalSoundRingSlots));
+      setSoundRingSlots(slots);
+    } catch (error) {
+      console.error("[Dashboard] Error fetching student sounds", error);
+      setMasteredSoundsCount(0);
+      setMasteredSoundLabels([]);
+      setSoundRingSlots(null);
+    }
+  }, [user?.id, user?.role, totalSoundRingSlots]);
+
   useEffect(() => {
     if (!user || user.role !== "student") return;
-    let isMounted = true;
 
-    const fetchStudentSounds = async () => {
-      try {
-        const response = await api.get<{ success: boolean; data: StudentSoundsResponse }>("/student-sounds/me");
-        const payload = (response as any)?.data?.data ?? (response as any)?.data ?? response;
-        const totalMastered = Number(payload?.totalMastered ?? 0);
-        const phonemes = Array.isArray(payload?.phonemes) ? payload.phonemes : [];
-        if (isMounted) {
-          setMasteredSoundsCount(Math.max(0, Math.min(totalSoundRingSlots, totalMastered)));
-          setMasteredSoundLabels(
-            phonemes
-              .map((p: any) => String(p ?? "").trim().toUpperCase())
-              .filter(Boolean)
-              .slice(0, totalSoundRingSlots)
-          );
-        }
-      } catch (error) {
-        console.error("[Dashboard] Error fetching student sounds", error);
-        if (isMounted) {
-          setMasteredSoundsCount(0);
-          setMasteredSoundLabels([]);
-        }
-      }
+    void fetchStudentSounds();
+
+    const onVisible = () => {
+      if (document.visibilityState === "visible") void fetchStudentSounds();
     };
+    const onFocus = () => void fetchStudentSounds();
 
-    fetchStudentSounds();
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onFocus);
     return () => {
-      isMounted = false;
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onFocus);
     };
-  }, [user?.id]);
+  }, [user?.id, user?.role, fetchStudentSounds]);
 
   const handleContinueMission = async () => {
     if (!resumePoint) {
@@ -360,10 +412,11 @@ export default function StudentDashboardPage() {
           {/* Star Ring - Right Side */}
           <div className="relative flex flex-col items-center justify-center shrink-0" style={{ width: "454px" }}>
             <StarRing
-              selectedCircle={masteredSoundsCount}
-              initialValue={masteredSoundsCount}
+              selectedCircle={soundRingSlots ? 0 : masteredSoundsCount}
+              initialValue={soundRingSlots ? 0 : masteredSoundsCount}
               progressLabel={`${masteredSoundsCount}/${totalSoundRingSlots}`}
-              soundLabels={masteredSoundLabels}
+              soundLabels={soundRingSlots ? [] : masteredSoundLabels}
+              slots={soundRingSlots ?? undefined}
             />
 
             {/* Box below Star Ring - full unit (button + box) gets drop shadow on hover */}

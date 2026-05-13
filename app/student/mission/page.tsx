@@ -11,6 +11,24 @@ import { useUI } from "../../../contexts/UIContext";
 import { useTTS } from "../../../hooks/useTTS";
 import { api } from "../../../lib/api-client";
 
+function getMissionSeqValue(m: unknown): number {
+  const x = m as { mission_sequence?: unknown; missionSequence?: unknown };
+  const v = x?.mission_sequence ?? x?.missionSequence;
+  const n = typeof v === "number" ? v : parseInt(String(v ?? ""), 10);
+  return Number.isFinite(n) ? n : NaN;
+}
+
+/** Lowest `mission_sequence` in the lesson (first mission). Used after lesson intro or when URL points at a removed mission. */
+function getFirstMissionSequence(missions: unknown[] | undefined): number | null {
+  if (!Array.isArray(missions) || missions.length === 0) return null;
+  let min = Infinity;
+  for (const m of missions) {
+    const s = getMissionSeqValue(m);
+    if (s > 0 && s < min) min = s;
+  }
+  return min === Infinity ? null : min;
+}
+
 export default function MissionPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -96,13 +114,15 @@ export default function MissionPage() {
       const introSSML =
         introSource?.tts_missionControlVoice_ssml || introTTS;
 
+      const firstMissionSeq = getFirstMissionSequence(currentLesson.missions) ?? 1;
+
       if (introTTS) {
         // Play intro and auto-advance after completion
         playTTSWithSSML(introTTS, introSSML).then(() => {
-          // Auto-advance to first mission
+          // Auto-advance to first mission in this lesson (not always sequence 1 if authoring removed early missions)
           setTimeout(() => {
             router.push(
-              `/student/mission?lessonId=${lessonId}&missionSequence=1`
+              `/student/mission?lessonId=${lessonId}&missionSequence=${firstMissionSeq}`
             );
           }, 500);
         });
@@ -110,7 +130,7 @@ export default function MissionPage() {
         // No intro TTS - auto-advance immediately
         setTimeout(() => {
           router.push(
-            `/student/mission?lessonId=${lessonId}&missionSequence=1`
+            `/student/mission?lessonId=${lessonId}&missionSequence=${firstMissionSeq}`
           );
         }, 500);
       }
@@ -118,6 +138,16 @@ export default function MissionPage() {
       setIsLoading(false);
     }
   }, [missionSequence, currentLesson, hasPlayedIntro, lessonId, router, playTTSWithSSML, mission]);
+
+  // URL points at a mission_sequence that no longer exists (e.g. whole mission object removed from JSON)
+  useEffect(() => {
+    if (!currentLesson?.missions?.length) return;
+    if (missionSequence === 0) return;
+    if (mission) return;
+    const first = getFirstMissionSequence(currentLesson.missions);
+    if (first == null) return;
+    router.replace(`/student/mission?lessonId=${lessonId}&missionSequence=${first}`);
+  }, [currentLesson, missionSequence, mission, lessonId, router]);
 
   // Auto-play mission-level intro (mission.introduction) when landing on a mission page
   useEffect(() => {
@@ -355,12 +385,36 @@ export default function MissionPage() {
       }
     }
 
-    // Fallback to first task type found
-    const type = Object.keys(pageMapping)[0];
-    const page = pageMapping[type];
-    router.push(
-      `/student/${page}?lessonId=${lessonId}&missionSequence=${missionSequence}&taskId=1&taskIndex=0`
+    // Intro-only mission: every practice array is empty (e.g. mission_mode shell with introduction only).
+    // Skip to the next mission hub that has tasks or is wrap; do not stay on sequence with no tasks.
+    let seq = missionSequence + 1;
+    const missions = currentLesson.missions ?? [];
+    while (seq < 100) {
+      const nm = missions.find(
+        (m: any) => (m.mission_sequence ?? m.missionSequence) === seq
+      );
+      if (!nm) break;
+      const mt = (nm as any).mission_type || (nm as any).missionType;
+      if (mt === "wrap") {
+        router.push(`/student/mission?lessonId=${lessonId}&missionSequence=${seq}`);
+        return;
+      }
+      const hasTasks = taskTypePriority.some((taskType) => {
+        const arr = (nm as any).tasks?.[taskType];
+        return Array.isArray(arr) && arr.length > 0;
+      });
+      if (hasTasks) {
+        router.push(`/student/mission?lessonId=${lessonId}&missionSequence=${seq}`);
+        return;
+      }
+      seq += 1;
+    }
+
+    console.warn(
+      "[MissionPage] No tasks in this mission and no next mission with tasks; sending student to dashboard.",
+      { lessonId, missionSequence }
     );
+    router.push("/student/dashboard");
   };
 
   if (isLoading || missionSequence === 0) {

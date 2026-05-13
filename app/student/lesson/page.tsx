@@ -9,6 +9,7 @@ import { VisualBox } from "./components/VisualBox";
 import { MicButton } from "./components/MicButton";
 import { PrimaryButton } from "../../../components/PrimaryButton";
 import { LevelOverlay } from "../components/LevelOverlay";
+import { TaskAttemptFraction } from "../components/TaskAttemptFraction";
 import { useLevelOverlay } from "../contexts/LevelOverlayContext";
 import { useLessonPageData } from "../hooks/useLessonData";
 import { useTTS } from "../../../hooks/useTTS";
@@ -19,6 +20,7 @@ import { useLesson } from "../../../contexts/LessonContext";
 import { useUI } from "../../../contexts/UIContext";
 import { api } from "../../../lib/api-client";
 import { resolvePhonemeCode } from "../../../lib/phonemeCatalog";
+import { getLetterIllustration } from "../../../lib/phonemeIllustrations";
 import { getNextLessonStep, PAGE_BY_TASK_TYPE, resolveTaskIndex } from "../../../lib/lesson-navigation";
 import {
   getAttemptDurationSeconds,
@@ -28,7 +30,7 @@ import {
 } from "../../../lib/attempt-timing";
 import {
   clearTaskOutcomeState,
-  loadTaskOutcomeState,
+  loadStudentTaskUiSnapshot,
   saveTaskOutcomeState,
 } from "../../../lib/taskOutcomeState";
 import { devMockSyncAlphabetMastered } from "../../../lib/dev-mock-checkpoint-sync";
@@ -92,6 +94,7 @@ export default function LessonPage() {
     taskId: string;
     taskType: string;
   } | null>(null);
+  const [showContinueAfterSkipOffer, setShowContinueAfterSkipOffer] = useState(false);
   const [currentTaskIndex, setCurrentTaskIndex] = useState(0); // Index in alphabet_practice array
 
   // Get data from URL params
@@ -178,23 +181,6 @@ export default function LessonPage() {
     setCurrentTaskIndex(effectiveTaskIndex);
   }, [effectiveTaskIndex]);
 
-  useEffect(() => {
-    const stored = loadTaskOutcomeState<any>(
-      taskStateKeyPage,
-      lessonId,
-      missionSequence,
-      taskId
-    );
-    if (!stored) return;
-    setStatusVariant(stored.statusVariant);
-    setFeedbackData(stored.feedbackData ?? null);
-    setCurrentRetry(stored.currentRetry ?? 0);
-    setPendingReset(stored.pendingReset ?? null);
-    setIsMicActive(false);
-    setIsProcessing(false);
-    setShowingFeedback(false);
-  }, [lessonId, missionSequence, taskId]);
-
   // Register batch start when user lands on first task (creates activity in backend)
   useEffect(() => {
     if (
@@ -255,13 +241,31 @@ export default function LessonPage() {
         }, 300);
       }
 
-      // Reset state for new task
-      setStatusVariant("initial");
-      setCurrentRetry(0);
-      setShowingFeedback(false);
-      setFeedbackData(null);
-      setIsMicActive(false);
-      setIsProcessing(false);
+      // Restore full persisted UI (green/red, attempts, Continue vs Skip) from one snapshot
+      const snap = loadStudentTaskUiSnapshot<any>(
+        taskStateKeyPage,
+        lessonId,
+        missionSequence,
+        taskId
+      );
+      if (snap) {
+        setStatusVariant(snap.statusVariant);
+        setFeedbackData(snap.feedbackData ?? null);
+        setCurrentRetry(snap.currentRetry);
+        setPendingReset(snap.pendingReset);
+        setShowContinueAfterSkipOffer(snap.showContinueAfterSkipOffer);
+        setShowingFeedback(false);
+        setIsMicActive(false);
+        setIsProcessing(false);
+      } else {
+        setStatusVariant("initial");
+        setCurrentRetry(0);
+        setShowingFeedback(false);
+        setFeedbackData(null);
+        setIsMicActive(false);
+        setIsProcessing(false);
+        setShowContinueAfterSkipOffer(false);
+      }
       taskStartTimeRef.current = null;
       assessmentEndTimeRef.current = null;
 
@@ -288,6 +292,25 @@ export default function LessonPage() {
         taskStartTimeRef.current = null;
         assessmentEndTimeRef.current = null;
 
+        const snap = loadStudentTaskUiSnapshot<any>(
+          taskStateKeyPage,
+          lessonId,
+          missionSequence,
+          taskId
+        );
+        if (snap?.showContinueAfterSkipOffer) {
+          setShowContinueAfterSkipOffer(true);
+          setStatusVariant("error");
+          setCurrentRetry(snap.currentRetry);
+          setFeedbackData(snap.feedbackData ?? null);
+        } else if (snap && (snap.statusVariant === "success" || snap.statusVariant === "error")) {
+          setStatusVariant(snap.statusVariant);
+          setCurrentRetry(snap.currentRetry);
+          setFeedbackData(snap.feedbackData ?? null);
+          setPendingReset(snap.pendingReset);
+          setShowContinueAfterSkipOffer(snap.showContinueAfterSkipOffer);
+        }
+
         // Auto-play instruction TTS after a brief delay (disable mic while playing)
         if (data.tts && (data.tts.text || data.tts.ssml)) {
           setTimeout(async () => {
@@ -305,6 +328,7 @@ export default function LessonPage() {
   // Handle mic button click
   const handleMicClick = async () => {
     if (isProcessing) return;
+    if (showContinueAfterSkipOffer) return;
 
     const newMicState = !isMicActive;
     setIsMicActive(newMicState);
@@ -398,7 +422,12 @@ export default function LessonPage() {
               taskStartTime: getTaskStartTimeIso(taskStartTimeRef.current),
             }
           );
-          result = response.data;
+          const envelope = response as Record<string, unknown>;
+          const inner = envelope?.data as Record<string, unknown> | undefined;
+          result =
+            inner && typeof inner === "object" && "feedbackType" in inner
+              ? inner
+              : (inner?.data as Record<string, unknown>) ?? inner ?? envelope;
         } else {
           // Use Azure for word/sentence-level assessment via backend
           const audioBase64 = await blobToBase64(audioBlob);
@@ -423,7 +452,6 @@ export default function LessonPage() {
 
         if (result) {
           assessmentEndTimeRef.current = markAttemptEnd();
-          console.log("result", result);
           setFeedbackData(result);
           saveTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId, {
             statusVariant: result.feedbackType === "exactMatch" ? "success" : "error",
@@ -478,7 +506,6 @@ export default function LessonPage() {
           // Play feedback TTS using ONLY lesson SSML
           if (result.feedbackType === "exactMatch") {
             setStatusVariant("success");
-            console.log(taskData?.feedback);
             const successSSML = (taskData?.feedback as any)?.tts_exactMatch_ssml;
 
             await playTTSManaged(successSSML || "", successSSML);
@@ -499,14 +526,6 @@ export default function LessonPage() {
             const improvementSSML =
               (taskData?.feedback as any)?.tts_closeMatch_ssml;
 
-            console.log("[LessonTTS] closeMatch feedback (lesson SSML only)", {
-              feedbackType: result.feedbackType,
-              taskFeedback: taskData?.feedback,
-              chosenSSMLPreview: improvementSSML
-                ? String(improvementSSML).substring(0, 120)
-                : null,
-            });
-
             await playTTSManaged(
               improvementSSML || "",
               improvementSSML
@@ -525,18 +544,23 @@ export default function LessonPage() {
             const incorrectSSML =
               (taskData?.feedback as any)?.tts_wrongSound_ssml;
 
-            console.log("[LessonTTS] wrongSound feedback (lesson SSML only)", {
-              feedbackType: result.feedbackType,
-              taskFeedback: taskData?.feedback,
-              chosenSSMLPreview: incorrectSSML
-                ? String(incorrectSSML).substring(0, 120)
-                : null,
-            });
-
             await playTTSManaged(incorrectSSML || "", incorrectSSML);
 
-            // Check retry logic
-            if (taskData && currentRetry + 1 >= (taskData.retryLimit || 3)) {
+            const limit = taskData?.retryLimit || 3;
+            const apiRetryCount = typeof result.retryCount === "number" ? result.retryCount : currentRetry + 1;
+            const terminalThisAttempt = apiRetryCount >= limit;
+
+            if (result.allowContinueToNextSubtask && terminalThisAttempt) {
+              setShowContinueAfterSkipOffer(true);
+              setCurrentRetry(Math.max(0, apiRetryCount - 1));
+              saveTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId, {
+                statusVariant: "error",
+                feedbackData: result,
+                currentRetry: Math.max(0, apiRetryCount - 1),
+                pendingReset: null,
+                showContinueAfterSkipOffer: true,
+              });
+            } else if (taskData && currentRetry + 1 >= limit) {
               saveTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId, {
                 statusVariant: "error",
                 feedbackData: result,
@@ -600,11 +624,19 @@ export default function LessonPage() {
 
   // Handle refresh (reset same letter)
   const handleRefresh = () => {
+    if (showContinueAfterSkipOffer) {
+      setIsMicActive(false);
+      setIsProcessing(false);
+      taskStartTimeRef.current = null;
+      assessmentEndTimeRef.current = null;
+      return;
+    }
     clearTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId);
     setStatusVariant("initial");
     setShowingFeedback(false);
     setFeedbackData(null);
     setPendingReset(null);
+    setShowContinueAfterSkipOffer(false);
     setCurrentRetry(0);
     setIsMicActive(false);
     setIsProcessing(false);
@@ -634,6 +666,7 @@ export default function LessonPage() {
   const handleContinue = async () => {
     if (!lessonId || !missionSequence || !currentLesson || isProcessing) return;
     setIsProcessing(true);
+    setShowContinueAfterSkipOffer(false);
 
     try {
       clearTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId);
@@ -775,7 +808,9 @@ export default function LessonPage() {
     taskData?.expectedResponse?.value ||
     taskData?.visual?.[0]?.word ||
     "S";
-  const visualImage = taskData?.visual?.[0]?.image;
+  const letterIllustration = letter ? getLetterIllustration(letter) : null;
+  const visualImage = letterIllustration?.cdnUrl || taskData?.visual?.[0]?.image;
+  const visualImageAlt = letterIllustration?.label || "";
   const isSuccess = statusVariant === "success";
 
   return (
@@ -794,7 +829,6 @@ export default function LessonPage() {
           <button
             onClick={async () => {
               await playTTSManaged(taskData.tts.text, taskData.tts.ssml || taskData.tts.text);
-              console.log('Manual TTS playback completed');
             }}
             disabled={isPlayingTTS}
             style={{
@@ -829,8 +863,8 @@ export default function LessonPage() {
           />
         )}
 
-        {/* VisualBox - Show image on error */}
-        {visualImage && (
+        {/* VisualBox - Always shown under the letter while practicing */}
+        {visualImage && !isSuccess && (
           <div
             style={{
               height: "140px",
@@ -839,13 +873,13 @@ export default function LessonPage() {
               justifyContent: "center"
             }}
           >
-            {(statusVariant === "error" || showingFeedback) && !isSuccess && (
-              <VisualBox
-                imageSrc={visualImage}
-                imageWidth={107}
-                imageHeight={107}
-              />
-            )}
+            <VisualBox
+              imageSrc={visualImage}
+              imageAlt={visualImageAlt}
+              imageWidth={107}
+              imageHeight={107}
+              tintToPlatform={Boolean(letterIllustration)}
+            />
           </div>
         )}
 
@@ -904,52 +938,65 @@ export default function LessonPage() {
               />
             </div>
           ) : (
-            <div className="flex items-center gap-8 justify-center">
-              {/* Refresh button for new try on error */}
-              {statusVariant === "error" && (
-                <button
-                  type="button"
-                  onClick={handleRefresh}
-                  className="flow-icon-btn-attention"
-                  style={{
-                    display: "flex",
-                    width: "70px",
-                    height: "70px",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    gap: "4px",
-                    borderRadius: "76.829px",
-                    border: "2px solid #F529F9",
-                    boxShadow: "0 0 0 1.602px #E451FE",
-                    background: "transparent",
-                    cursor: "pointer",
-                  }}
-                >
-                  <Image
-                    src="/assets/icons/others/refresh.svg"
-                    alt="Refresh"
-                    width={43.82}
-                    height={43.82}
-                  />
-                </button>
-              )}
+            <div className="flex flex-col items-center gap-6">
+              <div className="flex items-center gap-8 justify-center">
+                {statusVariant === "error" && !showContinueAfterSkipOffer && (
+                  <button
+                    type="button"
+                    onClick={handleRefresh}
+                    className="flow-icon-btn-attention"
+                    style={{
+                      display: "flex",
+                      width: "70px",
+                      height: "70px",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      gap: "4px",
+                      borderRadius: "76.829px",
+                      border: "2px solid #F529F9",
+                      boxShadow: "0 0 0 1.602px #E451FE",
+                      background: "transparent",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <Image
+                      src="/assets/icons/others/refresh.svg"
+                      alt="Refresh"
+                      width={43.82}
+                      height={43.82}
+                    />
+                  </button>
+                )}
 
-              <MicButton
-                icon={isMicActive ? "pause" : "mic"}
-                size={100}
-                onClick={handleMicClick}
-                disabled={isProcessing || isPlayingTTS}
-                className="flow-mic-btn-attention"
-              />
+                {showContinueAfterSkipOffer ? (
+                  <PrimaryButton
+                    text="Skip"
+                    size="medium"
+                    variant="filled"
+                    onClick={handleContinue}
+                    disabled={isProcessing || isPlayingTTS}
+                    className="flow-btn-attention"
+                  />
+                ) : (
+                  <MicButton
+                    icon={isMicActive ? "pause" : "mic"}
+                    size={100}
+                    onClick={handleMicClick}
+                    disabled={isProcessing || isPlayingTTS}
+                    className="flow-mic-btn-attention"
+                  />
+                )}
+              </div>
             </div>
           )}
         </div>
 
         {/* Retry counter */}
         {currentRetry > 0 && statusVariant !== "success" && (
-          <p style={{ marginTop: "16px", color: "#FFF", opacity: 0.7, fontSize: "14px" }}>
-            Attempt {currentRetry + 1} of {taskData.retryLimit || 3}
-          </p>
+          <TaskAttemptFraction
+            attemptCurrent={currentRetry + 1}
+            attemptLimit={taskData.retryLimit || 3}
+          />
         )}
       </div>
 
