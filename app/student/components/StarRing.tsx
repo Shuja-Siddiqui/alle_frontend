@@ -5,6 +5,12 @@ import Image from "next/image";
 import { Fragment } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 
+export type SoundRingSlot = {
+    label: string;
+    /** `passed` = cleared (pink), `failed` = red */
+    status: "passed" | "failed";
+};
+
 type StarRingProps = {
     className?: string;
     /** Selected circle number (1-based). */
@@ -17,6 +23,11 @@ type StarRingProps = {
     progressLabel?: string;
     /** Optional sound labels displayed outside each circle slot */
     soundLabels?: string[];
+    /**
+     * When set to a 45-length array, each dot/label uses pass (pink) vs fail (red).
+     * Legacy `selectedCircle` fill (green) is used only when this is omitted.
+     */
+    slots?: Array<SoundRingSlot | null>;
 };
 
 export function StarRing({ 
@@ -26,6 +37,7 @@ export function StarRing({
     onCircleClick,
     progressLabel,
     soundLabels = [],
+    slots,
 }: StarRingProps) {
     const containerSize = 424.667;
     const radius = containerSize / 2; // 204.5px
@@ -34,6 +46,8 @@ export function StarRing({
     const numCircles = 45;
     const smallCircleSize = 17.898; // Size of each small circle
     const labelRadiusOffset = 22;
+    const useSlotOutcomes =
+        Array.isArray(slots) && slots.length === numCircles;
     
     const effectiveInitialValue = initialValue ?? 0;
     const reduceMotion = useReducedMotion();
@@ -94,9 +108,40 @@ export function StarRing({
                 {circlePositions.map((pos, index) => {
                     const circleNumber = index + 1; // 1-based numbering
                     const isSelected = selectedCircle !== null && circleNumber <= selectedCircle;
-                    const label = soundLabels[index] ? String(soundLabels[index]).toUpperCase() : "";
+                    const slot = useSlotOutcomes ? slots?.[index] ?? null : null;
+                    const labelFromSlot = slot?.label?.trim() ?? "";
+                    const labelFromLegacy = soundLabels[index] ? String(soundLabels[index]).toUpperCase() : "";
+                    const label = labelFromSlot || labelFromLegacy;
                     const labelX = Math.round((centerX + (radius + labelRadiusOffset) * Math.cos(pos.angle)) * 100) / 100;
                     const labelY = Math.round((centerY + (radius + labelRadiusOffset) * Math.sin(pos.angle)) * 100) / 100;
+
+                    let circleBg = "#FFFFFF";
+                    let circleFilter = "none";
+                    if (useSlotOutcomes && slot) {
+                        if (slot.status === "failed") {
+                            circleBg = "#EF4444";
+                            circleFilter = "drop-shadow(0 0 3px rgba(239, 68, 68, 0.85))";
+                        } else {
+                            circleBg = "#E451FE";
+                            circleFilter = "drop-shadow(0 0 3px rgba(228, 81, 254, 0.75))";
+                        }
+                    } else if (!useSlotOutcomes && isSelected) {
+                        circleBg = "#75FF1A";
+                        circleFilter = "drop-shadow(0 0 2.258px #98FF55)";
+                    }
+
+                    const labelColor =
+                        useSlotOutcomes && slot
+                            ? slot.status === "failed"
+                                ? "#F87171"
+                                : "#F9A8FF"
+                            : "#E451FE";
+                    const labelShadow =
+                        useSlotOutcomes && slot
+                            ? slot.status === "failed"
+                                ? "0 0 6px rgba(248, 113, 113, 0.65)"
+                                : "0 0 6px rgba(228, 81, 254, 0.55)"
+                            : "0 0 6px rgba(228, 81, 254, 0.55)";
 
                     return (
                         <Fragment key={index}>
@@ -108,8 +153,8 @@ export function StarRing({
                                     height: `${smallCircleSize}px`,
                                     left: `${pos.x.toFixed(2)}px`,
                                     top: `${pos.y.toFixed(2)}px`,
-                                    backgroundColor: isSelected ? "#75FF1A" : "#FFFFFF",
-                                    filter: isSelected ? "drop-shadow(0 0 2.258px #98FF55)" : "none",
+                                    backgroundColor: circleBg,
+                                    filter: circleFilter,
                                     transform: "translate(-50%, -50%)",
                                     cursor: onCircleClick ? "pointer" : "default",
                                 }}
@@ -121,14 +166,14 @@ export function StarRing({
                                         left: `${labelX.toFixed(2)}px`,
                                         top: `${labelY.toFixed(2)}px`,
                                         transform: "translate(-50%, -50%)",
-                                        color: "#E451FE",
+                                        color: labelColor,
                                         fontFamily: "var(--font-orbitron), system-ui, sans-serif",
                                         fontSize: "11px",
                                         fontWeight: 700,
                                         lineHeight: 1,
                                         letterSpacing: "0.6px",
                                         textTransform: "uppercase",
-                                        textShadow: "0 0 6px rgba(228, 81, 254, 0.55)",
+                                        textShadow: labelShadow,
                                         pointerEvents: "none",
                                     }}
                                     animate={reduceMotion ? undefined : { rotate: -360 }}

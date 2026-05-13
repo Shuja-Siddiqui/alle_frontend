@@ -8,6 +8,7 @@ import { StatusBox } from "../lesson/components/StatusBox";
 import { MicButton } from "../lesson/components/MicButton";
 import { PrimaryButton } from "../../../components/PrimaryButton";
 import { LevelOverlay } from "../components/LevelOverlay";
+import { TaskAttemptFraction } from "../components/TaskAttemptFraction";
 import { useLevelOverlay } from "../contexts/LevelOverlayContext";
 import { useTTS } from "../../../hooks/useTTS";
 import { useSpeechAssessment } from "../../../hooks/useSpeechAssessment";
@@ -19,7 +20,7 @@ import { getNextLessonStep, PAGE_BY_TASK_TYPE, resolveTaskIndex } from "../../..
 import { getTaskStartTimeIso, markAttemptStart } from "../../../lib/attempt-timing";
 import {
   clearTaskOutcomeState,
-  loadTaskOutcomeState,
+  loadStudentTaskUiSnapshot,
   saveTaskOutcomeState,
 } from "../../../lib/taskOutcomeState";
 import { devMockSyncWordCorrect } from "../../../lib/dev-mock-checkpoint-sync";
@@ -69,6 +70,13 @@ function wordProgressEntryCorrect(wordProgress: Record<string, unknown>, word: s
   return hit?.correct === true;
 }
 
+function unwrapAssessmentPayload(response: unknown): Record<string, unknown> {
+  const r = response as Record<string, unknown>;
+  const inner = r?.data as Record<string, unknown> | undefined;
+  if (inner && typeof inner === "object" && "feedbackType" in inner) return inner;
+  return (inner?.data ?? inner ?? r) as Record<string, unknown>;
+}
+
 export default function WordPage() {
   const { isOverlayOpen, setOverlayOpen } = useLevelOverlay();
   const searchParams = useSearchParams();
@@ -94,6 +102,7 @@ export default function WordPage() {
     taskId: string;
     taskType: string;
   } | null>(null);
+  const [showContinueAfterSkipOffer, setShowContinueAfterSkipOffer] = useState(false);
   const taskStartTimeRef = useRef<number | null>(null);
   const taskStateKeyPage = "word";
 
@@ -159,12 +168,29 @@ export default function WordPage() {
         setTaskData(data);
         setCurrentRetry(data.currentRetries || 0);
 
+        const snap = loadStudentTaskUiSnapshot<any>(
+          taskStateKeyPage,
+          lessonId,
+          missionSequence,
+          taskId
+        );
+        if (snap?.showContinueAfterSkipOffer) {
+          setShowContinueAfterSkipOffer(true);
+          setStatusVariant("error");
+          setCurrentRetry(snap.currentRetry);
+        } else if (snap && (snap.statusVariant === "success" || snap.statusVariant === "error")) {
+          setStatusVariant(snap.statusVariant);
+          setCurrentRetry(snap.currentRetry);
+          setFeedbackData(snap.feedbackData ?? null);
+          setPendingReset(snap.pendingReset);
+          setShowContinueAfterSkipOffer(snap.showContinueAfterSkipOffer);
+        }
+
         // Auto-play instruction TTS after a brief delay
         if (data.tts && (data.tts.text || data.tts.ssml)) {
           setTimeout(async () => {
             try {
               await playTTSWithSSML(data.tts.text, data.tts.ssml || data.tts.text);
-              console.log('[Word Page] TTS playback completed');
             } catch (error) {
               console.error('[Word Page] TTS playback failed:', error);
             }
@@ -181,17 +207,21 @@ export default function WordPage() {
   }, [lessonId, missionSequence, taskId, playTTSWithSSML]);
 
   useEffect(() => {
-    const stored = loadTaskOutcomeState<any>(
+    const snap = loadStudentTaskUiSnapshot<any>(
       taskStateKeyPage,
       lessonId,
       missionSequence,
       taskId
     );
-    if (!stored) return;
-    setStatusVariant(stored.statusVariant);
-    setFeedbackData(stored.feedbackData ?? null);
-    setCurrentRetry(stored.currentRetry ?? 0);
-    setPendingReset(stored.pendingReset ?? null);
+    if (!snap) {
+      setShowContinueAfterSkipOffer(false);
+      return;
+    }
+    setStatusVariant(snap.statusVariant);
+    setFeedbackData(snap.feedbackData ?? null);
+    setCurrentRetry(snap.currentRetry);
+    setPendingReset(snap.pendingReset);
+    setShowContinueAfterSkipOffer(snap.showContinueAfterSkipOffer);
     setIsMicActive(false);
     setIsProcessing(false);
     setShowingFeedback(false);
@@ -200,7 +230,7 @@ export default function WordPage() {
   // Handle mic button click
   const handleMicClick = async () => {
     // Prevent starting a new recording while agent TTS is playing
-    if (isProcessing || (!isMicActive && isPlaying)) return;
+    if (isProcessing || (!isMicActive && isPlaying) || showContinueAfterSkipOffer) return;
 
     const newMicState = !isMicActive;
     setIsMicActive(newMicState);
@@ -273,13 +303,18 @@ export default function WordPage() {
             }
           );
 
-          const result = response.data;
+          const result = unwrapAssessmentPayload(response);
           setFeedbackData(result);
 
           if (result.lessonResetToStart) {
-            const restartMission = Number(result?.restartAt?.missionSequence ?? 1);
-            const restartTaskId = String(result?.restartAt?.taskId ?? "1");
-            const restartTaskType = String(result?.restartAt?.taskType ?? "alphabet_practice");
+            const restartAt = result.restartAt as {
+              missionSequence?: number;
+              taskId?: string;
+              taskType?: string;
+            } | undefined;
+            const restartMission = Number(restartAt?.missionSequence ?? 1);
+            const restartTaskId = String(restartAt?.taskId ?? "1");
+            const restartTaskType = String(restartAt?.taskType ?? "alphabet_practice");
             const currentMission = currentLesson?.missions?.find(
               (m: any) => (m.mission_sequence ?? m.missionSequence) === parseInt(missionSequence || "0", 10)
             );
@@ -308,8 +343,9 @@ export default function WordPage() {
               },
             });
 
-            if (result?.feedback?.text || result?.feedback?.ssml) {
-              await playTTSWithSSML(result.feedback.text || "", result.feedback.ssml);
+            const resetFb = result.feedback as { text?: string; ssml?: string } | undefined;
+            if (resetFb?.text || resetFb?.ssml) {
+              await playTTSWithSSML(resetFb.text || "", resetFb.ssml);
             }
             await playTTSWithSSML(
               resetMessage,
@@ -353,8 +389,22 @@ export default function WordPage() {
               taskData.feedback?.tts_incorrectFeedback_ssml;
             await playTTSWithSSML(incorrectSSML || "", incorrectSSML);
 
-            // Check retry logic
-            if (currentRetry + 1 >= (taskData.retryLimit || 3)) {
+            const limit = taskData.retryLimit || 3;
+            const apiRetryCount =
+              typeof result.retryCount === "number" ? result.retryCount : currentRetry + 1;
+            const terminalThisAttempt = apiRetryCount >= limit;
+
+            if (result.allowContinueToNextSubtask && terminalThisAttempt) {
+              setShowContinueAfterSkipOffer(true);
+              setCurrentRetry(Math.max(0, apiRetryCount - 1));
+              saveTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId, {
+                statusVariant: "error",
+                feedbackData: result,
+                currentRetry: Math.max(0, apiRetryCount - 1),
+                pendingReset: null,
+                showContinueAfterSkipOffer: true,
+              });
+            } else if (currentRetry + 1 >= limit) {
               saveTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId, {
                 statusVariant: "error",
                 feedbackData: result,
@@ -542,6 +592,7 @@ export default function WordPage() {
   const handleContinue = async () => {
     if (!lessonId || !missionSequence || !taskId || isProcessing) return;
     setIsProcessing(true);
+    setShowContinueAfterSkipOffer(false);
 
     try {
       clearTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId);
@@ -636,12 +687,19 @@ export default function WordPage() {
   };
 
   const handleRefresh = () => {
+    if (showContinueAfterSkipOffer) {
+      setIsMicActive(false);
+      setIsProcessing(false);
+      return;
+    }
     clearTaskOutcomeState(taskStateKeyPage, lessonId, missionSequence, taskId);
     setStatusVariant("initial");
     setIsMicActive(false);
     setShowingFeedback(false);
     setFeedbackData(null);
     setPendingReset(null);
+    setShowContinueAfterSkipOffer(false);
+    setCurrentRetry(0);
   };
 
   const handleTryAgain = () => {
@@ -661,7 +719,9 @@ export default function WordPage() {
     "";
   const wordImage = taskData?.visual?.[0]?.image;
   const isSuccess = statusVariant === "success";
-  const canContinue = !isTaskLoading && (isSuccess || feedbackData?.taskComplete === true);
+  const canContinueAfterSuccess =
+    !isTaskLoading && (isSuccess || feedbackData?.taskComplete === true);
+  const showSkipContinueCTA = !isTaskLoading && showContinueAfterSkipOffer;
 
   // Helper to convert blob to base64
   const blobToBase64 = (blob: Blob): Promise<string> => {
@@ -694,7 +754,6 @@ export default function WordPage() {
               setIsPlayingTTS(true);
               try {
                 await playTTSWithSSML(taskData.tts.text, taskData.tts.ssml || taskData.tts.text);
-                console.log('Manual TTS playback completed');
               } catch (error) {
                 console.error('Manual TTS playback failed:', error);
               } finally {
@@ -756,7 +815,7 @@ export default function WordPage() {
                 className="flow-btn-attention"
               />
             </div>
-          ) : canContinue ? (
+          ) : canContinueAfterSuccess ? (
             <div className="flex items-center gap-8">
               {/* Refresh Button */}
               <button
@@ -795,22 +854,63 @@ export default function WordPage() {
                 className="flow-btn-attention"
               />
             </div>
+          ) : showSkipContinueCTA ? (
+            <div className="flex flex-col items-center gap-6">
+              <PrimaryButton
+                text="Skip"
+                size="medium"
+                variant="filled"
+                onClick={handleContinue}
+                disabled={isProcessing || isPlaying || isTaskLoading}
+                className="flow-btn-attention"
+              />
+            </div>
           ) : (
-            <MicButton
-              icon={isMicActive ? "pause" : "mic"}
-              size={100}
-              onClick={handleMicClick}
-              disabled={isProcessing || isPlaying || isTaskLoading}
-              className="flow-mic-btn-attention"
-            />
+            <div className="flex flex-col items-center gap-6">
+              <div className="flex items-center gap-8 justify-center">
+                {statusVariant === "error" && (
+                  <button
+                    type="button"
+                    onClick={handleRefresh}
+                    className="flow-icon-btn-attention"
+                    style={{
+                      display: "flex",
+                      width: "70px",
+                      height: "70px",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      gap: "4px",
+                      borderRadius: "76.829px",
+                      border: "2px solid #F529F9",
+                      boxShadow: "0 0 0 1.602px #E451FE",
+                      background: "transparent",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <Image
+                      src="/assets/icons/others/refresh.svg"
+                      alt="Refresh"
+                      width={43.82}
+                      height={43.82}
+                    />
+                  </button>
+                )}
+                <MicButton
+                  icon={isMicActive ? "pause" : "mic"}
+                  size={100}
+                  onClick={handleMicClick}
+                  disabled={isProcessing || isPlaying || isTaskLoading}
+                  className="flow-mic-btn-attention"
+                />
+              </div>
+            </div>
           )}
         </div>
-
-        {/* Retry counter */}
         {currentRetry > 0 && statusVariant !== "success" && (
-          <p style={{ marginTop: "16px", color: "#FFF", opacity: 0.7, fontSize: "14px" }}>
-            Attempt {currentRetry + 1} of {taskData?.retryLimit ?? 3}
-          </p>
+          <TaskAttemptFraction
+            attemptCurrent={currentRetry + 1}
+            attemptLimit={taskData?.retryLimit ?? 3}
+          />
         )}
       </div>
 

@@ -100,7 +100,9 @@ export function useTTS() {
 
         const voice = options.voice || getVoice();
         const lang = options.lang || "en-US";
-        const isSSML = options.useSSML ?? normalizedText.startsWith("<speak");
+        const isSSML =
+          options.useSSML ??
+          /^\s*<speak\b/i.test(text.trim());
 
         // Call TTS API (use fetch directly for blob response)
         const API_BASE_URL =
@@ -119,7 +121,7 @@ export function useTTS() {
             "Content-Type": "application/json",
             ...(token && { Authorization: `Bearer ${token}` }),
           },
-          body: JSON.stringify({ text: normalizedText, voice, lang }),
+          body: JSON.stringify({ text, voice, lang, isSSML }),
         })
           .then(async (response) => {
             console.log("[LessonTTS] Response status", response.status, response.statusText);
@@ -280,16 +282,10 @@ export function useTTS() {
       options: TTSOptions = {}
     ): Promise<void> => {
       // Prefer SSML if available
-      const normalizedText = normalizeSpeakableInput(text);
-      const normalizedSSML = normalizeSpeakableInput(ssmlText);
-      const textToUse = normalizedSSML || normalizedText;
-      if (!textToUse) {
-        // Shared guard: surface a friendly message when no instruction content exists.
-        showInfoRef.current?.("No instructions available to read.");
-        return Promise.resolve();
-      }
-      const useSSML = normalizedSSML.startsWith("<speak");
-      const key = textToUse;
+      const textToUse = ssmlText && ssmlText.trim() ? ssmlText : text;
+      const useSSML =
+        !!ssmlText && /^\s*<speak\b/i.test(ssmlText.trim());
+      const key = textToUse.trim();
 
       // If we already have audio for this exact text/SSML, just replay it
       if (lastKeyRef.current === key && audioRef.current) {
